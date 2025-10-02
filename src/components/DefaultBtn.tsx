@@ -18,6 +18,21 @@ const buttonStyle = tv({
   },
 });
 
+/* 
+DefaultBtn은 호출 시 size, text, highLight를 인자로 받습니다
+1. size: "sm" | "md" | "lg" 
+    "sm": 댓글 등록, 메시지 답장 등
+    "md": 사이드바 로그인/회원가입, 영화 트레일러 바로가기, 좋아요 등
+    "lg": 로그인, 회원가입 등
+2. text: string
+    버튼에 들어갈 텍스트
+3. highLight: boolean
+    true: 메인 컬러가 들어간 버튼
+    false: 컬러 X 버튼
+
+사용 예시: <DefaultBtn size="md" text="회원가입" highlight={true} />
+*/
+
 export default function DefaultBtn({
   size,
   text,
