@@ -1,9 +1,11 @@
-export default function App() {
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+
+export default function App () {
   return (
-    <>
-      <div className="bg-background-sub p-4">
-        <p className="text-main">메인 텍스트</p>
-      </div>
-    </>
+    <div className="relative w-full mx-auto h-[1080px] bg-white">
+      <Header />
+      <Sidebar />
+    </div>
   );
 }
