@@ -13,7 +13,7 @@
   /* 기본 테마(라이트 모드) 색상 정의 */
   --color-background-main: #ffffff;
   --color-background-sub: #fafafa;
-  --color-text-main: #f65050;
+  --color-text-main: #111827;
   --color-text-sub: #6b7280;
   --color-text-light: #9ca3af;
   --color-text-placeholder: #d1d5db;
@@ -26,5 +26,5 @@
   --color-text-main: #f9fafb;
   --color-text-sub: #d1d5db;
   --color-text-light: #6b7280;
-  --color-text-placeholder: #d1d5db;
+  --color-text-placeholder: #374151;
 }
