@@ -1,12 +1,5 @@
-import MoviesRendering from "./components/MoviesRendering";
+import DefaultLayout from "./layouts/DefaultLayout";
 
 export default function App() {
-  return (
-    <>
-      <div className="bg-background-sub p-4">
-        <p className="text-main">메인 텍스트</p>
-      </div>
-      <MoviesRendering variant="home" limit={2} />
-    </>
-  );
+  return <DefaultLayout></DefaultLayout>;
 }
