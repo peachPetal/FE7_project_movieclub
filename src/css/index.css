@@ -1,5 +1,13 @@
-@import "./tailwind.css";
 
-.review-item {
+@import "tailwindcss";
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-variable.css');
+
+@layer base {
+  body {
+    font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+  }
+  
+  .review-item {
   margin-right: 20px;
+}
 }

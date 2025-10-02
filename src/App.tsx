@@ -1,11 +1,8 @@
-import ReviewList from "./components/reviews/ReviewList";
+import DefaultLayout from './layouts/DefaultLayout';
 
 export default function App() {
   return (
-    <>
-      <div>
-        <ReviewList />
-      </div>
-    </>
+    <DefaultLayout>
+    </DefaultLayout>
   );
 }
