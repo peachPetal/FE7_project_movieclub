@@ -1,1 +1,5 @@
 @import "./tailwind.css";
+
+.review-item {
+  margin-right: 20px;
+}

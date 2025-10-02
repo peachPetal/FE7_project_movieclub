@@ -1,8 +1,10 @@
+import ReviewList from "./components/reviews/ReviewList";
+
 export default function App() {
   return (
     <>
-      <div className="bg-background-sub p-4">
-        <p className="text-main">메인 텍스트</p>
+      <div>
+        <ReviewList />
       </div>
     </>
   );
