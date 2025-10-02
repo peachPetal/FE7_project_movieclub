@@ -1,8 +1,5 @@
-import DefaultLayout from './layouts/DefaultLayout';
+import DefaultLayout from "./layouts/DefaultLayout";
 
 export default function App() {
-  return (
-    <DefaultLayout>
-    </DefaultLayout>
-  );
+  return <DefaultLayout></DefaultLayout>;
 }
