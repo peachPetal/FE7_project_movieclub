@@ -13,7 +13,7 @@ function MoviesRendering({ variant = "page", limit }: Props) {
   // 컴포넌트가 마운트될 때 영화 데이터를 가져옴
   useEffect(() => {
     fetchMovies(variant === "home" ? limit : undefined);
-  }, [fetchMovies, limit]);
+  }, [fetchMovies, limit, variant]);
 
   // 로딩동안 빈 카드 틀 표시
   if (isLoading) {
