@@ -1,62 +1,73 @@
-# FE7_project_movieclub
-FE7 2차 2팀 프로젝트 "Movie Club"
+# React + TypeScript + Vite
 
-영화 정보 조회와 리뷰 공유, 댓글·좋아요·메시지 등 소셜 기능을 갖춘 영화 커뮤니티 플랫폼
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🚀 기술 스택
-- React, React Router
-- TypeScript
-- Tailwind CSS
-- Supabase
+Currently, two official plugins are available:
 
-## 📂 프로젝트 구조
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-root/
-├── public/
-├── src/
-│   ├── components/
-│   │   ├─ loading/
-│   │   ├─ routes/
-│   ├── layouts/
-│   │   ├─ Default.tsx
-│   ├── css/
-│   │   ├─ index.css
-│   │   ├─ tailwind.css
-│   ├── types/
-│   ├── utils/
-│   │   ├─ supabase.ts
-│   ├── stores/
-│   │   ├─ authStore.ts
-│   ├── pages/
-│   │   ├─ auth/
 
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-
-
-## 🌱 브랜치 네이밍 규칙
-| 브랜치 타입 | 네이밍 규칙            | 예시                        | 설명                  |
-|-------------|------------------------|-----------------------------|-----------------------|
-| 기능 개발   | `feature/<기능명>`     | `feature/login`             | 새로운 기능 개발      |
-| 버그 수정   | `fix/<이슈번호>-<설명>`| `fix/123-todo-delete-error` | 버그 수정             |
-| 리팩토링    | `refactor/<설명>`      | `refactor/auth-flow`        | 코드 구조/성능 개선   |
-| 배포        | `develop`       | `develop`            | 기능 통합      |
-
-## 🎨 Gitmoji
-| 이모지  | 코드        | 설명                                | 예시 커밋 메시지                  |
-|---------|-------------|-------------------------------------|-----------------------------------|
-| ✨      | `:sparkles:`| 새로운 기능 추가                     | `✨ feat: 로그인 기능 추가`         |
-| 🐛      | `:bug:`     | 버그 수정                           | `🐛 fix: 리뷰 삭제 안되던 문제 수정` |
-| ♻️      | `:recycle:` | 코드 리팩토링                       | `♻️ refactor: auth 로직 정리`       |
-| 📝      | `:memo:`    | 문서 추가/수정                      | `📝 docs: README 브랜치 규칙 추가`  |
-| 🎨      | `:art:`     | 코드 포맷/스타일 개선 (기능 변경X)   | `🎨 style: 변수명 카멜케이스로 수정`        |
-| ✅      | `:white_check_mark:`| 테스트 추가/수정            | `✅ test: 유저 로그인 테스트 추가`  |
-| 🔧      | `:wrench:`  | 설정 파일 수정                      | `🔧 config: ESLint 설정 업데이트`   |
-| 🔥      | `:fire:`    | 코드/파일 삭제                      | `🔥 remove: 불필요한 mock 데이터 제거` |
-| 📦      | `:package:` | 패키지 추가/업데이트                | `📦 build: supabase-js 버전 업그레이드` |
-| 🚧      | `:construction:` | 작업 진행 중 (WIP)             | `🚧 wip: 소셜 로그인 기능 구현 중`  |
-
-
-## 📝 주요 기능
-- 🔐 Supabase Auth (회원가입/로그인/로그아웃)
-- 📄 Supabase Database 연동 (CRUD)
-- 🗂️ 파일 업로드 (Storage)
