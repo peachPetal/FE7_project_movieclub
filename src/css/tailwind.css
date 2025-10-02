@@ -6,6 +6,7 @@
 @theme {
   /* 공통 색상 정의 */
   --color-main: #9858f3;
+  --color-main-10: #9858f31a;
   --color-alert: #f65050;
   --color-alert-online: #59d22d;
   --color-alert-friend: #ffd900;
