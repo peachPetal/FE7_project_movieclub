@@ -1,7 +1,9 @@
-export default function App () {
+export default function App() {
   return (
     <>
-      <h1>App Component</h1>
+      <div className="bg-background-sub p-4">
+        <p className="text-main">메인 텍스트</p>
+      </div>
     </>
   );
 }
