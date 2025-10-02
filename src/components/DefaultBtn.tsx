@@ -1,7 +1,7 @@
 import { tv } from "tailwind-variants/lite";
 
 const buttonStyle = tv({
-  base: "rounded-[10px] flex justify-center items-center font-bold",
+  base: "rounded-[10px] flex justify-center items-center font-bold duration-200",
   variants: {
     size: {
       sm: "w-[100px] h-[45px] text-xs",
@@ -9,8 +9,9 @@ const buttonStyle = tv({
       lg: "w-[470px] h-[55px] text-[16px]",
     },
     highlight: {
-      true: "bg-main text-white",
-      false: "border bg-background-main text-main",
+      true: "bg-main text-white hover:opacity-90 transition-opacity",
+      false:
+        "border bg-background-main text-main hover:bg-main-10 transition-colors",
     },
     defaultVariants: {
       size: "lg",
@@ -45,7 +46,9 @@ export default function DefaultBtn({
   return (
     <>
       <div className={buttonStyle({ size: size, highlight: highlight })}>
-        <a href="">{text}</a>
+        <a href="" className="w-full h-full flex justify-center items-center">
+          <span>{text}</span>
+        </a>
       </div>
     </>
   );
