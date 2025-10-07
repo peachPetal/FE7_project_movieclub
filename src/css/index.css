@@ -8,3 +8,12 @@ body {
 .review-item {
   margin-right: 20px;
 }
+
+.sosical-btn {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.sosical-btn:last-of-type {
+  margin-bottom: 0;
+}
