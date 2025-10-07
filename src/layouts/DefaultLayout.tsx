@@ -1,6 +1,5 @@
 import Header from "../components/Header";
 import HomeContent from "../components/homeContent";
-import Sidebar from "../components/Sidebar";
 
 export default function DefaultLayout() {
   return (

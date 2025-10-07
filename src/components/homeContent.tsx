@@ -1,5 +1,5 @@
-import React from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from "./Sidebar";
+import SocialBtn from "./buttons/SocialBtn";
 
 export default function HomeContent() {
   return (
@@ -13,6 +13,9 @@ export default function HomeContent() {
           <div className="bg-white p-4 rounded-lg shadow">Content Card 1</div>
           <div className="bg-white p-4 rounded-lg shadow">Content Card 2</div>
           <div className="bg-white p-4 rounded-lg shadow">Content Card 3</div>
+          <SocialBtn socialType="google" />
+          <SocialBtn socialType="kakao" />
+          <SocialBtn socialType="github" />
         </div>
       </main>
     </div>
