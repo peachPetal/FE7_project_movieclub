@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import notificationsIcon from '../assets/notifications.svg';
-import profileIcon from '../assets/person.svg';
-import friendsIcon from '../assets/person-circle-black.svg';
-import settingIcon from '../assets/setting.svg';
-import logoutIcon from '../assets/logout.svg';
+import notificationsIcon from "../assets/notifications.svg";
+import profileIcon from "../assets/person.svg";
+import friendsIcon from "../assets/person-circle-black.svg";
+import settingIcon from "../assets/setting.svg";
+import logoutIcon from "../assets/logout.svg";
 import accountIcon from "../assets/person-circle-white.svg";
 
 export default function Sidebar() {
@@ -16,31 +16,32 @@ export default function Sidebar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const friendsData = [
-    { id: 1, name: 'Friend 1', status: 'online' as const },
-    { id: 2, name: 'Friend 2', status: 'offline' as const },
-    { id: 3, name: 'Friend 3', status: 'offline' as const },
+    { id: 1, name: "Friend 1", status: "online" as const },
+    { id: 2, name: "Friend 2", status: "offline" as const },
+    { id: 3, name: "Friend 3", status: "offline" as const },
   ];
 
   const handleToggleCollapse = () => setIsCollapsed(!isCollapsed);
-  const handleToggleFriendsMenu = () => setIsFriendsMenuOpen(!isFriendsMenuOpen);
+  const handleToggleFriendsMenu = () =>
+    setIsFriendsMenuOpen(!isFriendsMenuOpen);
 
   const navigate = useNavigate();
 
-    const handleLoginClick = () => {
-    navigate('/loginPage');
+  const handleLoginClick = () => {
+    navigate("/loginPage");
   };
 
   return (
     <aside
       className={`
         w-[290px] bg-[#FAFAFA] shadow-lg rounded-[10px] font-pretendard flex flex-col
-        transition-all duration-300 ease-in-out
+        transition-all duration-300 ease-in-out ml-[50px]
       `}
     >
       {/* 상단 영역 */}
       <div
         className={`flex h-[110px] items-center p-4 bg-[#9858F3] text-white relative ${
-          isCollapsed ? 'rounded-[10px]' : 'rounded-t-[10px]'
+          isCollapsed ? "rounded-[10px]" : "rounded-t-[10px]"
         }`}
       >
         <div className="relative mr-4">
@@ -59,7 +60,7 @@ export default function Sidebar() {
         <button
           onClick={handleToggleCollapse}
           className="absolute top-4 right-4 p-1 text-white rounded-full hover:bg-white/20 transition-colors"
-          aria-label={isCollapsed ? '펼치기' : '접기'}
+          aria-label={isCollapsed ? "펼치기" : "접기"}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -68,10 +69,14 @@ export default function Sidebar() {
             strokeWidth={1.5}
             stroke="currentColor"
             className={`w-6 h-6 transition-transform duration-300 ease-in-out ${
-              isCollapsed ? '-rotate-180' : ''
+              isCollapsed ? "-rotate-180" : ""
             }`}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m4.5 15.75 7.5-7.5 7.5 7.5"
+            />
           </svg>
         </button>
       </div>
@@ -84,8 +89,15 @@ export default function Sidebar() {
               {/* 상단 메뉴 */}
               <ul className="space-y-1">
                 <li>
-                  <a href="#" className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200">
-                    <img src={notificationsIcon} alt="Notifications" className="w-6 h-6 mr-3" />
+                  <a
+                    href="#"
+                    className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+                  >
+                    <img
+                      src={notificationsIcon}
+                      alt="Notifications"
+                      className="w-6 h-6 mr-3"
+                    />
                     Notifications
                   </a>
                 </li>
@@ -96,7 +108,11 @@ export default function Sidebar() {
                     className="flex w-full items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200"
                     aria-expanded={isFriendsMenuOpen}
                   >
-                    <img src={friendsIcon} alt="Friends" className="w-6 h-6 mr-3" />
+                    <img
+                      src={friendsIcon}
+                      alt="Friends"
+                      className="w-6 h-6 mr-3"
+                    />
                     <span>Friends</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -105,27 +121,40 @@ export default function Sidebar() {
                       strokeWidth={2}
                       stroke="currentColor"
                       className={`w-4 h-4 ml-auto transition-transform duration-300 ${
-                        isFriendsMenuOpen ? '' : '-rotate-180'
+                        isFriendsMenuOpen ? "" : "-rotate-180"
                       }`}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                      />
                     </svg>
                   </button>
 
                   <div
                     className={`overflow-hidden transition-all duration-300 ${
-                      isFriendsMenuOpen ? 'max-h-96' : 'max-h-0'
+                      isFriendsMenuOpen ? "max-h-96" : "max-h-0"
                     }`}
                   >
                     <ul className="space-y-1 pl-6 pt-1">
                       {friendsData.map((friend) => (
                         <li key={friend.id}>
-                          <a href="#" className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200">
+                          <a
+                            href="#"
+                            className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+                          >
                             <div className="relative mr-3">
-                              <img src={friendsIcon} alt={friend.name} className="h-8 w-8" />
+                              <img
+                                src={friendsIcon}
+                                alt={friend.name}
+                                className="h-8 w-8"
+                              />
                               <span
                                 className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border-2 border-white ${
-                                  friend.status === 'online' ? 'bg-green-500' : 'bg-black'
+                                  friend.status === "online"
+                                    ? "bg-green-500"
+                                    : "bg-black"
                                 }`}
                               />
                             </div>
@@ -142,20 +171,41 @@ export default function Sidebar() {
               <div className="mt-auto border-t border-gray-200 pt-4">
                 <ul className="space-y-1">
                   <li>
-                    <a href="#" className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200">
-                      <img src={profileIcon} alt="Profile" className="w-6 h-6 mr-3" />
+                    <a
+                      href="#"
+                      className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+                    >
+                      <img
+                        src={profileIcon}
+                        alt="Profile"
+                        className="w-6 h-6 mr-3"
+                      />
                       Profile
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200">
-                      <img src={settingIcon} alt="Settings" className="w-6 h-6 mr-3" />
+                    <a
+                      href="#"
+                      className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+                    >
+                      <img
+                        src={settingIcon}
+                        alt="Settings"
+                        className="w-6 h-6 mr-3"
+                      />
                       Settings
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200">
-                      <img src={logoutIcon} alt="Logout" className="w-6 h-6 mr-3" />
+                    <a
+                      href="#"
+                      className="flex items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+                    >
+                      <img
+                        src={logoutIcon}
+                        alt="Logout"
+                        className="w-6 h-6 mr-3"
+                      />
                       Logout
                     </a>
                   </li>
