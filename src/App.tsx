@@ -13,15 +13,15 @@ export default function App() {
   return (
     <Routes>
       <Route element={<DefaultLayout />}>
-        {" "}
+        {" "} 
         <Route path="/" element={<HomeContent />} />
         <Route path="/loginPage" element={<LoginPage />} />
-        <Route path="/error" element={<Error />} />
         <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/reviews/:id" element={<ReviewsDetail />} />
         <Route path="/movies" element={<MoviesPage />} />
         <Route path="/movies/:id" element={<MoviesDetail />} />
       </Route>
+        <Route path="/error" element={<Error />} />
     </Routes>
   );
 }
