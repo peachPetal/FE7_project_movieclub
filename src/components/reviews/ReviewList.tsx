@@ -2,10 +2,10 @@ import { useReviewStore } from "../../stores/reviewStore";
 import ReviewsRendering from "./ReviewsRendering";
 
 export default function ReviewList() {
-  const { reviews } = useReviewStore();
+  const { reviewsData } = useReviewStore();
   return (
     <>
-      <ReviewsRendering data={reviews} />
+      <ReviewsRendering data={reviewsData} hasImage={true} />
     </>
   );
 }
