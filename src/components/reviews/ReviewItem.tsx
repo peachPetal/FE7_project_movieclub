@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
+import TimeAgo from "../TimeAgo";
 
 export default function ReviewItem({
   data,
@@ -57,10 +58,10 @@ export default function ReviewItem({
               <p className="review-content text-xs mb-3 line-clamp-4 leading-relaxed">
                 {content}
               </p>
-              <p className="review-created-info text-xs text-text-sub mb-4">
-                {createdAt}{" "}
-                <span className="review-created-user text-main">{author}</span>
-              </p>
+                <p className="review-created-info text-xs text-text-sub mb-4">
+                  <TimeAgo dateString={createdAt} /> by{" "}
+                  <span className="review-created-user text-main">{author}</span>
+                </p>
             </div>
             <div className="review-social-buttons flex justify-around align-middle">
               <div className="like flex justify-center items-center">
