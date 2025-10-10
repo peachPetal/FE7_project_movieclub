@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import logo from "../assets/movieClub.svg";
-import search from "../assets/search.svg";
+import search from "../assets/searchBar.svg";
 
 export default function Header() {
   const navItems = [
