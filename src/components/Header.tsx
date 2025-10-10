@@ -36,7 +36,7 @@ export default function Header() {
 
   //--- 렌더링 (Return JSX) ---//
   return (
-    <header className="w-full h-[82px] bg-white shadow-sm font-sans flex items-center justify-between px-[105px]">
+    <header className="w-full h-[82px] bg-white shadow-sm font-sans flex items-center justify-between px-[105px] mb-[50px]">
       {/* 좌측: 로고 + 네비게이션 */}
       <div className="flex items-center space-x-[121px]">
         {/* 로고 */}
