@@ -36,6 +36,7 @@ export default function Sidebar() {
       className={`
         w-[290px] bg-[#FAFAFA] shadow-lg rounded-[10px] font-pretendard flex flex-col
         transition-all duration-300 ease-in-out ml-[50px]
+        ${isLoggedIn ? (isCollapsed ? "h-[852px]" : "h-[110px]") : "h-[255px]"}
       `}
     >
       {/* 상단 영역 */}
@@ -57,28 +58,30 @@ export default function Sidebar() {
             <p className="text-sm text-white/90">로그인 해주세요</p>
           )}
         </div>
-        <button
-          onClick={handleToggleCollapse}
-          className="absolute top-4 right-4 p-1 text-white rounded-full hover:bg-white/20 transition-colors"
-          aria-label={isCollapsed ? "펼치기" : "접기"}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className={`w-6 h-6 transition-transform duration-300 ease-in-out ${
-              isCollapsed ? "-rotate-180" : ""
-            }`}
+        {isLoggedIn && (
+          <button
+            onClick={handleToggleCollapse}
+            className="absolute top-4 right-4 p-1 text-white rounded-full hover:bg-white/20 transition-colors"
+            aria-label={isCollapsed ? "펼치기" : "접기"}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m4.5 15.75 7.5-7.5 7.5 7.5"
-            />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className={`w-6 h-6 transition-transform duration-300 ease-in-out ${
+                isCollapsed ? "-rotate-180" : ""
+              }`}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m4.5 15.75 7.5-7.5 7.5 7.5"
+              />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* 로그인 여부에 따른 사이드바 내용 */}
