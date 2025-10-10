@@ -8,12 +8,11 @@ export default function DefaultLayout() {
   return (
     <div className="w-full flex flex-col">
       <Header />
-      <div className="flex w-full">
+      <div className="flex w-full mt-[50px]">
         {/* 사이드바 */}
         <Sidebar />
 
-        {/* HomeContent: 사이드바 옆에 배치 */}
-        <div className="flex-1 ml-[46px]"> 
+        <div className="flex-1 ml-[46px]">
           <HomeContent />
         </div>
       </div>
