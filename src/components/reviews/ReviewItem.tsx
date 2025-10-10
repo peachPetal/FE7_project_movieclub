@@ -51,12 +51,10 @@ export default function ReviewItem({
 
           <div className="review-data p-5 h-[227px] flex flex-col justify-between">
             <div className="review-post">
-              {" "}
-              <p className="review-title font-bold mb-3 text-[18px]">
-                {title}
-                <span className="review-movie text-main ml-1.5">#{movie}</span>
+              <p className="review-title font-bold mb-3 text-[18px] truncate">
+                <span className="review-movie text-main">#{movie}</span> {title}
               </p>
-              <p className="review-content text-xs mb-3 line-clamp-3 leading-relaxed">
+              <p className="review-content text-xs mb-3 line-clamp-4 leading-relaxed">
                 {content}
               </p>
               <p className="review-created-info text-xs text-text-sub mb-4">
