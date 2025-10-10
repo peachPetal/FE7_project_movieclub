@@ -1,28 +1,21 @@
-import { useEffect } from "react";
 import { useMovieStore } from "../../stores/movieStore";
-import MoviesRendering from "../movies/MoviesRendering";
+import MoviesRendering from "./MoviesRendering";
+import { useEffect } from "react";
 
-interface Props {
-  variant?: "home" | "page"; // Home 페이지용 or Movies 페이지용
-  limit?: number; // variant가 "home"일 때만 적용
-}
+type MoviesListProps = {
+  variant?: "home" | "page";
+};
 
-export default function MoviesList({ variant = "page", limit }: Props) {
+export default function MoviesList({ variant = "page" }: MoviesListProps) {
   const { movies, isLoading, fetchMovies } = useMovieStore();
 
   useEffect(() => {
-    fetchMovies(variant === "home" ? limit : undefined);
-  }, [fetchMovies, limit, variant]);
+    // variant에 따라 개수 다르게 불러오기
+    const limit = variant === "home" ? 5 : 20; // 홈은 5개, Movies 페이지는 20개
+    fetchMovies(limit);
+  }, [fetchMovies, variant]);
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="animate-pulse bg-gray-200 card-shadow h-40" />
-        ))}
-      </div>
-    );
-  }
-
-  return <MoviesRendering data={movies} variant={variant} />;
+  return (
+    <MoviesRendering data={movies} variant={variant} isLoading={isLoading} />
+  );
 }

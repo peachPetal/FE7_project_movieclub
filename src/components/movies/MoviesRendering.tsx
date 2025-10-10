@@ -3,19 +3,34 @@ import MovieItem from "./MovieItem";
 type Props = {
   data: Movie[];
   variant?: "home" | "page";
+  isLoading?: boolean; // 로딩 상태 추가
 };
 
-export default function MoviesRendering({ data, variant = "page" }: Props) {
+export default function MoviesRendering({
+  data,
+  variant = "page",
+  isLoading,
+}: Props) {
+  const list: (Movie | undefined)[] = isLoading
+    ? // 로딩 상태에서 스켈레톤(placeholder) 카드를 몇 개 보여줄지를 결정하는 부분
+      Array.from({ length: 5 }).map(() => undefined)
+    : data;
+
+  // MoviesRendering.tsx
   return (
     <div
       className={
         variant === "home"
-          ? "grid grid-cols-2 gap-3 sm:grid-cols-3"
-          : "grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+          ? "flex gap-[30px] overflow-x-auto pb-4"
+          : "flex flex-wrap gap-[30px] justify-start"
       }
     >
-      {data.map((movie) => (
-        <MovieItem key={movie.id} data={movie} />
+      {list.map((movie, idx) => (
+        <MovieItem
+          key={(movie && movie.id) ?? `skeleton-${idx}`}
+          movie={movie}
+          isLoading={isLoading}
+        />
       ))}
     </div>
   );

@@ -9,4 +9,6 @@ interface Movie {
   director?: string;
   actors?: string[];
   runtime?: string | number;
+  likeCount?: number;
+  commentCount?: number;
 }
