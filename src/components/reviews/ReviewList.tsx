@@ -2,12 +2,10 @@ import { useReviewStore } from "../../stores/reviewStore";
 import ReviewsRendering from "./ReviewsRendering";
 
 export default function ReviewList() {
-  const { reviews } = useReviewStore();
+  const { reviewsData } = useReviewStore();
   return (
     <>
-      <div className="reviews flex">
-        <ReviewsRendering data={reviews} />
-      </div>
+      <ReviewsRendering data={reviewsData} hasImage={true} />
     </>
   );
 }

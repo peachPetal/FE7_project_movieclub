@@ -4,7 +4,7 @@ import { immer } from "zustand/middleware/immer";
 
 interface ReviewState {
   isLoading: boolean;
-  reviews: Review[];
+  reviewsData: Review[];
   setReviews: (data: Review) => void;
 }
 
@@ -12,7 +12,7 @@ export const useReviewStore = create<ReviewState>()(
   devtools(
     immer((set) => ({
       isLoading: true,
-      reviews: [
+      reviewsData: [
         {
           id: 1,
           title: "마음 울리는 여정",
@@ -78,7 +78,7 @@ export const useReviewStore = create<ReviewState>()(
       ],
       setReviews: (data: Review) =>
         set((state) => {
-          state.reviews.push(data);
+          state.reviewsData.push(data);
         }),
     }))
   )
