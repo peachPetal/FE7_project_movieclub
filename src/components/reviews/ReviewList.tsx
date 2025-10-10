@@ -5,9 +5,7 @@ export default function ReviewList() {
   const { reviews } = useReviewStore();
   return (
     <>
-      <div className="reviews flex">
-        <ReviewsRendering data={reviews} />
-      </div>
+      <ReviewsRendering data={reviews} />
     </>
   );
 }

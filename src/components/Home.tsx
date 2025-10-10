@@ -1,9 +1,9 @@
-import LoginPage from "../pages/LoginPage";
+import ReviewsPage from "../pages/ReviewsPage";
 
 export default function Home() {
   return (
     <main className="flex justify-center items-center w-full">
-      <LoginPage />
+      <ReviewsPage />
     </main>
   );
 }
