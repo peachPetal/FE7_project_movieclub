@@ -8,9 +8,9 @@ export default function DefaultLayout() {
       <div className="w-full flex flex-col">
         {" "}
         <Header />{" "}
-        <div className="flex justify-between h-[80vh]">
+        <div className="flex ml-[50px]">
           <Sidebar />
-          <div className="w-3/4 p-4 overflow-y-auto">
+          <div className="flex min-h-[80vh] w-full">
             <MoviesList variant="page" />
           </div>
         </div>
