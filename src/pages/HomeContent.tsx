@@ -154,7 +154,7 @@ export default function HomeContent() {
         },
       ]);
       setReviews(reviewsData);
-    }, 2000);
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
