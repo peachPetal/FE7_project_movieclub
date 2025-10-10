@@ -221,7 +221,7 @@ export default function HomeContent() {
           {reviews ? (
             <ReviewsRendering data={reviews} hasImage={false} />
           ) : (
-            Array.from({ length: 4 }).map((_, idx) => (
+            Array.from({ length: 5 }).map((_, idx) => (
               <div
                 key={idx}
                 className="relative w-[320px] h-[250px] bg-white rounded-[10px] shadow-md"
