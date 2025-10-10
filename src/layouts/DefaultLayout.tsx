@@ -8,7 +8,7 @@ export default function DefaultLayout() {
       <div className="w-full flex flex-col">
         {" "}
         <Header />{" "}
-        <div className="flex justify-between">
+        <div className="flex justify-between h-[80vh]">
           <Sidebar />
           <Home />
         </div>

@@ -9,7 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<DefaultLayout />} />
         <Route path="/loginPage" element={<LoginPage />} />
-        <Route path="/error" element={<Error />}/>
+        <Route path="/error" element={<Error />} />
       </Routes>
     </Router>
   );
