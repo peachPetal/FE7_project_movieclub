@@ -8,9 +8,11 @@ export default function DefaultLayout() {
       <div className="w-full flex flex-col">
         {" "}
         <Header />{" "}
-        <div className="flex justify-between h-[80vh]">
+        <div className="flex ml-[50px]">
           <Sidebar />
-          <Home />
+          <div className="flex justify-center items-center min-h-[80vh] w-full">
+            <Home />
+          </div>
         </div>
       </div>
     </>
