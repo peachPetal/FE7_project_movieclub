@@ -1,8 +1,6 @@
+import { Outlet } from "react-router-dom";
 import Header from "../components/Header";
-import Home from "../components/Home";
 import Sidebar from "../components/Sidebar";
-import HomeContent from "../pages/HomeContent";
-
 
 export default function DefaultLayout() {
   return (
@@ -11,9 +9,8 @@ export default function DefaultLayout() {
       <div className="flex w-full mt-[50px]">
         {/* 사이드바 */}
         <Sidebar />
-
-        <div className="flex-1 ml-[46px]">
-          <HomeContent />
+        <div className="flex-1 ml-[46px] justify-center items-center min-h-[80vh] w-full">
+          <Outlet />
         </div>
       </div>
     </div>
