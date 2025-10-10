@@ -1,20 +1,22 @@
 import Header from "../components/Header";
 import Home from "../components/Home";
 import Sidebar from "../components/Sidebar";
+import HomeContent from "../pages/HomeContent";
+
 
 export default function DefaultLayout() {
   return (
-    <>
-      <div className="w-full flex flex-col">
-        {" "}
-        <Header />{" "}
-        <div className="flex ml-[50px]">
-          <Sidebar />
-          <div className="flex justify-center items-center min-h-[80vh] w-full">
-            <Home />
-          </div>
+    <div className="w-full flex flex-col">
+      <Header />
+      <div className="flex w-full">
+        {/* 사이드바 */}
+        <Sidebar />
+
+        {/* HomeContent: 사이드바 옆에 배치 */}
+        <div className="flex-1 ml-[46px]"> 
+          <HomeContent />
         </div>
       </div>
-    </>
+    </div>
   );
 }
