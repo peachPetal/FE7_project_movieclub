@@ -125,7 +125,7 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({ friendsData }) => {
           </div>
         </li>
       </ul>
-      
+
       <div className="mt-auto border-t border-gray-200 pt-4">
         <ul className="space-y-1">
           <li>
@@ -169,7 +169,7 @@ const LoggedOutContent: React.FC<LoggedOutContentProps> = ({ onLoginClick }) => 
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const friendsData: Friend[] = [
     { id: 1, name: "Friend 1", status: "online" },
