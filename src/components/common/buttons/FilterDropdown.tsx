@@ -16,30 +16,34 @@ export default function FilterDropdown({ type }: { type: FilterType }) {
         { value: "romance", label: "로맨스" },
         { value: "action", label: "액션" },
       ]);
+      setSelected(options[0]);
       // 나중에 api 데이터 들어오면 해당하는 장르로 바꿀 것
     } else if (type === "Reviews" || type === "Comments") {
-      setOptions([
-        { value: "all", label: "모든 유저" },
-        { value: "friends", label: "친구" },
-      ]);
-    } else if (type === "Users") {
       setOptions([
         { value: "all", label: "전체 보기" },
         { value: "latest", label: "최신순" },
         { value: "popular", label: "인기순" },
       ]);
+      setSelected(options[1]);
+    } else if (type === "Users") {
+      setOptions([
+        { value: "all", label: "전체" },
+        { value: "friends", label: "친구" },
+      ]);
+      setSelected(options[0]);
     } else if (type === "MyPosts") {
       setOptions([
         { value: "reviews", label: "리뷰" },
         { value: "comments", label: "댓글" },
       ]);
+      setSelected(options[0]);
     } else if (type === "Likes") {
       setOptions([
         { value: "movies", label: "영화" },
         { value: "reviews", label: "리뷰" },
       ]);
+      setSelected(options[0]);
     }
-    setSelected(options[0]);
   }, []);
 
   const onChange = (e: SingleValue<FilterOption>) => {
