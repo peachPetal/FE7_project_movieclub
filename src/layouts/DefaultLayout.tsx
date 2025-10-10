@@ -1,12 +1,17 @@
 import Header from "../components/Header";
-import HomeContent from "../components/homeContent";
+import Home from "../components/Home";
+import Sidebar from "../components/Sidebar";
 
 export default function DefaultLayout() {
   return (
     <>
-      <div className="relative w-full mx-auto h-[1080px] bg-white">
-        <Header />
-        <HomeContent />
+      <div className="w-full flex flex-col">
+        {" "}
+        <Header />{" "}
+        <div className="flex justify-between">
+          <Sidebar />
+          <Home />
+        </div>
       </div>
     </>
   );
