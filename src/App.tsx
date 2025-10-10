@@ -5,7 +5,7 @@ import Error from "./pages/Error";
 import MoviesPage from "./pages/MoviesPage";
 import HomeContent from "./pages/HomeContent";
 import ReviewsPage from "./pages/ReviewsPage";
-// import MoviesDetail from "./pages/MoviesDetail";
+import MoviesDetail from "./pages/MoviesDetail";
 
 export default function App() {
   return (
@@ -17,8 +17,8 @@ export default function App() {
         <Route path="/error" element={<Error />} />
         <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/movies" element={<MoviesPage />} />
-        {/* <Route path="/movies/:id" element={<MoviesDetail />} /> */}
-      </Route>
-    </Routes>
+        <Route path="/movies/:id" element={<MoviesDetail />} />
+      </Routes>
+    </Router>
   );
 }
