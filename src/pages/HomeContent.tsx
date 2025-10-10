@@ -111,7 +111,7 @@ export default function HomeContent() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setReviews(reviewsData);
-    }, 2000);
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 

@@ -56,7 +56,7 @@ export const useMovieStore = create<MovieState>((set) => ({
     // mock API 호출
     set({ isLoading: true });
 
-    await new Promise((r) => setTimeout(r, 300)); // Mock 지연
+    await new Promise((r) => setTimeout(r, 3000)); // Mock 지연
     const data = limit ? MOCK_MOVIES.slice(0, limit) : MOCK_MOVIES; // limit에 따라 자르기, 우선 mock 데이터 사용
     set({ movies: data, isLoading: false });
 
