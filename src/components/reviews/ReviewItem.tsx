@@ -56,7 +56,7 @@ export default function ReviewItem({
                 {title}
                 <span className="review-movie text-main ml-1.5">#{movie}</span>
               </p>
-              <p className="review-content text-xs mb-3 line-clamp-4 leading-relaxed">
+              <p className="review-content text-xs mb-3 line-clamp-3 leading-relaxed">
                 {content}
               </p>
               <p className="review-created-info text-xs text-text-sub mb-4">
