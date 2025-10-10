@@ -17,3 +17,12 @@ body {
 .sosical-btn:last-of-type {
   margin-bottom: 0;
 }
+
+#filter-dropdown {
+  width: 201px;
+  height: 40px;
+  background: #ffffff;
+  border: 1px solid #9858f3;
+  border-radius: 10px;
+  color: var(--color-text-main);
+}

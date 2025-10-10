@@ -35,7 +35,7 @@ export default function Sidebar() {
     <aside
       className={`
         w-[290px] bg-[#FAFAFA] shadow-lg rounded-[10px] font-pretendard flex flex-col
-        transition-all duration-300 ease-in-out ml-[50px]
+        transition-all duration-300 ease-in-out mt-[50px]
       `}
     >
       {/* 상단 영역 */}
