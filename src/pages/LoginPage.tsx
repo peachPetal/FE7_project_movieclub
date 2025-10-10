@@ -1,4 +1,4 @@
-import SocialBtn from "../components/buttons/SocialBtn";
+import SocialBtn from "../components/common/buttons/SocialBtn";
 
 export default function LoginPage() {
   return (
