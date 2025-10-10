@@ -7,7 +7,14 @@ import commentIcon from "../assets/comment.svg";
 import shareIcon from "../assets/share.svg";
 import ReviewsRendering from "../components/reviews/ReviewsRendering";
 import { useReviewStore } from "../stores/reviewStore";
-import { useMovieStore } from "../stores/movieStore";
+
+interface Movie {
+  id: number;
+  title: string;
+  posterUrl: string;
+  likeCount: number;
+  commentCount: number;
+}
 
 const formatTimeAgo = (dateString: string) => {
   const now = new Date();
@@ -98,33 +105,58 @@ const ActionButtons = ({
 };
 
 export default function HomeContent() {
+  const [movies, setMovies] = useState<Movie[] | null>(null);
   const [reviews, setReviews] = useState<Review[] | null>(null);
   const { reviewsData } = useReviewStore();
 
-  const { movies, isLoading, fetchMovies } = useMovieStore();
-
-  useEffect(() => {
-    // 홈 섹션은 캐러셀이니 6개만 가져오기
-    fetchMovies(6);
-  }, [fetchMovies]);
-
   useEffect(() => {
     const timer = setTimeout(() => {
+      setMovies([
+        {
+          id: 1,
+          title: "얼굴",
+          posterUrl:
+            "https://i.namu.wiki/i/KMUqfF9AtnJv69CFHKYjteoM3soZ4R3LMeIg1NdH5t-WtdqkfkEAGlU8iLstbrLG16oBcOR5Bdyg8yi3E55EDQ.webp",
+          likeCount: 1352,
+          commentCount: 214,
+        },
+        {
+          id: 2,
+          title: "극장판 귀멸의 칼날: 무한성 편",
+          posterUrl:
+            "https://i.namu.wiki/i/gwqbq98J0nv5hKDlCnnlu7KJ_zFDzvN9Cj8y5ss64uohGgY_3A5HzFKnxlCNWbxRfIepjW1aAr5q7Zf-QA5lYg.webp",
+          likeCount: 1120,
+          commentCount: 188,
+        },
+        {
+          id: 3,
+          title: "살인자 리포트",
+          posterUrl:
+            "https://i.namu.wiki/i/jTX-_f2sko_ixODrk94ndy0No4kKvC2jZQMoe1CPHpFQED2YdEGcbseKVmKExzGwO9OfEooygPXTn6aq_lTenA.webp",
+          likeCount: 980,
+          commentCount: 152,
+        },
+        {
+          id: 4,
+          title: "F1 더 무비",
+          posterUrl:
+            "https://upload.wikimedia.org/wikipedia/ko/thumb/9/93/F1_%EB%8D%94_%EB%AC%B4%EB%B9%84_%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg/250px-F1_%EB%8D%94_%EB%AC%B4%EB%B9%84_%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg",
+          likeCount: 850,
+          commentCount: 121,
+        },
+        {
+          id: 5,
+          title: "홈캠",
+          posterUrl:
+            "https://i.namu.wiki/i/C4fiPlpmUh5pg8eZ6zyUmutFXMniQt2AZC9xfx5BiASuyokH4ybkowY_tZIqWehBfhENGe6XwY9vp1YQ_Nu2UA.webp",
+          likeCount: 760,
+          commentCount: 99,
+        },
+      ]);
       setReviews(reviewsData);
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
-
-  // 파생 UI용 영화 목록: 로딩 중이면 null 유지, 데이터 있을 때만 배열 + 안전 기본값 보정
-  const moviesForUI =
-    !isLoading && Array.isArray(movies) && movies.length
-      ? movies.map((m) => ({
-          ...m,
-          id: Number(m.id),
-          likeCount: m.likeCount ?? 0,
-          commentCount: m.commentCount ?? 0,
-        }))
-      : null;
 
   return (
     <div>
@@ -132,10 +164,9 @@ export default function HomeContent() {
         <h2 className="text-4xl font-bold mb-8">
           이번 주 인기 <span className="text-[#9858f3]">#영화</span>
         </h2>
-
         <div className="flex gap-[30px] overflow-x-auto pb-4">
-          {moviesForUI
-            ? moviesForUI.map((movie) => (
+          {movies
+            ? movies.map((movie) => (
                 <div
                   key={movie.id}
                   className="w-[250px] h-[450px] rounded-lg overflow-hidden shadow-md flex flex-col bg-white flex-shrink-0
@@ -181,7 +212,6 @@ export default function HomeContent() {
               ))}
         </div>
       </section>
-
       <section>
         <h2 className="text-4xl font-bold mb-8">
           이번 주 인기 <span className="text-[#9858f3]">#리뷰</span>
@@ -193,22 +223,16 @@ export default function HomeContent() {
             Array.from({ length: 5 }).map((_, idx) => (
               <div
                 key={idx}
-                className="relative w-[320px] h-[250px] bg-white rounded-[10px] shadow-md"
+                className="w-[320px] h-[250px] bg-white rounded-[10px] shadow-md p-6 flex flex-col justify-between"
               >
-                <div className="absolute left-[22px] top-[21.34px] w-[277px]">
-                  <Skeleton count={2} />
+                <div>
+                  <Skeleton height={24} width="60%" />
+                  <Skeleton height={16} width="40%" className="mt-2" />
+                  <div className="mt-4">
+                    <Skeleton count={3} />
+                  </div>
                 </div>
-                <Skeleton
-                  className="absolute left-[22px] top-[80.28px]"
-                  width={277}
-                  count={3}
-                />
-                <Skeleton
-                  className="absolute left-[22px] top-[172.76px]"
-                  width={180}
-                  height={16}
-                />
-                <div className="absolute bottom-0 left-0 right-0 h-[60px] px-[22px] flex items-center">
+                <div className="pt-4">
                   <div className="grid grid-cols-3 items-center w-full">
                     <Skeleton width={40} height={20} />
                     <Skeleton width={40} height={20} className="mx-auto" />
@@ -228,3 +252,4 @@ export default function HomeContent() {
     </div>
   );
 }
+
