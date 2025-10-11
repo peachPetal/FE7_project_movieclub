@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import errorLogo from "../assets/404error.svg";
+import DefaultBtn from "../components/common/buttons/DefaultBtn";
 
 function Error() {
   const navigate = useNavigate();
@@ -30,12 +31,12 @@ function Error() {
       </div>
 
       <div className="mt-4">
-        <button
-          onClick={goHome}
-          className="h-10 w-32 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition"
-        >
-          홈으로 돌아가기
-        </button>
+        <DefaultBtn
+          size="lg"
+          text="홈으로 돌아가기"
+          highlight={false}
+          onClickFn={goHome}
+        />
       </div>
     </div>
   );

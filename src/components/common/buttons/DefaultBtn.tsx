@@ -1,10 +1,10 @@
 import { tv } from "tailwind-variants/lite";
 
 const buttonStyle = tv({
-  base: "rounded-[10px] flex justify-center items-center font-bold duration-200",
+  base: "rounded-[10px] flex justify-center items-center font-bold duration-200 cursor-pointer",
   variants: {
     size: {
-      sm: "w-[100px] h-[45px] text-xs",
+      sm: "w-[75px] h-[45px] text-[15px]",
       md: "w-[170px] h-[57px] text-[15px]",
       lg: "w-[470px] h-[55px] text-[16px]",
     },
@@ -23,7 +23,7 @@ const buttonStyle = tv({
 DefaultBtn은 호출 시 size, text, highLight를 인자로 받습니다
 1. size: "sm" | "md" | "lg" 
     "sm": 댓글 등록, 메시지 답장 등
-    "md": 사이드바 로그인/회원가입, 영화 트레일러 바로가기, 좋아요 등
+    "md": 사이드바 로그인/회원가입
     "lg": 로그인, 회원가입 등
 2. text: string
     버튼에 들어갈 텍스트
@@ -38,18 +38,21 @@ export default function DefaultBtn({
   size,
   text,
   highlight,
+  onClickFn,
 }: {
   size: ButtonType;
   text: string;
   highlight: boolean;
+  onClickFn: () => void;
 }) {
   return (
     <>
-      <div className={buttonStyle({ size: size, highlight: highlight })}>
-        <a href="" className="w-full h-full flex justify-center items-center">
-          <span>{text}</span>
-        </a>
-      </div>
+      <button
+        className={buttonStyle({ size: size, highlight: highlight })}
+        onClick={onClickFn}
+      >
+        <span>{text}</span>
+      </button>
     </>
   );
 }
