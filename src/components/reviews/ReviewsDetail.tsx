@@ -1,8 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useReviewStore } from "../../stores/reviewStore";
-import DefaultBtn from "../common/buttons/DefaultBtn";
 import LikeBtn from "../common/buttons/LikeBtn";
-import TrailerBtn from "../common/buttons/TrailerBtn";
+import Comment from "../comments/Comment";
 
 export default function ReviewsDetail() {
   const { id } = useParams();
@@ -23,7 +22,7 @@ export default function ReviewsDetail() {
 
   return (
     <>
-      <div>
+      <div className="mr-15">
         <h1 className="text-4xl font-semibold mb-2.5">
           {title}
           <span className="text-main"> #{movie}</span>
@@ -46,6 +45,9 @@ export default function ReviewsDetail() {
           <LikeBtn like={like} isLiked={false} />
         </div>
         <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
+        <div>
+          <Comment comment={comment} />
+        </div>
       </div>
     </>
   );

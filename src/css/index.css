@@ -26,3 +26,7 @@ body {
   border-radius: 10px;
   color: var(--color-text-main);
 }
+
+.reply-btns button {
+  transform: scale(0.8);
+}
