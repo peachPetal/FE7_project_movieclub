@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useReviewStore } from "../../stores/reviewStore";
 import DefaultBtn from "../common/buttons/DefaultBtn";
 import LikeBtn from "../common/buttons/LikeBtn";
+import TrailerBtn from "../common/buttons/TrailerBtn";
 
 export default function ReviewsDetail() {
   const { id } = useParams();
