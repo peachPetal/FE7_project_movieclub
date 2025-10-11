@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useReviewStore } from "../../stores/reviewStore";
 import DefaultBtn from "../common/buttons/DefaultBtn";
+import LikeBtn from "../common/buttons/LikeBtn";
+import TrailerBtn from "../common/buttons/TrailerBtn";
 
 export default function ReviewsDetail() {
   const { id } = useParams();
@@ -41,7 +43,7 @@ export default function ReviewsDetail() {
           <p className="mr-12 whitespace-pre-line leading-relaxed">{content}</p>
         </div>
         <div className="flex justify-center">
-          <DefaultBtn size="md" text={like.toString()} highlight={false} />
+          <LikeBtn like={like} isLiked={false} />
         </div>
         <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
       </div>
