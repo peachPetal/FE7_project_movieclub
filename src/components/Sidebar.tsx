@@ -96,7 +96,6 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
   const [isFriendsMenuOpen, setIsFriendsMenuOpen] = useState(true);
 
   const handleToggleFriendsMenu = () => {
-    onNotificationClick(); // Notification 모달 닫기
     setIsFriendsMenuOpen(!isFriendsMenuOpen);
   };
 
@@ -249,7 +248,7 @@ export default function Sidebar() {
   };
 
   const handleNotificationClick = () => {
-    setModalFriend(null); // Friend 모달 닫기
+    setModalFriend(null); 
     setModalNotificationOpen((prev) => {
       if (!prev && notificationButtonRef.current) {
         const rect = notificationButtonRef.current.getBoundingClientRect();
@@ -259,7 +258,7 @@ export default function Sidebar() {
     });
   };
 
-  const handleLogout = () => setIsLoggedIn(false);
+  const handleLogout = () => {setIsLoggedIn(false); navigate("/");};
 
   const handleProfileClick = () => navigate("/profile");
   const handleSettingsClick = () => navigate("/settings");
