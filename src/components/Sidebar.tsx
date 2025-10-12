@@ -77,21 +77,38 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 interface LoggedInContentProps {
   friendsData: Friend[];
   onFriendClick: (friend: Friend, e: React.MouseEvent<HTMLDivElement>) => void;
+  onLogout: () => void;
+  onNotificationClick: () => void;
+  notificationButtonRef: React.RefObject<HTMLButtonElement | null>;
+  onProfileClick: () => void;
+  onSettingsClick: () => void;
 }
 
 const LoggedInContent: React.FC<LoggedInContentProps> = ({
   friendsData,
   onFriendClick,
+  onLogout,
+  onNotificationClick,
+  notificationButtonRef,
+  onProfileClick,
+  onSettingsClick,
 }) => {
   const [isFriendsMenuOpen, setIsFriendsMenuOpen] = useState(true);
-  const handleToggleFriendsMenu = () =>
+
+  const handleToggleFriendsMenu = () => {
+    onNotificationClick(); // Notification 모달 닫기
     setIsFriendsMenuOpen(!isFriendsMenuOpen);
+  };
 
   return (
     <div className="flex flex-col flex-1 p-4 overflow-y-auto">
       <ul className="space-y-1">
         <li>
-          <button className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200">
+          <button
+            ref={notificationButtonRef}
+            onClick={onNotificationClick}
+            className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+          >
             <img src={notificationsIcon} alt="" className="w-6 h-6 mr-3" />
             Notifications
           </button>
@@ -157,33 +174,6 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
                       </div>
                       <span>{friend.name}</span>
                     </a>
-
-                    {/* <div className="opacity-0 group-hover:opacity-100 flex gap-2 transition-opacity duration-200">
-                      <button
-                        type="button"
-                        className="relative w-8 h-8 flex items-center justify-center rounded-full bg-gray-500 hover:bg-red-500 transition-colors group/delete"
-                        aria-label="Delete friend"
-                      >
-                        <img
-                          src={deleteFriendMouseOff}
-                          alt="delete"
-                          className="w-8 h-8 opacity-100 group-hover/delete:opacity-0 transition-opacity duration-200"
-                        />
-                        <img
-                          src={deleteFriendMouseOn}
-                          alt="delete hover"
-                          className="w-8 h-8 absolute opacity-0 group-hover/delete:opacity-100 transition-opacity duration-200"
-                        />
-                      </button>
-
-                      <button
-                        type="button"
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-[#9858F3] hover:bg-[#8645e6] transition-colors"
-                        aria-label="Send message"
-                      >
-                        <img src={messageIcon} alt="message" className="w-8 h-8" />
-                      </button>
-                    </div> */}
                   </div>
                 </li>
               ))}
@@ -195,19 +185,30 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
       <div className="mt-auto border-t border-gray-200 pt-4">
         <ul className="space-y-1">
           <li>
-            <button className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200">
+            <button
+              className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+              onClick={onProfileClick}
+            >
               <img src={profileIcon} alt="" className="w-6 h-6 mr-3" />
               Profile
             </button>
           </li>
+
           <li>
-            <button className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200">
+            <button
+              className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+              onClick={onSettingsClick}
+            >
               <img src={settingIcon} alt="" className="w-6 h-6 mr-3" />
               Settings
             </button>
           </li>
+
           <li>
-            <button className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200">
+            <button
+              className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+              onClick={onLogout}
+            >
               <img src={logoutIcon} alt="" className="w-6 h-6 mr-3" />
               Logout
             </button>
@@ -218,28 +219,13 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
   );
 };
 
-interface LoggedOutContentProps {
-  onLoginClick: () => void;
-}
-
-const LoggedOutContent: React.FC<LoggedOutContentProps> = ({
-  onLoginClick,
-}) => (
-  <div className="flex flex-col items-center justify-center flex-1 p-4">
-    <button
-      className="w-[200px] h-[50px] bg-[#9858F3] text-white rounded-lg hover:bg-[#8645e6] transition-colors"
-      onClick={onLoginClick}
-    >
-      로그인 / 회원가입
-    </button>
-  </div>
-);
-
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [modalFriend, setModalFriend] = useState<Friend | null>(null);
   const [modalY, setModalY] = useState(0);
+  const [modalNotificationOpen, setModalNotificationOpen] = useState(false);
+  const [notificationY, setNotificationY] = useState(0);
 
   const friendsData: Friend[] = [
     { id: 1, name: "Friend 1", status: "online" },
@@ -248,43 +234,69 @@ export default function Sidebar() {
   ];
 
   const navigate = useNavigate();
+  const notificationButtonRef = useRef<HTMLButtonElement>(null);
+
   const handleToggleCollapse = () => setIsCollapsed(!isCollapsed);
-  const handleLoginClick = () => navigate("/loginPage");
 
   const handleFriendClick = (
     friend: Friend,
     e: React.MouseEvent<HTMLDivElement>
   ) => {
+    if (modalNotificationOpen) setModalNotificationOpen(false);
     const rect = e.currentTarget.getBoundingClientRect();
     setModalY(rect.top + window.scrollY);
     setModalFriend(friend);
   };
 
-  const closeModal = () => setModalFriend(null);
+  const handleNotificationClick = () => {
+    setModalFriend(null); // Friend 모달 닫기
+    setModalNotificationOpen((prev) => {
+      if (!prev && notificationButtonRef.current) {
+        const rect = notificationButtonRef.current.getBoundingClientRect();
+        setNotificationY(rect.top + window.scrollY);
+      }
+      return !prev;
+    });
+  };
 
-  const modalRef = useRef<HTMLDivElement>(null);
+  const handleLogout = () => setIsLoggedIn(false);
 
-  // 모달 외부 클릭 감지
+  const handleProfileClick = () => navigate("/profile");
+  const handleSettingsClick = () => navigate("/settings");
+
+  const closeModals = () => {
+    setModalFriend(null);
+    setModalNotificationOpen(false);
+  };
+
+  const modalFriendRef = useRef<HTMLDivElement>(null);
+  const modalNotificationRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        closeModal();
+      if (
+        (modalFriend &&
+          modalFriendRef.current &&
+          !modalFriendRef.current.contains(event.target as Node)) ||
+        (modalNotificationOpen &&
+          modalNotificationRef.current &&
+          !modalNotificationRef.current.contains(event.target as Node))
+      ) {
+        closeModals();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [modalRef]);
+  }, [modalFriend, modalNotificationOpen]);
 
   return (
     <>
       <aside
-        className={`
-        w-[290px] bg-[#FAFAFA] shadow-lg rounded-[10px] font-pretendard flex flex-col
+        className={`w-[290px] bg-[#FAFAFA] shadow-lg rounded-[10px] font-pretendard flex flex-col
         transition-all duration-300 ease-in-out ml-[50px]
-        ${isLoggedIn ? (isCollapsed ? "h-[110px]" : "h-[852px]") : "h-[255px]"}
-      `}
+        ${isLoggedIn ? (isCollapsed ? "h-[110px]" : "h-[852px]") : "h-[255px]"}`}
       >
         <SidebarHeader
           isLoggedIn={isLoggedIn}
@@ -298,22 +310,37 @@ export default function Sidebar() {
               <LoggedInContent
                 friendsData={friendsData}
                 onFriendClick={handleFriendClick}
+                onLogout={handleLogout}
+                onNotificationClick={handleNotificationClick}
+                notificationButtonRef={notificationButtonRef}
+                onProfileClick={handleProfileClick}
+                onSettingsClick={handleSettingsClick}
               />
             ) : (
-              <LoggedOutContent onLoginClick={handleLoginClick} />
+              <div className="flex flex-col items-center justify-center flex-1 p-4">
+                <button
+                  className="w-[200px] h-[50px] bg-[#9858F3] text-white rounded-lg hover:bg-[#8645e6] transition-colors"
+                  onClick={() => navigate("/loginPage")}
+                  onDoubleClick={() => {
+                    setIsLoggedIn(true);
+                    navigate("/");
+                  }}
+                >
+                  로그인 / 회원가입
+                </button>
+              </div>
             )}
           </>
         )}
       </aside>
 
-      {/* 모달 */}
+      {/* Friend 모달 */}
       {modalFriend && (
         <div
-          ref={modalRef}
+          ref={modalFriendRef}
           className="absolute left-[347px] w-[290px] h-[82px] bg-[#FAFAFA] rounded-lg shadow-md z-50 flex items-center px-4"
           style={{ top: modalY }}
         >
-          {/* 친구 아이콘 + 상태 */}
           <div className="relative w-12 h-12">
             <img
               src={friendsIcon}
@@ -327,7 +354,6 @@ export default function Sidebar() {
             />
           </div>
 
-          {/* 친구 이름과 상태 */}
           <div className="ml-4 flex flex-col justify-center">
             <p className="font-medium text-black">{modalFriend.name}</p>
             <p className="text-sm text-gray-500 capitalize">
@@ -335,7 +361,6 @@ export default function Sidebar() {
             </p>
           </div>
 
-          {/* 버튼 */}
           <div className="ml-auto flex gap-2">
             <button className="relative w-8 h-8 group">
               <img
@@ -353,6 +378,17 @@ export default function Sidebar() {
               <img src={messageIcon} className="w-8 h-8" alt="message" />
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Notification 모달 */}
+      {modalNotificationOpen && (
+        <div
+          ref={modalNotificationRef}
+          className="absolute left-[347px] w-[290px] bg-[#FAFAFA] rounded-lg shadow-md z-50 px-4"
+          style={{ top: notificationY, height: 82 * 3 }}
+        >
+          <p className="p-4">Notification 내용</p>
         </div>
       )}
     </>
