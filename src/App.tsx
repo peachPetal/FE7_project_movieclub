@@ -7,6 +7,7 @@ import HomeContent from "./pages/HomeContent";
 import ReviewsPage from "./pages/ReviewsPage";
 import MoviesDetail from "./pages/MoviesDetail";
 import ReviewsDetail from "./components/reviews/ReviewsDetail";
+import Settings from "./pages/Settings";
 // import MoviesDetail from "./pages/MoviesDetail";
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/reviews/:id" element={<ReviewsDetail />} />
         <Route path="/movies" element={<MoviesPage />} />
         <Route path="/movies/:id" element={<MoviesDetail />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
         <Route path="/error" element={<Error />} />
     </Routes>
