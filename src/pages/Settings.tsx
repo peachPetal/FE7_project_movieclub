@@ -1,22 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { toggleTheme } from "../lib/theme";
 
 export default function Settings() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(
+    () => localStorage.getItem("theme") === "dark"
+  );
+
+  const handleToggle = () => {
+    toggleTheme();
+    setIsDark((prev) => !prev);
+  };
 
   return (
-    <div className="relative min-h-screen font-pretendard flex flex-col items-start px-10 py-10">
-      <h1 className="text-[32px] font-bold text-[#373737] mb-6">설정</h1>
-      <div className="w-[300px] rounded-[10px] bg-white shadow-[0_0_4px_rgba(0,0,0,0.25)] p-6 flex items-center justify-between">
-        <span className="text-[20px] font-medium text-[#373737]">
-          다크모드
-        </span>
-
-        {/* 스위치 버튼 */}
+    <div className="relative min-h-screen font-pretendard flex flex-col items-start px-10 py-10 bg-background-main text-text-main">
+      <h1 className="text-[32px] font-bold mb-6">설정</h1>
+      
+      <div className="w-[300px] rounded-[10px] bg-background-sub card-shadow p-6 flex items-center justify-between">
+        <span className="text-[20px] font-medium">다크모드</span>
         <button
-          onClick={() => setIsDark(!isDark)}
+          onClick={handleToggle}
           className="relative w-[70px] h-[31.5px] rounded-full transition-all duration-300"
           style={{
-            background: isDark ? "#9858F3" : "#DEDEDE",
+            background: isDark ? "var(--color-main)" : "#DEDEDE",
             boxShadow: isDark
               ? "inset 0px 6px 8px 3px rgba(0, 0, 0, 0.1)"
               : "none",

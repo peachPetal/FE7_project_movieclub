@@ -65,7 +65,8 @@ export default function Header() {
   }, [location.pathname]);
 
   return (
-    <header className="w-full h-[8vh] bg-white shadow-sm font-sans flex items-center justify-between px-[105px] relative">
+    <header className="w-full h-[8vh] bg-[var(--color-background-main)]   shadow-[5px_5px_10px_0_rgba(0,0,0,0.25)]
+  dark:shadow-[5px_5px_10px_0_rgba(255,255,255,0.1)] font-sans flex items-center justify-between px-[105px] relative">
       <div className="flex items-center space-x-[121px]">
         <button onClick={() => navigate("/")} className="flex-shrink-0">
           <img
@@ -90,8 +91,8 @@ export default function Header() {
                     text-[20px] font-medium tracking-wider transition-colors duration-300
                     ${
                       location.pathname === item.path
-                        ? "text-[#9858F3]"
-                        : "text-black/50 hover:text-black/80"
+                        ? "text-[var(--color-main)]"
+                        : "text-[var(--color-text-sub)] hover:text-[var(--color-text-main)]"
                     }`}
                 >
                   {item.name}
@@ -99,7 +100,7 @@ export default function Header() {
               </li>
             ))}
             <div
-              className="absolute -bottom-1 h-[3px] bg-[#9858F3] rounded-full transition-all duration-300 ease-in-out"
+              className="absolute -bottom-1 h-[3px] bg-[var(--color-main)] rounded-full transition-all duration-300 ease-in-out"
               style={indicatorStyle}
             />
           </ul>
@@ -110,16 +111,16 @@ export default function Header() {
         <img
           src={search}
           alt="Search"
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-[20px] h-[20px] pointer-events-none"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-[20px] h-[20px] pointer-events-none dark:invert"
         />
         <input
           type="text"
           placeholder="Search"
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setIsSearchFocused(false)}
-          className="w-full h-full bg-white border border-black/12 rounded-full
-            pl-10 pr-4 text-[13px] placeholder:text-black/40
-            focus:outline-none focus:ring-2 focus:ring-[#9858F3]/50"
+          className="w-full h-full bg-[var(--color-background-main)] border border-[var(--color-text-placeholder)] rounded-full
+            pl-10 pr-4 text-[13px] text-[var(--color-text-main)] placeholder:text-[var(--color-text-placeholder)]
+            focus:outline-none focus:ring-2 focus:ring-[var(--color-main-20)"
         />
 
         {isSearchFocused && (
@@ -128,10 +129,10 @@ export default function Header() {
               className="absolute -top-[7px] left-1/2 -translate-x-1/2 
                          w-0 h-0 border-l-[7.5px] border-l-transparent 
                          border-r-[7.5px] border-r-transparent 
-                         border-b-[7.5px] border-b-[#9858F3]"
+                         border-b-[7.5px] border-b-[var(--color-main)]"
             />
             <div
-              className="w-[268px] h-[40px] bg-[#9858F3] rounded-[30px] 
+              className="w-[268px] h-[40px] bg-[var(--color-main)] rounded-[30px] 
                          flex items-center justify-center shadow-lg"
             >
               <p className="text-white text-[10px] font-normal font-pretendard">
