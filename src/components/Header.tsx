@@ -3,7 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/movieClub.svg";
 import search from "../assets/searchBar.svg";
 
+// Header 컴포넌트
 export default function Header() {
+  // Navigation Bar의 항목은 다음과 같음
   const navItems = [
     { id: 1, name: "HOME", path: "/" },
     { id: 2, name: "MOVIES", path: "/movies" },
@@ -11,39 +13,53 @@ export default function Header() {
     { id: 4, name: "USERS", path: "/error" },
   ];
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  // 라우팅 구현(이동, 현재 위치 반환)
+  const navigate = useNavigate(); // 라우터 이동
+  const location = useLocation(); // 현재 위치 반환
 
+  // 인디케이터 상태 관리
   const [indicatorStyle, setIndicatorStyle] = useState({
+    // 초기값 세팅
     left: 0,
     width: 0,
     opacity: 0,
   });
 
+  // 검색바 상태 관리
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  // Dom 요소 조작
   const navListRef = useRef<HTMLLIElement[]>([]);
 
+  //
   useEffect(() => {
     const updateIndicator = () => {
+      // activeIndex는 navItems의 item중 path가 location.pathname과 같은 것
       const activeIndex = navItems.findIndex(
         (item) => item.path === location.pathname
       );
 
+      // activeIndex가 -1이 아니면(존재하면)
       if (activeIndex !== -1) {
+        // activeItem은 현재 Dom 요소
         const activeItem = navListRef.current[activeIndex];
+        // activeItem이 존재하면 
         if (activeItem) {
+          // indicator의 디자인을 수정
           setIndicatorStyle({
             left: activeItem.offsetLeft,
             width: activeItem.offsetWidth,
             opacity: 1,
           });
         }
+        // 존재하지 않으면 초기값
       } else {
         setIndicatorStyle({ left: 0, width: 0, opacity: 0 });
       }
     };
 
+    // 인디케이터 업데이트
     updateIndicator();
+    // 화면의 크기가 바뀌면 업데이트
     window.addEventListener("resize", updateIndicator);
     return () => window.removeEventListener("resize", updateIndicator);
   }, [location.pathname]);
