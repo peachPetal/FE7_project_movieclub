@@ -31,15 +31,11 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   isCollapsed,
   onToggleCollapse,
 }) => (
-  <div
-    className={`flex h-[110px] shrink-0 items-center p-4 bg-[#9858F3] text-white relative ${
-      isCollapsed ? "rounded-[10px]" : "rounded-t-[10px]"
-    }`}
-  >
+  <div className={`flex h-[110px] shrink-0 items-center p-4 bg-[var(--color-main)] text-white relative ${isCollapsed ? "rounded-[10px]" : "rounded-t-[10px]"}`}>
     <div className="relative mr-4">
       <img src={accountIcon} alt="Account" className="w-10 h-10" />
       {isLoggedIn && (
-        <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-[#9858F3] bg-green-500" />
+        <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-[var(--color-main)] bg-[var(--color-alert-online)]" />
       )}
     </div>
     <div>
@@ -103,11 +99,7 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
     <div className="flex flex-col flex-1 p-4 overflow-y-auto">
       <ul className="space-y-1">
         <li>
-          <button
-            ref={notificationButtonRef}
-            onClick={onNotificationClick}
-            className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200"
-          >
+          <button ref={notificationButtonRef} onClick={onNotificationClick} className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]">
             <img src={notificationsIcon} alt="" className="w-6 h-6 mr-3" />
             Notifications
           </button>
@@ -117,7 +109,7 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
           <button
             type="button"
             onClick={handleToggleFriendsMenu}
-            className="flex w-full items-center p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+            className="flex w-full items-center p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
             aria-expanded={isFriendsMenuOpen}
           >
             <img src={friendsIcon} alt="" className="w-6 h-6 mr-3" />
@@ -149,7 +141,7 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
               {friendsData.map((friend) => (
                 <li key={friend.id}>
                   <div
-                    className="group flex items-center justify-between p-2 rounded-lg text-[#373737] hover:bg-gray-200 transition-colors cursor-pointer"
+                    className="group flex items-center justify-between p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)] transition-colors cursor-pointer"
                     onClick={(e) => onFriendClick(friend, e)}
                   >
                     <a
@@ -163,13 +155,7 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
                           alt={friend.name}
                           className="h-8 w-8"
                         />
-                        <span
-                          className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border-2 border-white ${
-                            friend.status === "online"
-                              ? "bg-green-500"
-                              : "bg-gray-400"
-                          }`}
-                        />
+                        <span className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border-2 border-[var(--color-background-sub)] ${friend.status === "online" ? "bg-[var(--color-alert-online)]" : "bg-[var(--color-text-light)]"}`} />
                       </div>
                       <span>{friend.name}</span>
                     </a>
@@ -181,11 +167,11 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
         </li>
       </ul>
 
-      <div className="mt-auto border-t border-gray-200 pt-4">
+      <div className="mt-auto border-t border-[var(--color-text-placeholder)] pt-4">
         <ul className="space-y-1">
           <li>
             <button
-              className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+              className="flex items-center w-full p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
               onClick={onProfileClick}
             >
               <img src={profileIcon} alt="" className="w-6 h-6 mr-3" />
@@ -195,7 +181,7 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
 
           <li>
             <button
-              className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+              className="flex items-center w-full p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
               onClick={onSettingsClick}
             >
               <img src={settingIcon} alt="" className="w-6 h-6 mr-3" />
@@ -205,7 +191,7 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
 
           <li>
             <button
-              className="flex items-center w-full p-2 rounded-lg text-[#373737] hover:bg-gray-200"
+              className="flex items-center w-full p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
               onClick={onLogout}
             >
               <img src={logoutIcon} alt="" className="w-6 h-6 mr-3" />
@@ -292,11 +278,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside
-        className={`w-[290px] bg-[#FAFAFA] shadow-lg rounded-[10px] font-pretendard flex flex-col
-        transition-all duration-300 ease-in-out ml-[50px]
-        ${isLoggedIn ? (isCollapsed ? "h-[110px]" : "h-[852px]") : "h-[255px]"}`}
-      >
+      <aside className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ml-[50px] ${isLoggedIn ? (isCollapsed ? "h-[110px]" : "h-[852px]") : "h-[255px]"}`}>
         <SidebarHeader
           isLoggedIn={isLoggedIn}
           isCollapsed={isCollapsed}
@@ -318,7 +300,7 @@ export default function Sidebar() {
             ) : (
               <div className="flex flex-col items-center justify-center flex-1 p-4">
                 <button
-                  className="w-[200px] h-[50px] bg-[#9858F3] text-white rounded-lg hover:bg-[#8645e6] transition-colors"
+                  className="w-[200px] h-[50px] bg-[var(--color-main)] text-white rounded-lg hover:bg-[var(--color-main-80)] transition-colors"
                   onClick={() => navigate("/loginPage")}
                   onDoubleClick={() => {
                     setIsLoggedIn(true);
@@ -335,27 +317,14 @@ export default function Sidebar() {
 
       {/* Friend 모달 */}
       {modalFriend && (
-        <div
-          ref={modalFriendRef}
-          className="absolute left-[347px] w-[290px] h-[82px] bg-[#FAFAFA] rounded-lg shadow-md z-50 flex items-center px-4"
-          style={{ top: modalY }}
-        >
+        <div ref={modalFriendRef} className="absolute left-[347px] w-[290px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 flex items-center px-4" style={{ top: modalY }}>
           <div className="relative w-12 h-12">
-            <img
-              src={friendsIcon}
-              alt={modalFriend.name}
-              className="w-full h-full rounded-full"
-            />
-            <span
-              className={`absolute bottom-0 right-0 block w-4 h-4 rounded-full border-2 border-white ${
-                modalFriend.status === "online" ? "bg-green-500" : "bg-gray-400"
-              }`}
-            />
+            <img src={friendsIcon} alt={modalFriend.name} className="w-full h-full rounded-full" />
+            <span className={`absolute bottom-0 right-0 block w-4 h-4 rounded-full border-2 border-[var(--color-background-sub)] ${modalFriend.status === "online" ? "bg-[var(--color-alert-online)]" : "bg-[var(--color-text-light)]"}`} />
           </div>
-
           <div className="ml-4 flex flex-col justify-center">
-            <p className="font-medium text-black">{modalFriend.name}</p>
-            <p className="text-sm text-gray-500 capitalize">
+            <p className="font-medium text-[var(--color-text-main)]">{modalFriend.name}</p>
+            <p className="text-sm text-[var(--color-text-sub)] capitalize">
               {modalFriend.status === "online" ? "Online" : "Offline"}
             </p>
           </div>
@@ -384,10 +353,10 @@ export default function Sidebar() {
       {modalNotificationOpen && (
         <div
           ref={modalNotificationRef}
-          className="absolute left-[347px] w-[290px] bg-[#FAFAFA] rounded-lg shadow-md z-50 px-4"
+          className="absolute left-[347px] w-[290px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 px-4"
           style={{ top: notificationY, height: 82 * 3 }}
         >
-          <p className="p-4">Notification 내용</p>
+          <p className="p-4 text-[var(--color-text-main)]">Notification 내용</p>
         </div>
       )}
     </>

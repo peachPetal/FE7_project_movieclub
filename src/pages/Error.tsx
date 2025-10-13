@@ -19,13 +19,13 @@ function Error() {
       />
 
       <div className="flex flex-col mb-8">
-        <p className="mt-4 font-pretendard font-normal text-[#333333] text-[20px]">
+        <p className="mt-4 font-pretendard font-normal text-[var(--color-text-main)] text-[20px]">
           죄송합니다. 페이지를 찾을 수 없습니다.
         </p>
-        <p className="mt-4 font-pretendard font-normal text-[20px] text-[#333333]">
+        <p className="mt-4 font-pretendard font-normal text-[20px] text-[var(--color-text-main)]">
           존재하지 않는 주소를 입력하셨거나
         </p>
-        <p className="mt-4 font-pretendard font-normal text-[20px] text-[#333333]">
+        <p className="mt-4 font-pretendard font-normal text-[20px] text-[var(--color-text-main)]">
           요청하신 페이지의 주소가 변경, 삭제되어 찾을 수 없습니다.
         </p>
       </div>
