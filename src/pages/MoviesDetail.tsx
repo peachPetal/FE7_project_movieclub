@@ -4,11 +4,10 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import ReviewsRendering from "../components/reviews/ReviewsRendering";
-import heartIcon from "../assets/heart.svg";
-// import commentIcon from "../assets/comment.svg";
-// import shareIcon from "../assets/share.svg";
 import { useMovieStore } from "../stores/movieStore";
 import { useReviewStore } from "../stores/reviewStore";
+import TrailerBtn from "../components/common/buttons/TrailerBtn";
+import LikeBtn from "../components/common/buttons/LikeBtn";
 
 function MetaRow({
   label,
@@ -114,16 +113,8 @@ export default function MoviesDetail() {
 
           {/* CTA 버튼 영역 (트레일러 / 좋아요 카운트) */}
           <div className="flex items-center gap-4 mt-1">
-            <button
-              type="button"
-              className="h-12 px-6 rounded-[14px] bg-gradient-to-r from-[#8b5cf6] to-[#a78bfa] text-white font-semibold shadow-md hover:opacity-90 active:scale-[0.99] transition"
-            >
-              <span className="mr-2">▶</span> 트레일러
-            </button>
-            <div className="h-12 px-6 rounded-[14px] border-2 border-[#a78bfa] text-[#7c3aed] bg-white font-semibold flex items-center gap-2">
-              <img src={heartIcon} alt="Likes" className="w-5 h-5" />
-              <span>{movie?.likeCount ?? 0}</span>
-            </div>
+            <TrailerBtn src="" /> {/* 트레일러 URL이 없으므로 빈 문자열 전달 */}
+            <LikeBtn like={movie?.likeCount ?? 0} isLiked={false} />
           </div>
 
           {/* 메타 정보 */}
@@ -163,7 +154,7 @@ export default function MoviesDetail() {
       <section className="mt-10">
         <div className="flex items-baseline gap-2 justify-start mb-4">
           <h2 className="text-2xl font-bold">Reviews</h2>
-          <span className="text-2xl text-[#7c3aed] font-bold">
+          <span className="text-2xl text-[var(--color-main)] font-bold">
             {reviewsCount}
           </span>
         </div>
