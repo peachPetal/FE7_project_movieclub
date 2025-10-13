@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { isDarkMode } from "../lib/theme"; // 테마 상태 확인 함수 import
+import { isDarkMode } from "../lib/theme";
 
 import ReviewsRendering from "../components/reviews/ReviewsRendering";
 import heartIcon from "../assets/heart.svg";
@@ -20,13 +20,11 @@ function MetaRow({
 }) {
   if (!value || (Array.isArray(value) && value.length === 0)) return null;
   return (
-    // [변경 1] 텍스트 색상
     <div className="flex gap-2 text-sm text-[var(--color-text-sub)]">
       <span className="min-w-[72px]">{label}</span>
       {Array.isArray(value) ? (
         <div className="flex flex-wrap gap-2">
           {value.map((v) => (
-            // [변경 2] 장르/배우 태그 스타일
             <span key={String(v)} className="px-2 py-0.5 rounded-full bg-[var(--color-main-10)] text-[var(--color-main)] text-xs">
               {v}
             </span>
@@ -131,9 +129,7 @@ export default function MoviesDetail() {
               <span>{movie?.likeCount ?? 0}</span>
             </div>
           </div>
-          {/* [수정 1] </div>가 여기 있으면 안 됩니다. 아래로 이동 */}
 
-          {/* 메타 정보 */}
           <div className="flex flex-col gap-2">
             {isLoading || !movie ? (
               <>
@@ -163,7 +159,7 @@ export default function MoviesDetail() {
               </p>
             )}
           </div>
-        </div> {/* [수정 1] 정보 영역을 감싸는 div는 여기서 닫혀야 합니다. */}
+        </div>
       </div>
 
       {/* 리뷰 섹션: 기존 컴포넌트 재사용 */}
@@ -176,7 +172,6 @@ export default function MoviesDetail() {
         </div>
         {matchedReviews !== null ? (
           <div className="flex flex-col gap-4">
-            {/* [수정 2] 불필요한 옵셔널 체이닝(?.) 제거 */}
             {Array.isArray(matchedReviews) && matchedReviews.length > 0 ? (
               <div className="flex flex-wrap gap-[30px]">
                 <ReviewsRendering data={matchedReviews} hasImage={false} />
@@ -197,10 +192,6 @@ export default function MoviesDetail() {
               // 그림자: 공통 스타일 적용 (card-shadow)
               className="relative w-[320px] h-[250px] bg-[var(--color-background-sub)] rounded-[10px] card-shadow"
             >
-              {/*
-                모든 Skeleton 컴포넌트에 baseColor와 highlightColor를
-                props로 전달하여 다크 모드 색상을 적용합니다.
-              */}
               <div className="absolute left-[22px] top-[21.34px] w-[277px]">
                 <Skeleton
                   count={2}

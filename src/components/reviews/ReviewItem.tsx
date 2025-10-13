@@ -27,7 +27,6 @@ export default function ReviewItem({
         <div
           key={id}
           className={twMerge(
-          // [변경 1] 카드 배경을 sub로 변경하여 메인 배경과 구분
           "review-item w-80 bg-background-sub card-shadow overflow-hidden h-[410px]",
           !hasImage && "h-[230px]"
           )}

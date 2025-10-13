@@ -75,7 +75,6 @@ export default function HomeContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  // 파생 UI용 영화 목록: 로딩 중이면 null 유지, 데이터 있을 때만 배열 + 안전 기본값 보정
   const moviesForUI =
     !isLoading && Array.isArray(movies) && movies.length
       ? movies.map((m) => ({
@@ -88,7 +87,6 @@ export default function HomeContent() {
 
   const [isDark, setIsDark] = useState(isDarkMode());
 
-  // 테마 변경을 감지하기 위한 리스너 (선택적이지만 UX에 좋음)
   useEffect(() => {
     const handleThemeChange = () => setIsDark(isDarkMode());
     window.addEventListener('storage', handleThemeChange);
