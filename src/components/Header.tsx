@@ -3,55 +3,69 @@ import { useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/movieClub.svg";
 import search from "../assets/searchBar.svg";
 
+// Header 컴포넌트
 export default function Header() {
-  // ✅ 네비게이션 메뉴 정의
+  // Navigation Bar의 항목은 다음과 같음
   const navItems = [
     { id: 1, name: "HOME", path: "/" },
     { id: 2, name: "MOVIES", path: "/movies" },
     { id: 3, name: "REVIEWS", path: "/reviews" },
-    { id: 4, name: "USERS", path: "/error" }, 
+    { id: 4, name: "USERS", path: "/error" },
   ];
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  // 라우팅 구현(이동, 현재 위치 반환)
+  const navigate = useNavigate(); // 라우터 이동
+  const location = useLocation(); // 현재 위치 반환
 
+  // 인디케이터 상태 관리
   const [indicatorStyle, setIndicatorStyle] = useState({
+    // 초기값 세팅
     left: 0,
     width: 0,
     opacity: 0,
   });
 
+  // 검색바 상태 관리
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  // Dom 요소 조작
   const navListRef = useRef<HTMLLIElement[]>([]);
 
-  // 인디케이터 위치 조정
+  //
   useEffect(() => {
     const updateIndicator = () => {
+      // activeIndex는 navItems의 item중 path가 location.pathname과 같은 것
       const activeIndex = navItems.findIndex(
         (item) => item.path === location.pathname
       );
 
+      // activeIndex가 -1이 아니면(존재하면)
       if (activeIndex !== -1) {
+        // activeItem은 현재 Dom 요소
         const activeItem = navListRef.current[activeIndex];
+        // activeItem이 존재하면 
         if (activeItem) {
+          // indicator의 디자인을 수정
           setIndicatorStyle({
             left: activeItem.offsetLeft,
             width: activeItem.offsetWidth,
             opacity: 1,
           });
         }
+        // 존재하지 않으면 초기값
       } else {
         setIndicatorStyle({ left: 0, width: 0, opacity: 0 });
       }
     };
 
+    // 인디케이터 업데이트
     updateIndicator();
+    // 화면의 크기가 바뀌면 업데이트
     window.addEventListener("resize", updateIndicator);
     return () => window.removeEventListener("resize", updateIndicator);
   }, [location.pathname]);
 
   return (
-    <header className="w-full h-[8vh] bg-white shadow-sm font-sans flex items-center justify-between px-[105px]">
-      {/* 로고 + 네비게이션 */}
+    <header className="w-full h-[8vh] bg-white shadow-sm font-sans flex items-center justify-between px-[105px] relative">
       <div className="flex items-center space-x-[121px]">
         <button onClick={() => navigate("/")} className="flex-shrink-0">
           <img
@@ -84,8 +98,6 @@ export default function Header() {
                 </button>
               </li>
             ))}
-
-            {/* 인디케이터 */}
             <div
               className="absolute -bottom-1 h-[3px] bg-[#9858F3] rounded-full transition-all duration-300 ease-in-out"
               style={indicatorStyle}
@@ -94,8 +106,7 @@ export default function Header() {
         </nav>
       </div>
 
-      {/* 검색창 */}
-      <div className="relative w-[220px] h-[40px] flex-shrink-0">
+      <div className="relative w-[268px] h-[40px] flex-shrink-0">
         <img
           src={search}
           alt="Search"
@@ -104,10 +115,32 @@ export default function Header() {
         <input
           type="text"
           placeholder="Search"
+          onFocus={() => setIsSearchFocused(true)}
+          onBlur={() => setIsSearchFocused(false)}
           className="w-full h-full bg-white border border-black/12 rounded-full
             pl-10 pr-4 text-[13px] placeholder:text-black/40
             focus:outline-none focus:ring-2 focus:ring-[#9858F3]/50"
         />
+
+        {isSearchFocused && (
+          <div className="absolute top-[50px] left-1/2 -translate-x-1/2 z-10">
+            <div
+              className="absolute -top-[7px] left-1/2 -translate-x-1/2 
+                         w-0 h-0 border-l-[7.5px] border-l-transparent 
+                         border-r-[7.5px] border-r-transparent 
+                         border-b-[7.5px] border-b-[#9858F3]"
+            />
+            <div
+              className="w-[268px] h-[40px] bg-[#9858F3] rounded-[30px] 
+                         flex items-center justify-center shadow-lg"
+            >
+              <p className="text-white text-[10px] font-normal font-pretendard">
+                사용자를 찾으려면{" "}
+                <span className="font-semibold">@아이디</span>를 입력해 보세요
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
