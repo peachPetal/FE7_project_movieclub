@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -136,30 +137,36 @@ export default function HomeContent() {
         <div className="flex gap-[30px] overflow-x-auto pb-4">
           {moviesForUI
             ? moviesForUI.map((movie) => (
-                <div
+                <Link
                   key={movie.id}
-                  className="w-[250px] h-[450px] rounded-lg overflow-hidden shadow-md flex flex-col bg-white flex-shrink-0
-                             transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl"
+                  to={`/movies/${movie.id}`}
+                  aria-label={`영화 상세로 이동: ${movie.title}`}
+                  className="block"
                 >
-                  <div className="w-full h-[358px] overflow-hidden">
-                    <img
-                      src={movie.posterUrl}
-                      alt={movie.title}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    />
+                  <div
+                    className="w-[250px] h-[450px] rounded-lg overflow-hidden shadow-md flex flex-col bg-white flex-shrink-0
+                               transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl cursor-pointer"
+                  >
+                    <div className="w-full h-[358px] overflow-hidden">
+                      <img
+                        src={movie.posterUrl}
+                        alt={movie.title}
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      />
+                    </div>
+                    <div className="w-full h-[92px] p-4 flex flex-col justify-between">
+                      <h3 className="font-bold text-lg truncate text-center">
+                        {movie.title}
+                      </h3>
+                      <ActionButtons
+                        itemId={movie.id}
+                        itemType="movie"
+                        likeCount={movie.likeCount}
+                        commentCount={movie.commentCount}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full h-[92px] p-4 flex flex-col justify-between">
-                    <h3 className="font-bold text-lg truncate text-center">
-                      {movie.title}
-                    </h3>
-                    <ActionButtons
-                      itemId={movie.id}
-                      itemType="movie"
-                      likeCount={movie.likeCount}
-                      commentCount={movie.commentCount}
-                    />
-                  </div>
-                </div>
+                </Link>
               ))
             : Array.from({ length: 5 }).map((_, idx) => (
                 <div key={idx} className="w-[250px] h-[450px] flex-shrink-0">
