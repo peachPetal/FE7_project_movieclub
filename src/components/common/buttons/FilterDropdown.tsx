@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
-import Select, {
-  type GroupBase,
-  type SingleValue,
-  type StylesConfig,
-} from "react-select";
+import { Fragment, useEffect, useState } from "react";
+import { Listbox, Transition } from "@headlessui/react";
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 
 export default function FilterDropdown({ type }: { type: FilterType }) {
   const [options, setOptions] = useState<FilterOption[]>([]);
@@ -11,101 +8,92 @@ export default function FilterDropdown({ type }: { type: FilterType }) {
 
   useEffect(() => {
     if (type === "Movies") {
-      setOptions([
-        { value: "all", label: "전체 보기" },
-        { value: "romance", label: "로맨스" },
-        { value: "action", label: "액션" },
-      ]);
-      setSelected(options[0]);
       // 나중에 api 데이터 들어오면 해당하는 장르로 바꿀 것
+      setOptions([
+        { value: "전체 보기" },
+        { value: "로맨스" },
+        { value: "액션" },
+      ]);
     } else if (type === "Reviews" || type === "Comments") {
       setOptions([
-        { value: "all", label: "전체 보기" },
-        { value: "latest", label: "최신순" },
-        { value: "popular", label: "인기순" },
+        { value: "전체 보기" },
+        { value: "최신순" },
+        { value: "인기순" },
       ]);
-      setSelected(options[1]);
     } else if (type === "Users") {
-      setOptions([
-        { value: "all", label: "전체" },
-        { value: "friends", label: "친구" },
-      ]);
-      setSelected(options[0]);
+      setOptions([{ value: "전체" }, { value: "친구" }]);
     } else if (type === "MyPosts") {
-      setOptions([
-        { value: "reviews", label: "리뷰" },
-        { value: "comments", label: "댓글" },
-      ]);
-      setSelected(options[0]);
+      setOptions([{ value: "리뷰" }, { value: "댓글" }]);
     } else if (type === "Likes") {
-      setOptions([
-        { value: "movies", label: "영화" },
-        { value: "reviews", label: "리뷰" },
-      ]);
-      setSelected(options[0]);
+      setOptions([{ value: "영화" }, { value: "리뷰" }]);
     }
   }, []);
 
-  const onChange = (e: SingleValue<FilterOption>) => {
-    setSelected(e);
-  };
-
-  const customStyles: StylesConfig<
-    FilterOption,
-    false,
-    GroupBase<FilterOption>
-  > = {
-    control: (base) => ({
-      ...base,
-      borderColor: "#9858F3",
-      boxShadow: "none",
-      borderRadius: "0.5rem",
-      color: "#6B7280",
-      fontSize: "14px",
-      cursor: "pointer",
-      "&:hover": {
-        borderColor: "#9858F3",
-      },
-    }),
-    option: (base, state) => ({
-      ...base,
-      backgroundColor: state.isFocused ? "#F3EBFF" : "#fff",
-      fontSize: "14px",
-      color: state.isSelected ? "#9858F3" : "#111827",
-      cursor: "pointer",
-    }),
-    menu: (base) => ({
-      ...base,
-      border: "1px solid #9858F3",
-      borderRadius: "0.5rem",
-      boxShadow: "0",
-    }),
-    placeholder: (base) => ({
-      ...base,
-      color: "#6B7280",
-    }),
-    singleValue: (base) => ({
-      ...base,
-      color: "#9858F3",
-      fontSize: "14px",
-    }),
-  };
+  useEffect(() => {
+    if (options.length > 0) {
+      setSelected(options[0]);
+    }
+    console.log(options);
+  }, [options]);
 
   return (
-    <>
-      {selected === null ? null : (
-        <div className="w-[200px] h-[40px]">
-          <Select
-            options={options}
-            defaultValue={options[0]}
-            value={selected}
-            onChange={onChange}
-            styles={customStyles}
-            components={{ IndicatorSeparator: () => null }}
-            isSearchable={false}
-          />
+    <div className="w-[200px] border border-main rounded-[10px]">
+      <Listbox value={selected} onChange={setSelected}>
+        <div className="relative mt-1">
+          <Listbox.Button className="w-full rounded-[10px] bg-background-main py-2 pl-3 pr-10 text-left focus:outline-none sm:text-sm cursor-pointer text-main">
+            {({ open }) => (
+              <>
+                <span className="block truncate">{selected?.value}</span>
+                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                  {open ? (
+                    <ChevronUpIcon
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <ChevronDownIcon
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  )}
+                </span>
+              </>
+            )}
+          </Listbox.Button>
+          <Transition
+            as={Fragment}
+            leave="transition ease-in duration-100"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-background-main py-1 text-base focus:outline-none sm:text-sm border border-main">
+              {options.map((option, optionIdx) => (
+                <Listbox.Option
+                  key={optionIdx}
+                  className={({ active }) =>
+                    `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
+                      active ? "bg-main-10 text-main" : "text-text-main"
+                    }`
+                  }
+                  value={option}
+                >
+                  {({ selected }) => (
+                    <>
+                      <span
+                        className={`block truncate ${
+                          selected ? "font-medium text-main" : "font-normal"
+                        }`}
+                      >
+                        {option.value}
+                      </span>
+                    </>
+                  )}
+                </Listbox.Option>
+              ))}
+            </Listbox.Options>
+          </Transition>
         </div>
-      )}
-    </>
+      </Listbox>
+    </div>
   );
 }

@@ -8,7 +8,6 @@ type FilterType =
 
 interface FilterOption {
   value: string;
-  label: string;
 }
 /*
 Movies : 전체보기, 장르 ... 
