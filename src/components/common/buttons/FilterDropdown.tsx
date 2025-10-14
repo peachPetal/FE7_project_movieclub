@@ -21,7 +21,7 @@ export default function FilterDropdown({ type }: { type: FilterType }) {
         { value: "인기순" },
       ]);
     } else if (type === "Users") {
-      setOptions([{ value: "전체" }, { value: "친구" }]);
+      setOptions([{ value: "모든 유저" }, { value: "친구" }]);
     } else if (type === "MyPosts") {
       setOptions([{ value: "리뷰" }, { value: "댓글" }]);
     } else if (type === "Likes") {

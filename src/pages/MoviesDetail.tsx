@@ -5,6 +5,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import { isDarkMode } from "../lib/theme";
 import { useMovieStore } from "../stores/movieStore";
 import { useReviewStore } from "../stores/reviewStore";
+
 import TrailerBtn from "../components/common/buttons/TrailerBtn";
 import LikeBtn from "../components/common/buttons/LikeBtn";
 

@@ -10,7 +10,7 @@ export default function Header() {
     { id: 1, name: "HOME", path: "/" },
     { id: 2, name: "MOVIES", path: "/movies" },
     { id: 3, name: "REVIEWS", path: "/reviews" },
-    { id: 4, name: "USERS", path: "/error" },
+    { id: 4, name: "USERS", path: "/users" },
   ];
 
   // 라우팅 구현(이동, 현재 위치 반환)
@@ -42,7 +42,7 @@ export default function Header() {
       if (activeIndex !== -1) {
         // activeItem은 현재 Dom 요소
         const activeItem = navListRef.current[activeIndex];
-        // activeItem이 존재하면 
+        // activeItem이 존재하면
         if (activeItem) {
           // indicator의 디자인을 수정
           setIndicatorStyle({
@@ -65,15 +65,13 @@ export default function Header() {
   }, [location.pathname]);
 
   return (
-    <header className="w-full h-[8vh] bg-[var(--color-background-main)]   shadow-[5px_5px_10px_0_rgba(0,0,0,0.25)]
-  dark:shadow-[5px_5px_10px_0_rgba(255,255,255,0.1)] font-sans flex items-center justify-between px-[105px] relative">
+    <header
+      className="w-full h-[8vh] bg-[var(--color-background-main)]   shadow-[5px_5px_10px_0_rgba(0,0,0,0.25)]
+  dark:shadow-[5px_5px_10px_0_rgba(255,255,255,0.1)] font-sans flex items-center justify-between px-[105px] relative"
+    >
       <div className="flex items-center space-x-[121px]">
         <button onClick={() => navigate("/")} className="flex-shrink-0">
-          <img
-            src={logo}
-            alt="MOVIECLUB Logo"
-            className="w-[165px] h-[48px]"
-          />
+          <img src={logo} alt="MOVIECLUB Logo" className="w-[165px] h-[48px]" />
         </button>
 
         <nav className="relative">
@@ -136,8 +134,8 @@ export default function Header() {
                          flex items-center justify-center shadow-lg"
             >
               <p className="text-white text-[10px] font-normal font-pretendard">
-                사용자를 찾으려면{" "}
-                <span className="font-semibold">@아이디</span>를 입력해 보세요
+                사용자를 찾으려면 <span className="font-semibold">@아이디</span>
+                를 입력해 보세요
               </p>
             </div>
           </div>
