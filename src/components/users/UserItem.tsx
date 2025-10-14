@@ -37,7 +37,7 @@ export default function UserItem({
       type="button"
       onClick={() => onClick?.(user)}
       className={[
-        "w-full flex items-center gap-3 rounded-xl border transition",
+        "shadow-sm w-full flex items-center gap-3 rounded-xl border transition",
         "px-4 py-3",
         "border-[var(--color-text-placeholder)]",
         "hover:border-[var(--color-text-light)] hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-main-20)]",
