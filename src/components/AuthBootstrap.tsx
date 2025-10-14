@@ -5,7 +5,6 @@ export default function AuthBootstrap() {
   const hydrateFromAuth = useAuthStore((state) => state.hydrateFromAuth);
   useEffect(() => {
     hydrateFromAuth();
-    console.log(1);
   }, [hydrateFromAuth]);
   return null;
 }
