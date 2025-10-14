@@ -1,5 +1,7 @@
-import type { AppUser } from "../../types/userClaims";
-import profileIcon from "../../assets/person.svg";
+import { useEffect, useState } from "react";
+import type { AppUser } from "../../types/appUser";
+import profileIconBlack from "../../assets/person-circle-black.svg";
+import profileIconWhite from "../../assets/person-circle-white.svg";
 
 type Props = {
   user: AppUser;
@@ -16,33 +18,51 @@ export default function UserItem({
 }: Props) {
   const { name, isOnline } = user;
 
+  // 다크 모드 상태 관리
+  const [isDark, setIsDark] = useState(
+    () => localStorage.getItem("theme") === "dark"
+  );
+
+  useEffect(() => {
+    const handleThemeChange = () => {
+      setIsDark(localStorage.getItem("theme") === "dark");
+    };
+
+    window.addEventListener("storage", handleThemeChange);
+    return () => window.removeEventListener("storage", handleThemeChange);
+  }, []);
+
   return (
     <button
       type="button"
       onClick={() => onClick?.(user)}
       className={[
-        // 카드 베이스
-        "w-full flex items-center gap-3 rounded-xl border transition",
+        "shadow-sm w-full flex items-center gap-3 rounded-xl border transition",
         "px-4 py-3",
-        // 배경 및 테두리 색상
-        "bg-[var(--color-background-sub)] border-[var(--color-text-placeholder)]",
-        // 호버/포커스
+        "border-[var(--color-text-placeholder)]",
         "hover:border-[var(--color-text-light)] hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-main-20)]",
-        // 선택 상태
         selected
           ? "border-[var(--color-main)] ring-2 ring-[var(--color-main-10)]"
           : "",
-        // 다크 모드
-        "dark:bg-[var(--color-background-main)] dark:border-[var(--color-text-light)] dark:hover:border-[var(--color-text-sub)]",
+        "dark:bg-[var(--color-background-sub)] dark:border-[var(--color-text-light)] dark:hover:border-[var(--color-text-sub)]",
         className || "",
+        `
+        card-shadow flex items-center gap-4 p-4 rounded-lg cursor-pointer transition
+        ${
+          selected
+            ? "bg-[color:var(--color-main-10)]" // 선택된 상태 (투명도 90%)
+            : "bg-[color:var(--color-background-main)] hover:bg-[color:var(--color-main-10)]"
+        }
+      `,
       ].join(" ")}
       aria-pressed={selected}
     >
+      {/* 다크 모드에 따라 아이콘 변경 */}
       <div className="relative h-10 w-10 shrink-0 rounded-full bg-[var(--color-background-sub)] overflow-hidden">
         <img
-          src={profileIcon}
+          src={isDark ? profileIconWhite : profileIconBlack}
           alt=""
-          className="absolute inset-0 w-8 h-8 object-cover rounded-full"
+          className="absolute inset-0 w-full h-full object-cover rounded-full"
         />
       </div>
 
