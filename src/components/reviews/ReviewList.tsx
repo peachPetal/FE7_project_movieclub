@@ -1,28 +1,28 @@
 import { useEffect, useState } from "react";
 import { useReviewStore } from "../../stores/reviewStore";
-import ReviewItem from "./ReviewItem";
-import ReviewItemSkeleton from "../loading/ReviewItemSkeleton";
+import ReviewsRendering from "./ReviewsRendering";
 
-export default function ReviewList() {
-  const { reviewsData } = useReviewStore();
-  const [isLoading, setIsLoading] = useState(true);
+type ReviewsListProps = {
+  variant?: "home" | "page";
+};
+
+export default function ReviewList({ variant = "page" }: ReviewsListProps) {
+  const { isLoading, setIsLoading, reviewsData } = useReviewStore();
+  const [data, setData] = useState<Review[]>([]);
+
+  useEffect(() => {
+    const limit = variant === "home" ? 5 : 20;
+    setData(reviewsData.slice(0, limit + 1));
+  }, [reviewsData, variant]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsLoading(false);
+      setIsLoading(!isLoading);
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
 
-  if (isLoading) {
-    return [...Array(4)].map(() => <ReviewItemSkeleton hasImage={true} />);
-  } else {
-    return (
-      <>
-        {reviewsData.map((review) => (
-          <ReviewItem data={review} hasImage={true} />
-        ))}
-      </>
-    );
-  }
+  return (
+    <ReviewsRendering data={data} variant={variant} isLoading={isLoading} />
+  );
 }

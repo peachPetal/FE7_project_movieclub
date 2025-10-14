@@ -5,10 +5,10 @@ import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
 export default function ReviewsPage() {
   return (
     <>
-      <div className="w-full h-full ml-[50px]flex flex-col justify-between">
+      <div className="w-full h-full flex flex-col justify-start">
         <FilterDropdown type="Reviews" />
         <div className="reviews flex flex-wrap gap-5 mt-[25px]">
-          <ReviewList />
+          <ReviewList variant="page" />
         </div>
       </div>
       <ReviewPostBtn />

@@ -21,8 +21,8 @@ export default function MoviesRendering({
     <div
       className={
         variant === "home"
-          ? "flex gap-[30px] overflow-x-auto pb-4"
-          : "flex flex-wrap gap-[30px] justify-start"
+          ? "flex gap-[30px] flex-wrap"
+          : "flex flex-wrap gap-4"
       }
     >
       {list.map((movie, idx) => (
