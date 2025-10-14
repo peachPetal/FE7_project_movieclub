@@ -7,8 +7,8 @@ import { isDarkMode } from "../lib/theme";
 import ReviewsRendering from "../components/reviews/ReviewsRendering";
 import { useMovieStore } from "../stores/movieStore";
 import { useReviewStore } from "../stores/reviewStore";
-import TrailerBtn from "../components/common/buttons/TrailerBtn";
-import LikeBtn from "../components/common/buttons/LikeBtn";
+// import TrailerBtn from "../components/common/buttons/TrailerBtn";
+// import LikeBtn from "../components/common/buttons/LikeBtn";
 import heartIcon from "../assets/heart.svg";
 
 function MetaRow({
