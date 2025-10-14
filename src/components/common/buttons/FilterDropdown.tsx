@@ -33,7 +33,6 @@ export default function FilterDropdown({ type }: { type: FilterType }) {
     if (options.length > 0) {
       setSelected(options[0]);
     }
-    console.log(options);
   }, [options]);
 
   return (

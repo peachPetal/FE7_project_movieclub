@@ -13,6 +13,7 @@ import ReviewPostPage from "./pages/ReviewPostPage";
 import Settings from "./pages/Settings";
 import Profile from "./pages/profilePage";
 import UsersPage from "./pages/UsersPage";
+import PublicOnlyRoute from "./components/routes/PublicOnlyRoute";
 
 export default function App() {
   // ProfileImageUpload onUpload 콜백
@@ -31,7 +32,9 @@ export default function App() {
       {/* DefaultLayout 적용 영역 */}
       <Route element={<DefaultLayout />}>
         <Route path="/" element={<HomeContent />} />
-        <Route path="/loginPage" element={<LoginPage />} />
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
         <Route path="/review/post" element={<ReviewPostPage />} />
         <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/reviews/:id" element={<ReviewsDetail />} />

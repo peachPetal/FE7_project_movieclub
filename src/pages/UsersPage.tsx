@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import FilterDropdown from "../components/common/buttons/FilterDropdown";
 import UserItem from "../components/users/UserItem";
 import UserDetailPanel from "../components/users/UserDetailPanel";
-import type { AppUser } from "../types/User";
+import type { AppUser } from "../types/appUser";
 
 export default function UsersPage() {
   const [users] = useState<AppUser[]>([

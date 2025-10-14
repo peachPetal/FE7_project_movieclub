@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { AppUser } from "../../types/User";
+import type { AppUser } from "../../types/appUser";
 import profileIconBlack from "../../assets/person-circle-black.svg";
 import profileIconWhite from "../../assets/person-circle-white.svg";
 
