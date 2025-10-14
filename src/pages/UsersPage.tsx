@@ -31,7 +31,11 @@ export default function UsersPage() {
               <UserItem
                 user={u}
                 selected={u.id === selectedId}
-                onClick={(clicked) => setSelectedId(clicked.id)}
+                onClick={(clicked) =>
+                  setSelectedId((prev) =>
+                    prev === clicked.id ? null : clicked.id
+                  )
+                }
               />
             </li>
           ))}
@@ -39,7 +43,7 @@ export default function UsersPage() {
       </div>
 
       {/* 우측 상세 패널 */}
-      <div className="flex w-[500px] h-[284px] min-w-0">
+      <div className="flex w-[500px] min-w-0">
         {selectedUser ? (
           <UserDetailPanel user={selectedUser} />
         ) : (
