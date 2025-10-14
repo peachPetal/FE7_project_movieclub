@@ -12,6 +12,7 @@ import ReviewPostPage from "./pages/ReviewPostPage";
 // import MoviesDetail from "./pages/MoviesDetail";
 import Settings from "./pages/Settings";
 import Profile from "./pages/profilePage";
+import UsersPage from "./pages/UsersPage";
 
 export default function App() {
   // ProfileImageUpload onUpload 콜백
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/movies" element={<MoviesPage />} />
         <Route path="/movies/:id" element={<MoviesDetail />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/users" element={<UsersPage />} />
         <Route
           path="/profile"
           element={<Profile onUpload={handleProfileUpload} />}
