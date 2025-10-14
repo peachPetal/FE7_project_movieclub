@@ -43,7 +43,7 @@ export default function UsersPage() {
       </div>
 
       {/* 우측 상세 패널 */}
-      <div className="flex w-[500px] h-[284px] min-w-0">
+      <div className="flex w-[500px] min-w-0">
         {selectedUser ? (
           <UserDetailPanel user={selectedUser} />
         ) : (
