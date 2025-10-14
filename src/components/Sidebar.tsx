@@ -96,7 +96,7 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
   };
 
   return (
-    <div className="flex flex-col flex-1 p-4 overflow-y-auto">
+    <div className="flex flex-col flex-1 p-4 overflow-visible">
       <ul className="space-y-1">
         <li>
           <button ref={notificationButtonRef} onClick={onNotificationClick} className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]">
@@ -134,7 +134,7 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
 
           <div
             className={`overflow-hidden transition-all duration-300 ${
-              isFriendsMenuOpen ? "max-h-96" : "max-h-0"
+              isFriendsMenuOpen ? "max-h-120" : "max-h-0"
             }`}
           >
             <ul className="space-y-1 pl-6 pt-1">
@@ -212,11 +212,18 @@ export default function Sidebar() {
   const [modalNotificationOpen, setModalNotificationOpen] = useState(false);
   const [notificationY, setNotificationY] = useState(0);
 
-  const friendsData: Friend[] = [
+  // friendsData를 state로 변경하고 9명으로 확장
+  const [friendsData, setFriendsData] = useState<Friend[]>([
     { id: 1, name: "Friend 1", status: "online" },
     { id: 2, name: "Friend 2", status: "offline" },
-    { id: 3, name: "Friend 3", status: "offline" },
-  ];
+    { id: 3, name: "Friend 3", status: "online" },
+    { id: 4, name: "Friend 4", status: "offline" },
+    { id: 5, name: "Friend 5", status: "online" },
+    { id: 6, name: "Friend 6", status: "offline" },
+    { id: 7, name: "Friend 7", status: "online" },
+    { id: 8, name: "Friend 8", status: "offline" },
+    { id: 9, name: "Friend 9", status: "online" },
+  ]);
 
   const navigate = useNavigate();
   const notificationButtonRef = useRef<HTMLButtonElement>(null);
@@ -276,6 +283,13 @@ export default function Sidebar() {
     };
   }, [modalFriend, modalNotificationOpen]);
 
+  // 친구 삭제 기능
+  const handleDeleteFriend = (friendId: number) => {
+    setFriendsData((prev) => prev.filter((f) => f.id !== friendId));
+    setModalFriend(null); // 모달 닫기
+  };
+
+
   return (
     <>
       <aside className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ml-[50px] ${isLoggedIn ? (isCollapsed ? "h-[110px]" : "h-[852px]") : "h-[255px]"}`}>
@@ -330,7 +344,11 @@ export default function Sidebar() {
           </div>
 
           <div className="ml-auto flex gap-2">
-            <button className="relative w-8 h-8 group">
+            {/* 삭제 버튼 */}
+            <button
+              className="relative w-8 h-8 group"
+              onClick={() => handleDeleteFriend(modalFriend.id)}
+            >
               <img
                 src={deleteFriendMouseOff}
                 alt="delete"

@@ -4,6 +4,7 @@ import LikeBtn from "../common/buttons/LikeBtn";
 import Comment from "../comments/Comment";
 import { useEffect, useState } from "react";
 import ReviewsDetailSkeleton from "../loading/ReviewsDetailSkeleton";
+import TimeAgo from "../TimeAgo";
 
 export default function ReviewsDetail() {
   const { id } = useParams();
@@ -36,12 +37,14 @@ export default function ReviewsDetail() {
     return (
       <>
         <div className="mr-15">
-          <h1 className="text-4xl font-semibold mb-2.5">
+          <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">
             {title}
-            <span className="text-main"> #{movie}</span>
+            <span className="text-main dark:text-main-dark"> #{movie}</span>
           </h1>
           <p className="mb-10 text-text-sub">
-            {createdAt} by <span className="text-main">{author}</span>{" "}
+            <span className="text-[var(--color-text-sub)]"><TimeAgo dateString={createdAt} /></span>
+            {" by "}
+            <span className="review-created-user text-main">{author}</span>
           </p>
           <div className="flex mb-10">
             <img
@@ -52,7 +55,7 @@ export default function ReviewsDetail() {
                   : "https://plus.unsplash.com/premium_photo-1661675440353-6a6019c95bc7?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               }
             />
-            <p className="mr-12 whitespace-pre-line leading-relaxed">
+            <p className="mr-12 whitespace-pre-line leading-relaxed text-text-main dark:text-text-main-dark">
               {content}
             </p>
           </div>

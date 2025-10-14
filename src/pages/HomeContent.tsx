@@ -10,6 +10,8 @@ import shareIcon from "../assets/share.svg";
 import ReviewsRendering from "../components/reviews/ReviewsRendering";
 import { useReviewStore } from "../stores/reviewStore";
 import { useMovieStore } from "../stores/movieStore";
+import MovieSkeleton from "../components/loading/MovieSkeleton";
+import ReviewcardSkeleton from "../components/loading/ReviewcardSkeleton";
 
 interface ActionButtonsProps {
   itemId: number;
@@ -104,51 +106,48 @@ export default function HomeContent() {
         </h2>
 
         <div className="flex gap-[30px] overflow-x-auto pb-4">
-          {moviesForUI
-            ? moviesForUI.map((movie) => (
-                <Link
-                  key={movie.id}
-                  to={`/movies/${movie.id}`}
-                  aria-label={`영화 상세로 이동: ${movie.title}`}
-                  className="block"
-                >
-                  <div className="w-[250px] h-[450px] rounded-lg overflow-hidden shadow-md flex flex-col bg-[var(--color-background-sub)] flex-shrink-0 transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl cursor-pointer">
-                    <div className="w-full h-[358px] overflow-hidden">
-                      <img
-                        src={movie.posterUrl}
-                        alt={movie.title}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                      />
-                    </div>
-                    <div className="w-full h-[92px] p-4 flex flex-col justify-between">
-                      <h3 className="font-bold text-lg truncate text-center text-[var(--color-text-main)]">
-                        {movie.title}
-                      </h3>
-                      <ActionButtons
-                        itemId={movie.id}
-                        itemType="movie"
-                        likeCount={movie.likeCount}
-                        commentCount={movie.commentCount}
-                      />
-                    </div>
+          {moviesForUI && moviesForUI.length > 0 ? (
+            moviesForUI.map((movie) => (
+              <Link
+                key={movie.id}
+                to={`/movies/${movie.id}`}
+                aria-label={`영화 상세로 이동: ${movie.title}`}
+                className="block"
+              >
+                <div className="w-[250px] h-[450px] rounded-lg overflow-hidden shadow-md flex flex-col bg-[var(--color-background-sub)] flex-shrink-0 transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl cursor-pointer">
+                  <div className="w-full h-[358px] overflow-hidden">
+                    <img
+                      src={movie.posterUrl}
+                      alt={movie.title}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
                   </div>
-                </Link>
-              ))
-            : Array.from({ length: 5 }).map((_, idx) => (
-                <div key={idx} className="w-[250px] h-[450px] flex-shrink-0">
-                  <Skeleton height={358} className="rounded-t-lg" baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-                  <div className="p-4 bg-[var(--color-background-sub)] rounded-b-lg">
-                    <Skeleton width="75%" height={20} className="mx-auto" baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-                    <div className="grid grid-cols-3 items-center mt-3">
-                      <Skeleton width={40} height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-                      <Skeleton width={40} height={20} className="mx-auto" baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-                      <Skeleton circle width={24} height={24} className="ml-auto" baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-                    </div>
+                  <div className="w-full h-[92px] p-4 flex flex-col justify-between">
+                    <h3 className="font-bold text-lg truncate text-center text-[var(--color-text-main)]">
+                      {movie.title}
+                    </h3>
+                    <ActionButtons
+                      itemId={movie.id}
+                      itemType="movie"
+                      likeCount={movie.likeCount}
+                      commentCount={movie.commentCount}
+                    />
                   </div>
                 </div>
-              ))}
+              </Link>
+            ))
+          ) : (
+            <>
+              <MovieSkeleton />
+              <MovieSkeleton />
+              <MovieSkeleton />
+              <MovieSkeleton />
+              <MovieSkeleton />
+            </>
+          )}
         </div>
       </section>
+
 
       <section>
         <h2 className="text-4xl font-bold mb-8 text-[var(--color-text-main)]">
@@ -158,22 +157,13 @@ export default function HomeContent() {
           {reviews ? (
             <ReviewsRendering data={reviews} hasImage={false} />
           ) : (
-            Array.from({ length: 4 }).map((_, idx) => (
-              <div key={idx} className="relative w-[320px] h-[250px] bg-[var(--color-background-sub)] rounded-[10px] card-shadow">
-                <div className="absolute left-[22px] top-[21.34px] w-[277px]">
-                  <Skeleton count={1} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
-                </div>
-                <Skeleton className="absolute left-[22px] top-[80.28px]" width={277} count={3} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
-                <Skeleton className="absolute left-[22px] top-[172.76px]" width={180} height={16} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
-                <div className="absolute bottom-0 left-0 right-0 h-[60px] px-[22px] flex items-center">
-                  <div className="grid grid-cols-3 items-center w-full">
-                    <Skeleton width={40} height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
-                    <Skeleton width={40} height={20} className="mx-auto" baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
-                    <Skeleton circle width={24} height={24} className="ml-auto" baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
-                  </div>
-                </div>
-              </div>
-            ))
+            <>
+            <ReviewcardSkeleton />
+            <ReviewcardSkeleton />
+            <ReviewcardSkeleton />
+            <ReviewcardSkeleton />
+            <ReviewcardSkeleton />
+            </>
           )}
         </div>
       </section>

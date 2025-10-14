@@ -52,14 +52,15 @@ export default function ReviewItem({
 
           <div className="review-data p-5 h-[227px] flex flex-col justify-between">
             <div className="review-post">
-              <p className="review-title font-bold mb-3 text-[18px] truncate text-text-main">
+              <p className="review-title font-bold mb-3 text-[18px] truncate text-[var(--color-text-main)]">
                 <span className="review-movie text-main">#{movie}</span> {title}
               </p>
               <p className="review-content text-xs mb-3 line-clamp-4 leading-relaxed text-text-main">
                 {content}
               </p>
                 <p className="review-created-info text-xs text-text-sub mb-4">
-                  <TimeAgo dateString={createdAt} /> by{" "}
+                  <span className="text-[var(--color-text-sub)]"><TimeAgo dateString={createdAt} /></span>
+                  {" by "}
                   <span className="review-created-user text-main">{author}</span>
                 </p>
             </div>
