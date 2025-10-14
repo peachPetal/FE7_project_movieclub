@@ -31,7 +31,11 @@ export default function UsersPage() {
               <UserItem
                 user={u}
                 selected={u.id === selectedId}
-                onClick={(clicked) => setSelectedId(clicked.id)}
+                onClick={(clicked) =>
+                  setSelectedId((prev) =>
+                    prev === clicked.id ? null : clicked.id
+                  )
+                }
               />
             </li>
           ))}

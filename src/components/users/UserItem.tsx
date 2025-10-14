@@ -46,6 +46,14 @@ export default function UserItem({
           : "",
         "dark:bg-[var(--color-background-sub)] dark:border-[var(--color-text-light)] dark:hover:border-[var(--color-text-sub)]",
         className || "",
+        `
+        card-shadow flex items-center gap-4 p-4 rounded-lg cursor-pointer transition
+        ${
+          selected
+            ? "bg-[color:var(--color-main-10)]" // 선택된 상태 (투명도 90%)
+            : "bg-[color:var(--color-background-main)] hover:bg-[color:var(--color-main-10)]"
+        }
+      `,
       ].join(" ")}
       aria-pressed={selected}
     >
