@@ -3,13 +3,10 @@ import { useParams } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { isDarkMode } from "../lib/theme";
-
-import ReviewsRendering from "../components/reviews/ReviewsRendering";
 import { useMovieStore } from "../stores/movieStore";
 import { useReviewStore } from "../stores/reviewStore";
 import TrailerBtn from "../components/common/buttons/TrailerBtn";
 import LikeBtn from "../components/common/buttons/LikeBtn";
-import heartIcon from "../assets/heart.svg";
 
 function MetaRow({
   label,
@@ -86,9 +83,9 @@ export default function MoviesDetail() {
     return filtered as Review[];
   }, [reviewsData, movie]);
 
-  const reviewsCount = Array.isArray(matchedReviews)
-    ? matchedReviews.length
-    : 0;
+  // const reviewsCount = Array.isArray(matchedReviews)
+  //   ? matchedReviews.length
+  //   : 0;
 
   // --- 스켈레톤 UI를 위한 테마 관리 로직 ---
   const [isDark, setIsDark] = useState(isDarkMode());
@@ -139,16 +136,8 @@ export default function MoviesDetail() {
 
           {/* CTA 버튼 영역 */}
           <div className="flex items-center gap-4 mt-1">
-            <button
-              type="button"
-              className="h-12 px-6 rounded-[14px] bg-gradient-to-r from-[#8b5cf6] to-[#a78bfa] text-white font-semibold shadow-md hover:opacity-90 active:scale-[0.99] transition"
-            >
-              <span className="mr-2">▶</span> 트레일러
-            </button>
-            <div className="h-12 px-6 rounded-[14px] border-2 border-[var(--color-main)] text-[var(--color-main)] bg-[var(--color-background-sub)] font-semibold flex items-center gap-2">
-              <img src={heartIcon} alt="Likes" className="w-5 h-5" />
-              <span>{movie?.likeCount ?? 0}</span>
-            </div>
+            <TrailerBtn src="" />
+            <LikeBtn like={movie?.likeCount ?? 0} isLiked={false} />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -198,90 +187,92 @@ export default function MoviesDetail() {
           </div>
         </div>
       </div>
-
-      {/* 리뷰 섹션: 기존 컴포넌트 재사용 */}
-      <section className="mt-10">
-        <div className="flex items-baseline gap-2 justify-start mb-4">
-          <h2 className="text-2xl font-bold text-[var(--color-text-main)]">
-            Reviews
-          </h2>
-          <span className="text-2xl text-[var(--color-main)] font-bold">
-            {reviewsCount}
-          </span>
-        </div>
-        {matchedReviews !== null ? (
-          <div className="flex flex-col gap-4">
-            {Array.isArray(matchedReviews) && matchedReviews.length > 0 ? (
-              <div className="flex flex-wrap gap-[30px]">
-                <ReviewsRendering data={matchedReviews} hasImage={false} />
-              </div>
-            ) : (
-              <div className="text-[var(--color-text-sub)] text-sm">
-                이 영화의 리뷰가 아직 없습니다.
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="flex gap-[30px] flex-wrap">
-            {/* 5개의 스켈레톤 카드를 생성 */}
-            {Array.from({ length: 5 }).map((_, idx) => (
-              <div
-                key={idx}
-                // 카드 배경: 테마에 따라 자동 변경 (bg-background-sub)
-                // 그림자: 공통 스타일 적용 (card-shadow)
-                className="relative w-[320px] h-[250px] bg-[var(--color-background-sub)] rounded-[10px] card-shadow"
-              >
-                <div className="absolute left-[22px] top-[21.34px] w-[277px]">
-                  <Skeleton
-                    count={2}
-                    baseColor={skeletonBaseColor}
-                    highlightColor={skeletonHighlightColor}
-                  />
-                </div>
-                <Skeleton
-                  className="absolute left-[22px] top-[80.28px]"
-                  width={277}
-                  count={3}
-                  baseColor={skeletonBaseColor}
-                  highlightColor={skeletonHighlightColor}
-                />
-                <Skeleton
-                  className="absolute left-[22px] top-[172.76px]"
-                  width={180}
-                  height={16}
-                  baseColor={skeletonBaseColor}
-                  highlightColor={skeletonHighlightColor}
-                />
-                <div className="absolute bottom-0 left-0 right-0 h-[60px] px-[22px] flex items-center">
-                  <div className="grid grid-cols-3 items-center w-full">
-                    <Skeleton
-                      width={40}
-                      height={20}
-                      baseColor={skeletonBaseColor}
-                      highlightColor={skeletonHighlightColor}
-                    />
-                    <Skeleton
-                      width={40}
-                      height={20}
-                      className="mx-auto"
-                      baseColor={skeletonBaseColor}
-                      highlightColor={skeletonHighlightColor}
-                    />
-                    <Skeleton
-                      circle
-                      width={24}
-                      height={24}
-                      className="ml-auto"
-                      baseColor={skeletonBaseColor}
-                      highlightColor={skeletonHighlightColor}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
     </div>
   );
 }
+
+{
+  /* 리뷰 섹션: 기존 컴포넌트 재사용 */
+}
+// <section className="mt-10">
+//   <div className="flex items-baseline gap-2 justify-start mb-4">
+//     <h2 className="text-2xl font-bold text-[var(--color-text-main)]">
+//       Reviews
+//     </h2>
+//     <span className="text-2xl text-[var(--color-main)] font-bold">
+//       {reviewsCount}
+//     </span>
+//   </div>
+//   {matchedReviews !== null ? (
+//     <div className="flex flex-col gap-4">
+//       {Array.isArray(matchedReviews) && matchedReviews.length > 0 ? (
+//         <div className="flex flex-wrap gap-[30px]">
+//           <ReviewsRendering data={matchedReviews} hasImage={false} />
+//         </div>
+//       ) : (
+//         <div className="text-[var(--color-text-sub)] text-sm">
+//           이 영화의 리뷰가 아직 없습니다.
+//         </div>
+//       )}
+//     </div>
+//   ) : (
+//     <div className="flex gap-[30px] flex-wrap">
+//       {/* 5개의 스켈레톤 카드를 생성 */}
+//       {Array.from({ length: 5 }).map((_, idx) => (
+//         <div
+//           key={idx}
+//           // 카드 배경: 테마에 따라 자동 변경 (bg-background-sub)
+//           // 그림자: 공통 스타일 적용 (card-shadow)
+//           className="relative w-[320px] h-[250px] bg-[var(--color-background-sub)] rounded-[10px] card-shadow"
+//         >
+//           <div className="absolute left-[22px] top-[21.34px] w-[277px]">
+//             <Skeleton
+//               count={2}
+//               baseColor={skeletonBaseColor}
+//               highlightColor={skeletonHighlightColor}
+//             />
+//           </div>
+//           <Skeleton
+//             className="absolute left-[22px] top-[80.28px]"
+//             width={277}
+//             count={3}
+//             baseColor={skeletonBaseColor}
+//             highlightColor={skeletonHighlightColor}
+//           />
+//           <Skeleton
+//             className="absolute left-[22px] top-[172.76px]"
+//             width={180}
+//             height={16}
+//             baseColor={skeletonBaseColor}
+//             highlightColor={skeletonHighlightColor}
+//           />
+//           <div className="absolute bottom-0 left-0 right-0 h-[60px] px-[22px] flex items-center">
+//             <div className="grid grid-cols-3 items-center w-full">
+//               <Skeleton
+//                 width={40}
+//                 height={20}
+//                 baseColor={skeletonBaseColor}
+//                 highlightColor={skeletonHighlightColor}
+//               />
+//               <Skeleton
+//                 width={40}
+//                 height={20}
+//                 className="mx-auto"
+//                 baseColor={skeletonBaseColor}
+//                 highlightColor={skeletonHighlightColor}
+//               />
+//               <Skeleton
+//                 circle
+//                 width={24}
+//                 height={24}
+//                 className="ml-auto"
+//                 baseColor={skeletonBaseColor}
+//                 highlightColor={skeletonHighlightColor}
+//               />
+//             </div>
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   )}
+// </section>

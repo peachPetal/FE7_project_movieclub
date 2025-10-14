@@ -1,10 +1,14 @@
+import FilterDropdown from "../components/common/buttons/FilterDropdown";
 import MoviesList from "../components/movies/MoviesList";
 
 export default function MoviesPage() {
   return (
     <>
-      <div className="w-3/4 p-4 overflow-y-auto">
-        <MoviesList variant="page" />
+      <div className="w-full h-full flex flex-col justify-start">
+        <FilterDropdown type="Movies" />
+        <div className="mt-[25px]">
+          <MoviesList variant="page" />
+        </div>
       </div>
     </>
   );
