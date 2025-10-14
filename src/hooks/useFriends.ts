@@ -10,34 +10,49 @@ export interface Friend {
   status: FriendStatus;
 }
 
-export function useFriends(userEmail: string | null) {
+export function useFriends(userId: string | null) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!userEmail) return;
+    if (!userId) return;
 
     const fetchFriends = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        // 1️⃣ friendship 테이블에서 친구 관계 조회
+        const { data: friendships, error: friendshipError } = await supabase
           .from("friendship")
-          .select(`
-            friend:friend_id (
-              id,
-              email,
-              avatar_url
-            )
-          `)
-          .eq("user_id", userEmail);
+          .select("user_id, friend_id")
+          .or(`user_id.eq.${userId},friend_id.eq.${userId}`);
 
-        if (error) throw error;
+        if (friendshipError) throw friendshipError;
 
-        const mapped: Friend[] = data?.map((item: any) => ({
-          id: item.friend.id,
-          name: item.friend.email,
-          avatarUrl: item.friend.avatar_url ?? undefined,
-          status: "offline" as FriendStatus, // 기본값 offline
+        if (!friendships || friendships.length === 0) {
+          setFriends([]);
+          setLoading(false);
+          return;
+        }
+
+        // 2️⃣ 상대방 ID만 추출
+        const friendIds = friendships.map(f =>
+          f.user_id === userId ? f.friend_id : f.user_id
+        );
+
+        // 3️⃣ users 테이블에서 상대방 프로필 조회
+        const { data: usersData, error: usersError } = await supabase
+          .from("users")
+          .select("id, email, avatar_url")
+          .in("id", friendIds);
+
+        if (usersError) throw usersError;
+
+        // 4️⃣ Friend 배열 생성
+        const mapped: Friend[] = usersData?.map(u => ({
+          id: u.id,
+          name: u.email,
+          avatarUrl: u.avatar_url ?? undefined,
+          status: "offline", // 기본값
         })) ?? [];
 
         setFriends(mapped);
@@ -49,7 +64,7 @@ export function useFriends(userEmail: string | null) {
     };
 
     fetchFriends();
-  }, [userEmail]);
+  }, [userId]);
 
-  return { friends, loading };
+  return { friends, loading, setFriends };
 }
