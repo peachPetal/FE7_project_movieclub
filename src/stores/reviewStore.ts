@@ -4,6 +4,7 @@ import { immer } from "zustand/middleware/immer";
 
 interface ReviewState {
   isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
   reviewsData: Review[];
   setReviews: (data: Review) => void;
   getReview: (id: number) => Review;
@@ -13,6 +14,9 @@ export const useReviewStore = create<ReviewState>()(
   devtools(
     immer((set, get) => ({
       isLoading: true,
+      setIsLoading: (loading) => {
+        set({ isLoading: loading });
+      },
       reviewsData: [
         {
           id: 1,

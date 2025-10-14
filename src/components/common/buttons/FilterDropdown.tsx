@@ -21,7 +21,7 @@ export default function FilterDropdown({ type }: { type: FilterType }) {
         { value: "인기순" },
       ]);
     } else if (type === "Users") {
-      setOptions([{ value: "전체" }, { value: "친구" }]);
+      setOptions([{ value: "모든 유저" }, { value: "친구" }]);
     } else if (type === "MyPosts") {
       setOptions([{ value: "리뷰" }, { value: "댓글" }]);
     } else if (type === "Likes") {
@@ -37,7 +37,7 @@ export default function FilterDropdown({ type }: { type: FilterType }) {
   }, [options]);
 
   return (
-    <div className="w-[200px] border border-main rounded-[10px]">
+    <div className="w-[200px] border border-main rounded-[10px] z-10">
       <Listbox value={selected} onChange={setSelected}>
         <div className="relative mt-1">
           <Listbox.Button className="w-full rounded-[10px] bg-background-main py-2 pl-3 pr-10 text-left focus:outline-none sm:text-sm cursor-pointer text-main">

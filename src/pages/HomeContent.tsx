@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { isDarkMode } from "../lib/theme";
-
-import heartIcon from "../assets/heart.svg";
-import commentIcon from "../assets/comment.svg";
-import shareIcon from "../assets/share.svg";
 import ReviewsRendering from "../components/reviews/ReviewsRendering";
 import { useReviewStore } from "../stores/reviewStore";
 import { useMovieStore } from "../stores/movieStore";
@@ -60,39 +54,20 @@ const ActionButtons = ({
 };
 
 export default function HomeContent() {
-  const [reviews, setReviews] = useState<Review[] | null>(null);
-  const { reviewsData } = useReviewStore();
-
-  const { movies, isLoading, fetchMovies } = useMovieStore();
-
-  useEffect(() => {
-    // 홈 섹션은 캐러셀이니 6개만 가져오기
-    fetchMovies(6);
-  }, [fetchMovies]);
+  const [isDark, setIsDark] = useState(isDarkMode());
+  const { isLoading, setIsLoading, reviewsData } = useReviewStore();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setReviews(reviewsData);
-    }, 3000);
+      setIsLoading(!isLoading);
+    }, 2000);
     return () => clearTimeout(timer);
   }, []);
 
-  const moviesForUI =
-    !isLoading && Array.isArray(movies) && movies.length
-      ? movies.map((m) => ({
-          ...m,
-          id: Number(m.id),
-          likeCount: m.likeCount ?? 0,
-          commentCount: m.commentCount ?? 0,
-        }))
-      : null;
-
-  const [isDark, setIsDark] = useState(isDarkMode());
-
   useEffect(() => {
     const handleThemeChange = () => setIsDark(isDarkMode());
-    window.addEventListener('storage', handleThemeChange);
-    return () => window.removeEventListener('storage', handleThemeChange);
+    window.addEventListener("storage", handleThemeChange);
+    return () => window.removeEventListener("storage", handleThemeChange);
   }, []);
 
   const skeletonBaseColor = isDark ? "#3c3c3c" : "#ebebeb";
