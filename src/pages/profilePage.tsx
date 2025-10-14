@@ -47,8 +47,8 @@ const Profile: React.FC<ProfileImageUploadProps> = ({ onUpload }) => {
         {/* 프로필 이미지 영역 */}
         <div className="relative flex flex-col items-center flex-shrink-0">
           {/* 이미지 클릭 영역 */}
-          <div className="w-full h-full rounded-full border-2 border-[var(--color-text-placeholder)] cursor-pointer hover:border-[var(--color-main)] relative" onClick={handleClick}>
-            <img src={previewUrl} alt="Profile" className="w-full h-full object-cover" />
+          <div className="w-full h-full rounded-full border-2 border-[var(--color-text-placeholder)] cursor-pointer hover:border-[var(--color-main)] relative">
+            <img src={previewUrl} alt="Profile" className="w-[120px] h-[120px] object-cover rounded-full" />
             <img src={profileCameraBtn} alt="Camera" className="absolute bottom-0 right-0 cursor-pointer" onClick={handleClick} />
           </div>
 
