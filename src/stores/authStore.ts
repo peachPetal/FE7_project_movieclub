@@ -3,7 +3,7 @@ import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import type { Users } from "../types/users";
 import { create } from "zustand";
-import supabase from "../../utils/supabase";
+import { supabase } from "../utils/supabase";
 
 type AuthStore = {
   isLoading: boolean;
