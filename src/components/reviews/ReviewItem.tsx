@@ -27,8 +27,8 @@ export default function ReviewItem({
         <div
           key={id}
           className={twMerge(
-            "review-item w-80 bg-background-main card-shadow overflow-hidden h-[410px]",
-            !hasImage && "h-[230px]"
+          "review-item w-80 bg-background-sub card-shadow overflow-hidden h-[410px]",
+          !hasImage && "h-[230px]"
           )}
         >
           {hasImage ? (
@@ -52,10 +52,10 @@ export default function ReviewItem({
 
           <div className="review-data p-5 h-[227px] flex flex-col justify-between">
             <div className="review-post">
-              <p className="review-title font-bold mb-3 text-[18px] truncate">
+              <p className="review-title font-bold mb-3 text-[18px] truncate text-text-main">
                 <span className="review-movie text-main">#{movie}</span> {title}
               </p>
-              <p className="review-content text-xs mb-3 line-clamp-4 leading-relaxed">
+              <p className="review-content text-xs mb-3 line-clamp-4 leading-relaxed text-text-main">
                 {content}
               </p>
                 <p className="review-created-info text-xs text-text-sub mb-4">
@@ -63,22 +63,16 @@ export default function ReviewItem({
                   <span className="review-created-user text-main">{author}</span>
                 </p>
             </div>
-            <div className="review-social-buttons flex justify-around align-middle">
+            <div className="review-social-buttons flex justify-around align-middle text-text-sub">
               <div className="like flex justify-center items-center">
                 <button className="like-btn">
-                  <svg
-                    width="18"
-                    height="17"
-                    viewBox="0 0 18 17"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
+                  <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_2210_874)">
                       <path
                         fill-rule="evenodd"
                         clip-rule="evenodd"
                         d="M8.89816 1.53033C13.7875 -3.1765 26.0119 5.05993 8.89816 15.6508C-8.21557 5.06096 4.00884 -3.1765 8.89816 1.53033Z"
-                        fill="black"
+                        fill="currentColor"
                         fill-opacity="0.38"
                       />
                     </g>
@@ -87,7 +81,7 @@ export default function ReviewItem({
                         <rect
                           width="17.6271"
                           height="16.5079"
-                          fill="white"
+                          fill="currentColor"
                           transform="translate(0.0848389 0.174561)"
                         />
                       </clipPath>
@@ -120,7 +114,7 @@ export default function ReviewItem({
                     width="22"
                     height="21"
                     viewBox="0 0 22 21"
-                    fill="none"
+                    fill="currentColor"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <ellipse

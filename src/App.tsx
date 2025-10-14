@@ -8,6 +8,8 @@ import HomeContent from "./pages/HomeContent";
 import ReviewsPage from "./pages/ReviewsPage";
 import MoviesDetail from "./pages/MoviesDetail";
 import ReviewsDetail from "./components/reviews/ReviewsDetail";
+import ReviewPostPage from "./pages/ReviewPostPage";
+// import MoviesDetail from "./pages/MoviesDetail";
 import Settings from "./pages/Settings";
 import Profile from "./pages/profilePage";
 
@@ -29,6 +31,7 @@ export default function App() {
       <Route element={<DefaultLayout />}>
         <Route path="/" element={<HomeContent />} />
         <Route path="/loginPage" element={<LoginPage />} />
+        <Route path="/review/post" element={<ReviewPostPage />} />
         <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/reviews/:id" element={<ReviewsDetail />} />
         <Route path="/movies" element={<MoviesPage />} />
@@ -39,8 +42,6 @@ export default function App() {
           element={<Profile onUpload={handleProfileUpload} />}
         />
       </Route>
-
-      {/* DefaultLayout 없이 단독 페이지 */}
       <Route path="/error" element={<Error />} />
     </Routes>
   );

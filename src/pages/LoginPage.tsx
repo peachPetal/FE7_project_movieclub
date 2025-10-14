@@ -5,7 +5,7 @@ export default function LoginPage() {
     <>
       <div className="w-full h-full flex justify-center items-center mt-[-50px]">
         <div className="login-cotainer w-[470px] h-500px">
-          <h1 className="text-4xl font-bold mb-11 text-center">로그인</h1>
+          <h1 className="text-4xl font-bold mb-11 text-center text-[var(--color-text-main)]">로그인</h1>
           <SocialBtn socialType="google" />
           <SocialBtn socialType="kakao" />
           <SocialBtn socialType="github" />

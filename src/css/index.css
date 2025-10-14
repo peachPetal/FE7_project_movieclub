@@ -30,3 +30,7 @@ body {
 .reply-btns button {
   transform: scale(0.8);
 }
+
+input#thumbnail {
+  display: none;
+}
