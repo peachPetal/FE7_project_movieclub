@@ -1,7 +1,7 @@
 import { useState } from "react";
 import FilterDropdown from "../components/common/buttons/FilterDropdown";
 import UserItem from "../components/users/UserItem";
-import type { AppUser } from "../types/User";
+import type { AppUser } from "../types/userClaims";
 
 function UsersPage() {
   // 실제 API 연동 전까지 임시 데이터

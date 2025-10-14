@@ -1,4 +1,4 @@
-import type { AppUser } from "../../types/User";
+import type { AppUser } from "../../types/userClaims";
 import profileIcon from "../../assets/person.svg";
 
 type Props = {
