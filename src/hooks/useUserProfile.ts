@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../utils/supabase";
 import { useAuthListener } from "./useAuthListener";
 
+// user 프로필의 타입 - id, name, avatar_url, email 필드
 type UserProfile = {
   id: string;
   name: string | null;
@@ -9,6 +10,8 @@ type UserProfile = {
   email: string | null;
 };
 
+
+// 유저 프로필 커스텀 훅
 export function useUserProfile() {
   const { session } = useAuthListener();
   const [profile, setProfile] = useState<UserProfile | null>(null);

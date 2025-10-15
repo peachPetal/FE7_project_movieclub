@@ -19,7 +19,7 @@ interface SidebarHeaderProps {
   isLoggedIn: boolean;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
-  email?: string;
+  name?: string;
   avatarUrl?: string;
 }
 
@@ -27,7 +27,7 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   isLoggedIn,
   isCollapsed,
   onToggleCollapse,
-  email,
+  name,
   avatarUrl,
 }) => (
   <div
@@ -47,7 +47,7 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
     </div>
     <div>
       <p className="text-sm text-white/90">
-        {isLoggedIn ? (email ?? "사용자") : "로그인 해주세요"}
+        {isLoggedIn ? name ?? "사용자" : "로그인 해주세요"}
       </p>
     </div>
     {isLoggedIn && (
@@ -80,7 +80,6 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 interface LoggedInContentProps {
   friendsData: Friend[];
   onFriendClick: (friend: Friend, e: React.MouseEvent<HTMLDivElement>) => void;
-  onDeleteFriend: (friendId: string) => void;
   onLogout: () => void;
   onNotificationClick: () => void;
   notificationButtonRef: React.RefObject<HTMLButtonElement | null>;
@@ -91,7 +90,6 @@ interface LoggedInContentProps {
 const LoggedInContent: React.FC<LoggedInContentProps> = ({
   friendsData,
   onFriendClick,
-  onDeleteFriend,
   onLogout,
   onNotificationClick,
   notificationButtonRef,
@@ -218,7 +216,7 @@ export default function Sidebar() {
   const { profile } = useUserProfile();
   const userId = session?.user?.id ?? null;
 
-  const { friends, loading, setFriends } = useFriends(userId);
+  const { friends, setFriends } = useFriends(userId);
   const isLoggedIn = !!session?.user;
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -251,13 +249,15 @@ export default function Sidebar() {
       const { error } = await supabase
         .from("friendship")
         .delete()
-        .or(`user_id.eq.'${userId}',friend_id.eq.'${friendId}'`);
+        .or(
+          `and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`
+        );
 
       if (error) throw error;
 
-      // 삭제 후 UI에서 친구 제거
+      // UI 업데이트
       setFriends(friends.filter((f) => f.id !== friendId));
-      setModalFriend(null); // 모달 닫기
+      setModalFriend(null);
     } catch (err) {
       console.error("Failed to delete friend:", err);
     }
@@ -315,7 +315,7 @@ export default function Sidebar() {
           isLoggedIn={isLoggedIn}
           isCollapsed={isCollapsed}
           onToggleCollapse={handleToggleCollapse}
-          email={profile?.email ?? undefined}
+          name={profile?.name ?? undefined}
           avatarUrl={profile?.avatar_url ?? undefined}
         />
 
@@ -325,7 +325,6 @@ export default function Sidebar() {
               <LoggedInContent
                 friendsData={friends}
                 onFriendClick={handleFriendClick}
-                onDeleteFriend={handleDeleteFriend}
                 onLogout={handleLogout}
                 onNotificationClick={handleNotificationClick}
                 notificationButtonRef={notificationButtonRef}
@@ -378,7 +377,10 @@ export default function Sidebar() {
           <div className="ml-auto flex gap-2">
             <button
               className="relative w-8 h-8 group"
-              onClick={() => handleDeleteFriend(modalFriend.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (modalFriend) handleDeleteFriend(modalFriend.id);
+              }}
             >
               <img
                 src={deleteFriendMouseOff}

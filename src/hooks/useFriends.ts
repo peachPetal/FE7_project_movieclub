@@ -42,7 +42,7 @@ export function useFriends(userId: string | null) {
         // 3️⃣ users 테이블에서 상대방 프로필 조회
         const { data: usersData, error: usersError } = await supabase
           .from("users")
-          .select("id, email, avatar_url")
+          .select("id, name, email, avatar_url")
           .in("id", friendIds);
 
         if (usersError) throw usersError;
@@ -50,7 +50,7 @@ export function useFriends(userId: string | null) {
         // 4️⃣ Friend 배열 생성
         const mapped: Friend[] = usersData?.map(u => ({
           id: u.id,
-          name: u.email,
+          name: u.name,
           avatarUrl: u.avatar_url ?? undefined,
           status: "offline", // 기본값
         })) ?? [];
