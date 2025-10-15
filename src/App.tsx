@@ -9,11 +9,12 @@ import ReviewsPage from "./pages/ReviewsPage";
 import MoviesDetail from "./pages/MoviesDetail";
 import ReviewsDetail from "./components/reviews/ReviewsDetail";
 import ReviewPostPage from "./pages/ReviewPostPage";
-// import MoviesDetail from "./pages/MoviesDetail";
 import Settings from "./pages/Settings";
 import Profile from "./pages/profilePage";
 import UsersPage from "./pages/UsersPage";
 import PublicOnlyRoute from "./components/routes/PublicOnlyRoute";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./utils/queryClient";
 
 export default function App() {
   // ProfileImageUpload onUpload 콜백
@@ -28,26 +29,28 @@ export default function App() {
   };
 
   return (
-    <Routes>
-      {/* DefaultLayout 적용 영역 */}
-      <Route element={<DefaultLayout />}>
-        <Route path="/" element={<HomeContent />} />
-        <Route element={<PublicOnlyRoute />}>
-          <Route path="/login" element={<LoginPage />} />
+    <QueryClientProvider client={queryClient}>
+      <Routes>
+        {/* DefaultLayout 적용 영역 */}
+        <Route element={<DefaultLayout />}>
+          <Route path="/" element={<HomeContent />} />
+          <Route element={<PublicOnlyRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+          </Route>
+          <Route path="/review/post" element={<ReviewPostPage />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
+          <Route path="/reviews/:id" element={<ReviewsDetail />} />
+          <Route path="/movies" element={<MoviesPage />} />
+          <Route path="/movies/:id" element={<MoviesDetail />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route
+            path="/profile"
+            element={<Profile />}
+          />
         </Route>
-        <Route path="/review/post" element={<ReviewPostPage />} />
-        <Route path="/reviews" element={<ReviewsPage />} />
-        <Route path="/reviews/:id" element={<ReviewsDetail />} />
-        <Route path="/movies" element={<MoviesPage />} />
-        <Route path="/movies/:id" element={<MoviesDetail />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/users" element={<UsersPage />} />
-        <Route
-          path="/profile"
-          element={<Profile onUpload={handleProfileUpload} />}
-        />
-      </Route>
-      <Route path="/error" element={<Error />} />
-    </Routes>
+        <Route path="/error" element={<Error />} />
+      </Routes>
+    </QueryClientProvider>
   );
 }

@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { supabase } from "../utils/supabase";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuthSession } from "./useAuthSession"; // ✅ 사용자 ID를 컨텍스트에서 가져오기
 
 export type FriendStatus = "online" | "offline";
 
@@ -10,61 +12,89 @@ export interface Friend {
   status: FriendStatus;
 }
 
-export function useFriends(userId: string | null) {
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+// 이 함수는 변경할 필요 없이 훌륭합니다.
+async function fetchFriends(userId: string): Promise<Friend[]> {
+  const { data: friendships, error: friendshipError } = await supabase
+    .from("friendship")
+    .select("user_id, friend_id")
+    .or(`user_id.eq.${userId},friend_id.eq.${userId}`);
+
+  if (friendshipError) throw friendshipError;
+  if (!friendships || friendships.length === 0) return [];
+
+  const friendIds = friendships.map(f => (f.user_id === userId ? f.friend_id : f.user_id));
+
+  const { data: usersData, error: usersError } = await supabase
+    .from("users")
+    .select("id, name, avatar_url, is_online")
+    .in("id", friendIds);
+
+  if (usersError) throw usersError;
+
+  return (
+    usersData?.map(u => ({
+      id: u.id,
+      name: u.name,
+      avatarUrl: u.avatar_url ?? undefined,
+      status: u.is_online ? "online" : "offline",
+    })) ?? []
+  );
+}
+
+export function useFriends() {
+  const queryClient = useQueryClient();
+  const { user } = useAuthSession();
+  const userId = user?.id;
+
+  const { data: friends = [], isLoading } = useQuery<Friend[], Error>({
+    queryKey: ["friends", userId],
+    queryFn: () => fetchFriends(userId!),
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, 
+  });
 
   useEffect(() => {
     if (!userId) return;
-
-    const fetchFriends = async () => {
-      setLoading(true);
-      try {
-        // 1️⃣ friendship 테이블에서 친구 관계 조회
-        const { data: friendships, error: friendshipError } = await supabase
-          .from("friendship")
-          .select("user_id, friend_id")
-          .or(`user_id.eq.${userId},friend_id.eq.${userId}`);
-
-        if (friendshipError) throw friendshipError;
-
-        if (!friendships || friendships.length === 0) {
-          setFriends([]);
-          setLoading(false);
-          return;
+    const friendshipChannel = supabase
+      .channel("friendship-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "friendship",
+          filter: `or=(user_id.eq.${userId},friend_id.eq.${userId})`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["friends", userId] });
         }
+      )
+      .subscribe();
 
-        // 2️⃣ 상대방 ID만 추출
-        const friendIds = friendships.map(f =>
-          f.user_id === userId ? f.friend_id : f.user_id
-        );
+    const usersChannel = supabase
+      .channel("users-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "users",
+        },
+        (payload) => {
+          const isFriend = friends.some(friend => friend.id === payload.new.id);
+          if (isFriend) {
+            queryClient.invalidateQueries({ queryKey: ["friends", userId] });
+          }
+        }
+      )
+      .subscribe();
 
-        // 3️⃣ users 테이블에서 상대방 프로필 조회
-        const { data: usersData, error: usersError } = await supabase
-          .from("users")
-          .select("id, name, email, avatar_url")
-          .in("id", friendIds);
-
-        if (usersError) throw usersError;
-
-        // 4️⃣ Friend 배열 생성
-        const mapped: Friend[] = usersData?.map(u => ({
-          id: u.id,
-          name: u.name,
-          avatarUrl: u.avatar_url ?? undefined,
-          status: "offline", // 기본값
-        })) ?? [];
-
-        setFriends(mapped);
-      } catch (err) {
-        console.error("Error fetching friends:", err);
-      } finally {
-        setLoading(false);
-      }
+    return () => {
+      supabase.removeChannel(friendshipChannel);
+      supabase.removeChannel(usersChannel);
     };
+  }, [userId, queryClient, friends]);
 
-    fetchFriends();
-  }, [userId]);
-
-  return { friends, loading, setFriends };
+  return { friends, loading: isLoading };
 }
+

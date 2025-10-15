@@ -1,10 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "../hooks/useUserProfile";
-import { useAuthListener } from "../hooks/useAuthListener";
+import { useAuthSession } from "../hooks/useAuthSession";
 import { useFriends, type Friend } from "../hooks/useFriends";
 import { supabase } from "../utils/supabase";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+// Asset Imports
 import notificationsIcon from "../assets/notifications.svg";
 import profileIcon from "../assets/person.svg";
 import friendsIcon from "../assets/person-circle-black.svg";
@@ -15,12 +17,30 @@ import messageIcon from "../assets/message.svg";
 import deleteFriendMouseOff from "../assets/deleteFriendMouseOff.svg";
 import deleteFriendMouseOn from "../assets/deleteFriendMouseOn.svg";
 
+// --- API 함수 ---
+async function deleteFriend(userId: string, friendId: string): Promise<void> {
+  const { error } = await supabase
+    .from("friendship")
+    .delete()
+    .or(
+      `and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`
+    );
+
+  if (error) {
+    console.error("Failed to delete friend:", error);
+    throw new Error(error.message);
+  }
+}
+
+// --- 프레젠테이셔널 서브 컴포넌트 ---
+
 interface SidebarHeaderProps {
   isLoggedIn: boolean;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   name?: string;
   avatarUrl?: string;
+  loading: boolean;
 }
 
 const SidebarHeader: React.FC<SidebarHeaderProps> = ({
@@ -29,6 +49,7 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   onToggleCollapse,
   name,
   avatarUrl,
+  loading,
 }) => (
   <div
     className={`flex h-[110px] shrink-0 items-center p-4 bg-[var(--color-main)] text-white relative ${
@@ -41,16 +62,16 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
         alt="Account"
         className="w-10 h-10 rounded-full object-cover"
       />
-      {isLoggedIn && (
+      {!loading && isLoggedIn && (
         <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-[var(--color-main)] bg-[var(--color-alert-online)]" />
       )}
     </div>
     <div>
       <p className="text-sm text-white/90">
-        {isLoggedIn ? name ?? "사용자" : "로그인 해주세요"}
+        {!loading && isLoggedIn ? name ?? "Loading..." : "로그인 해주세요"}
       </p>
     </div>
-    {isLoggedIn && (
+    {!loading && isLoggedIn && (
       <button
         onClick={onToggleCollapse}
         className="absolute top-4 right-4 p-1 text-white rounded-full hover:bg-white/20 transition-colors"
@@ -211,67 +232,66 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
   );
 };
 
+// --- 컨테이너 주 컴포넌트 ---
 export default function Sidebar() {
-  const { session } = useAuthListener();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const { user, loading } = useAuthSession();
   const { profile } = useUserProfile();
-  const userId = session?.user?.id ?? null;
+  const { friends } = useFriends();
 
-  const { friends, setFriends } = useFriends(userId);
-  const isLoggedIn = !!session?.user;
+  const isLoggedIn = !!user;
+  const userId = user?.id;
 
+  // UI 상태 관리
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [modalFriend, setModalFriend] = useState<Friend | null>(null);
-  const [modalY, setModalY] = useState(0);
+  const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [modalNotificationOpen, setModalNotificationOpen] = useState(false);
   const [notificationY, setNotificationY] = useState(0);
+  
 
-  const navigate = useNavigate();
+  // DOM 요소 참조
   const notificationButtonRef = useRef<HTMLButtonElement>(null);
   const modalFriendRef = useRef<HTMLDivElement>(null);
   const modalNotificationRef = useRef<HTMLDivElement>(null);
 
-  const handleToggleCollapse = () => setIsCollapsed(!isCollapsed);
+  const deleteFriendMutation = useMutation({
+    mutationFn: (friendId: string) => {
+      if (!userId) throw new Error("User not logged in");
+      return deleteFriend(userId, friendId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", userId] });
+      setModalFriend(null);
+    },
+  });
 
-  const handleFriendClick = (
-    friend: Friend,
-    e: React.MouseEvent<HTMLDivElement>
-  ) => {
+  const handleToggleCollapse = useCallback(() => setIsCollapsed(prev => !prev), []);
+
+  const handleFriendClick = useCallback((friend: Friend, e: React.MouseEvent<HTMLDivElement>) => {
     if (modalNotificationOpen) setModalNotificationOpen(false);
     const rect = e.currentTarget.getBoundingClientRect();
-    setModalY(rect.top + window.scrollY);
+    setModalPosition({ top: rect.top + window.scrollY, left: rect.right + 10 });
     setModalFriend(friend);
-  };
+  }, [modalNotificationOpen]);
 
-  const handleDeleteFriend = async (friendId: string) => {
-    if (!userId) return;
-
-    try {
-      const { error } = await supabase
-        .from("friendship")
-        .delete()
-        .or(
-          `and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`
-        );
-
-      if (error) throw error;
-
-      // UI 업데이트
-      setFriends(friends.filter((f) => f.id !== friendId));
-      setModalFriend(null);
-    } catch (err) {
-      console.error("Failed to delete friend:", err);
+  const handleDeleteFriend = useCallback(() => {
+    if (modalFriend) {
+      deleteFriendMutation.mutate(modalFriend.id);
     }
-  };
+  }, [modalFriend, deleteFriendMutation]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
     navigate("/login");
-  };
+  }, [navigate]);
 
-  const handleProfileClick = () => navigate("/profile");
-  const handleSettingsClick = () => navigate("/settings");
+  const handleProfileClick = useCallback(() => navigate("/profile"), [navigate]);
+  const handleSettingsClick = useCallback(() => navigate("/settings"), [navigate]);
 
-  const handleNotificationClick = () => {
+  const handleNotificationClick = useCallback(() => {
     setModalFriend(null);
     setModalNotificationOpen((prev) => {
       if (!prev && notificationButtonRef.current) {
@@ -280,35 +300,32 @@ export default function Sidebar() {
       }
       return !prev;
     });
-  };
+  }, [notificationButtonRef]);
 
-  const closeModals = () => {
+  const closeModals = useCallback(() => {
     setModalFriend(null);
     setModalNotificationOpen(false);
-  };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        (modalFriend &&
-          modalFriendRef.current &&
-          !modalFriendRef.current.contains(event.target as Node)) ||
-        (modalNotificationOpen &&
-          modalNotificationRef.current &&
-          !modalNotificationRef.current.contains(event.target as Node))
-      ) {
+      const target = event.target as Node;
+      if (modalFriend && modalFriendRef.current && !modalFriendRef.current.contains(target)) {
+        closeModals();
+      }
+      if (modalNotificationOpen && modalNotificationRef.current && !modalNotificationRef.current.contains(target)) {
         closeModals();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [modalFriend, modalNotificationOpen]);
+  }, [modalFriend, modalNotificationOpen, closeModals]);
 
   return (
     <>
       <aside
         className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ml-[50px] ${
-          isLoggedIn ? (isCollapsed ? "h-[110px]" : "h-[852px]") : "h-[255px]"
+          !loading && isLoggedIn ? (isCollapsed ? "h-[110px]" : "h-[852px]") : "h-[255px]"
         }`}
       >
         <SidebarHeader
@@ -317,11 +334,12 @@ export default function Sidebar() {
           onToggleCollapse={handleToggleCollapse}
           name={profile?.name ?? undefined}
           avatarUrl={profile?.avatar_url ?? undefined}
+          loading={loading} // ✅ 6. SidebarHeader에 loading prop 전달
         />
 
         {!isCollapsed && (
           <>
-            {isLoggedIn ? (
+            {!loading && isLoggedIn ? (
               <LoggedInContent
                 friendsData={friends}
                 onFriendClick={handleFriendClick}
@@ -345,12 +363,11 @@ export default function Sidebar() {
         )}
       </aside>
 
-      {/* Friend 모달 */}
       {modalFriend && (
         <div
           ref={modalFriendRef}
-          className="absolute left-[347px] w-[290px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 flex items-center px-4"
-          style={{ top: modalY }}
+          className="absolute w-[290px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 flex items-center px-4"
+          style={{ top: modalPosition.top, left: modalPosition.left }}
         >
           <div className="relative w-12 h-12">
             <img
@@ -377,10 +394,8 @@ export default function Sidebar() {
           <div className="ml-auto flex gap-2">
             <button
               className="relative w-8 h-8 group"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (modalFriend) handleDeleteFriend(modalFriend.id);
-              }}
+              onClick={handleDeleteFriend}
+              disabled={deleteFriendMutation.isPending}
             >
               <img
                 src={deleteFriendMouseOff}
@@ -400,12 +415,11 @@ export default function Sidebar() {
         </div>
       )}
 
-      {/* Notification 모달 */}
       {modalNotificationOpen && (
         <div
           ref={modalNotificationRef}
-          className="absolute left-[347px] w-[290px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 px-4"
-          style={{ top: notificationY, height: 82 * 3 }}
+          className="absolute w-[290px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 px-4"
+          style={{ top: notificationY, height: 82 * 3, left: modalPosition.left }}
         >
           <p className="p-4 text-[var(--color-text-main)]">Notification 내용</p>
         </div>
