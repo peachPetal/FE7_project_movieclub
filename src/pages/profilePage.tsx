@@ -21,21 +21,25 @@ async function uploadAvatar(userId: string, file: File): Promise<string> {
   const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(fileName);
   const publicUrl = urlData.publicUrl;
 
-  // 3. users 테이블에 URL 업데이트
+  // 캐시 버스팅을 위해 URL에 현재 시간 타임스탬프를 쿼리 파라미터로 추가
+  const cacheBustingUrl = `${publicUrl}?t=${new Date().getTime()}`;
+
+  // 3. users 테이블에 '캐시 버스팅 URL' 업데이트
   const { error: dbError } = await supabase
     .from("users")
-    .update({ avatar_url: publicUrl })
+    .update({ avatar_url: cacheBustingUrl })
     .eq("id", userId);
   if (dbError) throw dbError;
 
-  return publicUrl;
+  return cacheBustingUrl;
 }
 
 // 아바타 삭제 함수
 async function deleteAvatar(userId: string, currentUrl: string | null | undefined): Promise<void> {
   if (!currentUrl) return;
 
-  const pathInBucket = currentUrl.split("/avatars/")[1];
+  const urlWithoutQuery = currentUrl.split("?")[0];
+  const pathInBucket = urlWithoutQuery.split("/avatars/")[1];
   
   if (pathInBucket) {
     const { error: removeError } = await supabase.storage.from("avatars").remove([pathInBucket]);
@@ -162,7 +166,7 @@ export const Profile: React.FC = () => {
         ref={fileInputRef}
         onChange={handleFileChange}
         className="hidden"
-        disabled={uploadMutation.isPending} // 업로드 중 파일 선택 방지
+        disabled={uploadMutation.isPending}
       />
     </div>
   );
