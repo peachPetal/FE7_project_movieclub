@@ -47,7 +47,7 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
     </div>
     <div>
       <p className="text-sm text-white/90">
-        {isLoggedIn ? email ?? "사용자" : "로그인 해주세요"}
+        {isLoggedIn ? (email ?? "사용자") : "로그인 해주세요"}
       </p>
     </div>
     {isLoggedIn && (
@@ -99,7 +99,8 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
   onSettingsClick,
 }) => {
   const [isFriendsMenuOpen, setIsFriendsMenuOpen] = useState(true);
-  const handleToggleFriendsMenu = () => setIsFriendsMenuOpen(!isFriendsMenuOpen);
+  const handleToggleFriendsMenu = () =>
+    setIsFriendsMenuOpen(!isFriendsMenuOpen);
 
   return (
     <div className="flex flex-col flex-1 p-4 overflow-visible">
@@ -233,7 +234,10 @@ export default function Sidebar() {
 
   const handleToggleCollapse = () => setIsCollapsed(!isCollapsed);
 
-  const handleFriendClick = (friend: Friend, e: React.MouseEvent<HTMLDivElement>) => {
+  const handleFriendClick = (
+    friend: Friend,
+    e: React.MouseEvent<HTMLDivElement>
+  ) => {
     if (modalNotificationOpen) setModalNotificationOpen(false);
     const rect = e.currentTarget.getBoundingClientRect();
     setModalY(rect.top + window.scrollY);
@@ -332,7 +336,7 @@ export default function Sidebar() {
               <div className="flex flex-col items-center justify-center flex-1 p-4">
                 <button
                   className="w-[200px] h-[50px] bg-[var(--color-main)] text-white rounded-lg hover:bg-[var(--color-main-80)] transition-colors"
-                  onClick={() => navigate("/loginPage")}
+                  onClick={() => navigate("/login")}
                 >
                   로그인 / 회원가입
                 </button>
@@ -364,8 +368,12 @@ export default function Sidebar() {
             />
           </div>
           <div className="ml-4 flex flex-col justify-center">
-            <p className="font-medium text-[var(--color-text-main)]">{modalFriend.name}</p>
-            <p className="text-sm text-[var(--color-text-sub)] capitalize">{modalFriend.status}</p>
+            <p className="font-medium text-[var(--color-text-main)]">
+              {modalFriend.name}
+            </p>
+            <p className="text-sm text-[var(--color-text-sub)] capitalize">
+              {modalFriend.status}
+            </p>
           </div>
           <div className="ml-auto flex gap-2">
             <button
