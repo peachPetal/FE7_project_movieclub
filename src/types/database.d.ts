@@ -88,22 +88,34 @@ export type Database = {
         Row: {
           created_at: string;
           friend_id: string;
-          id: number;
           user_id: string;
         };
         Insert: {
           created_at?: string;
           friend_id?: string;
-          id?: number;
           user_id?: string;
         };
         Update: {
           created_at?: string;
           friend_id?: string;
-          id?: number;
           user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "friendship_friend_id_fkey";
+            columns: ["friend_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "friendship_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       movies: {
         Row: {
@@ -155,7 +167,7 @@ export type Database = {
       };
       reviews: {
         Row: {
-          author_id: string | null;
+          author_id: string;
           content: string;
           created_at: string;
           id: number;
@@ -164,7 +176,7 @@ export type Database = {
           title: string;
         };
         Insert: {
-          author_id?: string | null;
+          author_id?: string;
           content: string;
           created_at?: string;
           id?: number;
@@ -173,7 +185,7 @@ export type Database = {
           title: string;
         };
         Update: {
-          author_id?: string | null;
+          author_id?: string;
           content?: string;
           created_at?: string;
           id?: number;
@@ -198,6 +210,7 @@ export type Database = {
           created_at: string;
           email: string;
           id: string;
+          name: string | null;
         };
         Insert: {
           avatar_url?: string | null;
@@ -205,6 +218,7 @@ export type Database = {
           created_at?: string;
           email: string;
           id?: string;
+          name?: string | null;
         };
         Update: {
           avatar_url?: string | null;
@@ -212,6 +226,7 @@ export type Database = {
           created_at?: string;
           email?: string;
           id?: string;
+          name?: string | null;
         };
         Relationships: [];
       };

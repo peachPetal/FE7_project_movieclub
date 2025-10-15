@@ -8,12 +8,21 @@ import {
 } from "@headlessui/react";
 import { HashtagIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
+import { supabase } from "../utils/supabase";
+import { useAuthStore } from "../stores/authStore";
+import { useNavigate } from "react-router-dom";
 
 export default function ReviewPostPage() {
+  const navigate = useNavigate();
+  const userId = useAuthStore((state) => state.user?.id);
+
   const [title, setTitle] = useState("");
   const [movieId, setMovieId] = useState<number | null>(null);
   const [content, setContent] = useState("");
   const [thumbnail, setThumbnail] = useState("");
+
+  // comobobox 관련 state들
+  // db 설계 후에 { id: number; title: string } 모두 Movie 타입으로 바꿀 것
   const [movies, setMovies] = useState<{ id: number; title: string }[]>([]);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<{
@@ -41,21 +50,55 @@ export default function ReviewPostPage() {
   const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setThumbnail(url);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setThumbnail(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const removeThumbanil = () => {
+    setThumbnail("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(title, movieId, content);
+    if (thumbnail === "") {
+      // 영화 db 연동 시 movieId에 해당하는 영화 포스터 이미지 주소로 변경하기
+      setThumbnail(
+        "https://plus.unsplash.com/premium_photo-1661675440353-6a6019c95bc7?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1332"
+      );
+    }
 
     if (!title || !movieId || !content) {
       alert("값을 모두 입력해주세요.");
       return;
     }
 
+    try {
+      const { data, error } = await supabase
+        .from("reviews")
+        .insert({
+          author_id: userId,
+          title: title,
+          content: content,
+          thumbnail: thumbnail,
+          movie_id: movieId,
+        })
+        .select()
+        .single();
+
+      if (data) {
+        alert("게시글이 등록되었습니다.");
+        navigate("/reviews");
+      }
+
+      if (error) throw error;
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -116,9 +159,9 @@ export default function ReviewPostPage() {
                 onChange={(event) => {
                   setQuery(event.target.value);
                 }}
+                required
               />
             </div>
-
             <ComboboxOptions
               anchor="bottom"
               transition
@@ -152,25 +195,57 @@ export default function ReviewPostPage() {
             required
           />
           <div className="review-post-thumbnail flex mb-5">
-            <div className="review-post-btn mr-3">
-              {" "}
-              <label
-                htmlFor="thumbnail"
-                className="inline-flex items-center px-3 py-1 border rounded-[10px] border-text-light bg-background-main text-text-main hover:border-main transition-colors cursor-pointer"
-              >
-                이미지 첨부
-              </label>
-              <input
-                type="file"
-                id="thumbnail"
-                accept="image/*"
-                onChange={handleThumbnailUpload}
-              ></input>
+            <div className="review-thumbnail-btns mr-3 flex flex-col">
+              {!thumbnail ? (
+                <div className="review-add-thumbnail">
+                  {" "}
+                  <label
+                    htmlFor="thumbnail"
+                    className="inline-flex items-center px-3 py-1 border rounded-[10px] border-text-light bg-background-main text-text-main hover:border-main hover:bg-main-10 transition-colors cursor-pointer"
+                  >
+                    이미지 첨부
+                  </label>
+                  <input
+                    type="file"
+                    id="thumbnail"
+                    accept="image/*"
+                    onChange={handleThumbnailUpload}
+                  ></input>
+                </div>
+              ) : (
+                <>
+                  <div className="review-change-thumbnail mb-3">
+                    {" "}
+                    <label
+                      htmlFor="thumbnail"
+                      className="inline-flex items-center px-3 py-1 border rounded-[10px] border-text-light bg-background-main text-text-main hover:border-main hover:bg-main-10 transition-colors cursor-pointer"
+                    >
+                      이미지 변경
+                    </label>
+                    <input
+                      type="file"
+                      id="thumbnail"
+                      accept="image/*"
+                      onChange={handleThumbnailUpload}
+                    ></input>
+                  </div>
+                  <button
+                    className="review-delete-thumbnail"
+                    onClick={removeThumbanil}
+                  >
+                    {" "}
+                    <span className="inline-flex items-center px-3 py-1 border rounded-[10px] border-text-light bg-background-main text-text-main hover:border-main hover:bg-main-10 transition-colors cursor-pointer">
+                      이미지 삭제
+                    </span>
+                  </button>
+                </>
+              )}
             </div>
             {thumbnail ? (
               <img
                 src={thumbnail}
                 className="max-w-[400px] max-h-[300px] object-cover"
+                alt="Thumbnail Preview"
               />
             ) : null}
           </div>

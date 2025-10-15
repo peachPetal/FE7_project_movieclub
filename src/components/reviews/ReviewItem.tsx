@@ -2,30 +2,25 @@ import { Link } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import TimeAgo from "../TimeAgo";
 import ReviewItemSkeleton from "../loading/ReviewItemSkeleton";
+import type { ReviewWithDetail } from "../../types/Review";
 
 export default function ReviewItem({
   review,
   hasImage,
   isLoading,
 }: {
-  review?: Review;
+  review?: ReviewWithDetail;
   hasImage: boolean;
   isLoading: boolean;
 }) {
   if (isLoading || !review) {
     return <ReviewItemSkeleton hasImage={hasImage} />;
   } else {
-    const {
-      id,
-      title,
-      movie,
-      content,
-      createdAt,
-      author,
-      like,
-      comment,
-      thumbnail,
-    } = review as Review;
+    const { id, content, created_at, movie_id, thumbnail, title } = review;
+
+    const like = review.likes?.[0]?.count ?? 0;
+    const author = review.users?.name ?? "author";
+    // const comments = review.comments?.[0]?.count ?? 0;
 
     return (
       <>
@@ -56,18 +51,23 @@ export default function ReviewItem({
               </>
             ) : null}
 
-          <div className="review-data p-5 h-[227px] flex flex-col justify-between">
-            <div className="review-post">
-              <p className="review-title font-bold mb-3 text-[18px] truncate text-[var(--color-text-main)]">
-                <span className="review-movie text-main">#{movie}</span> {title}
-              </p>
-              <p className="review-content text-xs mb-3 line-clamp-4 leading-relaxed text-text-main">
-                {content}
-              </p>
+            <div className="review-data p-5 h-[227px] flex flex-col justify-between">
+              <div className="review-post">
+                <p className="review-title font-bold mb-3 text-[18px] truncate text-[var(--color-text-main)]">
+                  <span className="review-movie text-main">#{movie_id}</span>{" "}
+                  {title}
+                </p>
+                <p className="review-content text-xs mb-3 line-clamp-4 leading-relaxed text-text-main">
+                  {content}
+                </p>
                 <p className="review-created-info text-xs text-text-sub mb-4">
-                  <span className="text-[var(--color-text-sub)]"><TimeAgo dateString={createdAt} /></span>
+                  <span className="text-[var(--color-text-sub)]">
+                    <TimeAgo dateString={created_at} />
+                  </span>
                   {" by "}
-                  <span className="review-created-user text-main">{author}</span>
+                  <span className="review-created-user text-main">
+                    {author}
+                  </span>
                 </p>
               </div>
               <div className="review-social-buttons flex justify-around align-middle text-text-sub">
@@ -105,7 +105,7 @@ export default function ReviewItem({
                       />
                     </svg>
                   </button>
-                  <span className="comment-count text-sm ml-2">{comment}</span>
+                  <span className="comment-count text-sm ml-2">comment</span>
                 </div>
                 <div className="share">
                   <button className="share-btn">
