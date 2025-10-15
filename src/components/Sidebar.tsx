@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserProfile } from "../hooks/useUserProfile";
+import { useAuthListener } from "../hooks/useAuthListener";
+import { useFriends, type Friend } from "../hooks/useFriends";
+import { supabase } from "../utils/supabase";
 
 import notificationsIcon from "../assets/notifications.svg";
 import profileIcon from "../assets/person.svg";
@@ -7,40 +11,43 @@ import friendsIcon from "../assets/person-circle-black.svg";
 import settingIcon from "../assets/setting.svg";
 import logoutIcon from "../assets/logout.svg";
 import accountIcon from "../assets/person-circle-white.svg";
-
 import messageIcon from "../assets/message.svg";
 import deleteFriendMouseOff from "../assets/deleteFriendMouseOff.svg";
 import deleteFriendMouseOn from "../assets/deleteFriendMouseOn.svg";
-
-type FriendStatus = "online" | "offline";
-
-interface Friend {
-  id: number;
-  name: string;
-  status: FriendStatus;
-}
 
 interface SidebarHeaderProps {
   isLoggedIn: boolean;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  email?: string;
+  avatarUrl?: string;
 }
 
 const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   isLoggedIn,
   isCollapsed,
   onToggleCollapse,
+  email,
+  avatarUrl,
 }) => (
-  <div className={`flex h-[110px] shrink-0 items-center p-4 bg-[var(--color-main)] text-white relative ${isCollapsed ? "rounded-[10px]" : "rounded-t-[10px]"}`}>
+  <div
+    className={`flex h-[110px] shrink-0 items-center p-4 bg-[var(--color-main)] text-white relative ${
+      isCollapsed ? "rounded-[10px]" : "rounded-t-[10px]"
+    }`}
+  >
     <div className="relative mr-4">
-      <img src={accountIcon} alt="Account" className="w-10 h-10" />
+      <img
+        src={avatarUrl ?? accountIcon}
+        alt="Account"
+        className="w-10 h-10 rounded-full object-cover"
+      />
       {isLoggedIn && (
         <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full border-2 border-[var(--color-main)] bg-[var(--color-alert-online)]" />
       )}
     </div>
     <div>
       <p className="text-sm text-white/90">
-        {isLoggedIn ? "kikoherrsc@gmail.com" : "로그인 해주세요"}
+        {isLoggedIn ? email ?? "사용자" : "로그인 해주세요"}
       </p>
     </div>
     {isLoggedIn && (
@@ -73,6 +80,7 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 interface LoggedInContentProps {
   friendsData: Friend[];
   onFriendClick: (friend: Friend, e: React.MouseEvent<HTMLDivElement>) => void;
+  onDeleteFriend: (friendId: string) => void;
   onLogout: () => void;
   onNotificationClick: () => void;
   notificationButtonRef: React.RefObject<HTMLButtonElement | null>;
@@ -83,6 +91,7 @@ interface LoggedInContentProps {
 const LoggedInContent: React.FC<LoggedInContentProps> = ({
   friendsData,
   onFriendClick,
+  onDeleteFriend,
   onLogout,
   onNotificationClick,
   notificationButtonRef,
@@ -90,26 +99,26 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
   onSettingsClick,
 }) => {
   const [isFriendsMenuOpen, setIsFriendsMenuOpen] = useState(true);
-
-  const handleToggleFriendsMenu = () => {
-    setIsFriendsMenuOpen(!isFriendsMenuOpen);
-  };
+  const handleToggleFriendsMenu = () => setIsFriendsMenuOpen(!isFriendsMenuOpen);
 
   return (
     <div className="flex flex-col flex-1 p-4 overflow-visible">
       <ul className="space-y-1">
         <li>
-          <button ref={notificationButtonRef} onClick={onNotificationClick} className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]">
+          <button
+            ref={notificationButtonRef}
+            onClick={onNotificationClick}
+            className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+          >
             <img src={notificationsIcon} alt="" className="w-6 h-6 mr-3" />
             Notifications
           </button>
         </li>
-
         <li>
           <button
             type="button"
             onClick={handleToggleFriendsMenu}
-            className="flex w-full items-center p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+            className="flex w-full items-center p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
             aria-expanded={isFriendsMenuOpen}
           >
             <img src={friendsIcon} alt="" className="w-6 h-6 mr-3" />
@@ -131,7 +140,6 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
               />
             </svg>
           </button>
-
           <div
             className={`overflow-hidden transition-all duration-300 ${
               isFriendsMenuOpen ? "max-h-120" : "max-h-0"
@@ -141,24 +149,26 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
               {friendsData.map((friend) => (
                 <li key={friend.id}>
                   <div
-                    className="group flex items-center justify-between p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)] transition-colors cursor-pointer"
+                    className="group flex items-center flex-1 p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)] transition-colors cursor-pointer"
                     onClick={(e) => onFriendClick(friend, e)}
                   >
-                    <a
-                      href={`/profile/${friend.id}`}
-                      className="flex items-center flex-1"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      <div className="relative mr-3">
+                    <div className="flex items-center flex-1">
+                      <div className="relative mr-3 w-8 h-8">
                         <img
-                          src={friendsIcon}
+                          src={friend.avatarUrl ?? friendsIcon}
                           alt={friend.name}
-                          className="h-8 w-8"
+                          className="w-full h-full rounded-full object-cover"
                         />
-                        <span className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border-2 border-[var(--color-background-sub)] ${friend.status === "online" ? "bg-[var(--color-alert-online)]" : "bg-[var(--color-text-light)]"}`} />
+                        <span
+                          className={`absolute bottom-0 right-0 block w-2.5 h-2.5 rounded-full border-2 border-[var(--color-background-sub)] ${
+                            friend.status === "online"
+                              ? "bg-[var(--color-alert-online)]"
+                              : "bg-[var(--color-text-light)]"
+                          }`}
+                        />
                       </div>
                       <span>{friend.name}</span>
-                    </a>
+                    </div>
                   </div>
                 </li>
               ))}
@@ -171,27 +181,25 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
         <ul className="space-y-1">
           <li>
             <button
-              className="flex items-center w-full p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+              className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
               onClick={onProfileClick}
             >
               <img src={profileIcon} alt="" className="w-6 h-6 mr-3" />
               Profile
             </button>
           </li>
-
           <li>
             <button
-              className="flex items-center w-full p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+              className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
               onClick={onSettingsClick}
             >
               <img src={settingIcon} alt="" className="w-6 h-6 mr-3" />
               Settings
             </button>
           </li>
-
           <li>
             <button
-              className="flex items-center w-full p-2 rounded-lg  text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+              className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
               onClick={onLogout}
             >
               <img src={logoutIcon} alt="" className="w-6 h-6 mr-3" />
@@ -205,43 +213,62 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
 };
 
 export default function Sidebar() {
+  const { session } = useAuthListener();
+  const { profile } = useUserProfile();
+  const userId = session?.user?.id ?? null;
+
+  const { friends, loading, setFriends } = useFriends(userId);
+  const isLoggedIn = !!session?.user;
+
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [modalFriend, setModalFriend] = useState<Friend | null>(null);
   const [modalY, setModalY] = useState(0);
   const [modalNotificationOpen, setModalNotificationOpen] = useState(false);
   const [notificationY, setNotificationY] = useState(0);
 
-  // friendsData를 state로 변경하고 9명으로 확장
-  const [friendsData, setFriendsData] = useState<Friend[]>([
-    { id: 1, name: "Friend 1", status: "online" },
-    { id: 2, name: "Friend 2", status: "offline" },
-    { id: 3, name: "Friend 3", status: "online" },
-    { id: 4, name: "Friend 4", status: "offline" },
-    { id: 5, name: "Friend 5", status: "online" },
-    { id: 6, name: "Friend 6", status: "offline" },
-    { id: 7, name: "Friend 7", status: "online" },
-    { id: 8, name: "Friend 8", status: "offline" },
-    { id: 9, name: "Friend 9", status: "online" },
-  ]);
-
   const navigate = useNavigate();
   const notificationButtonRef = useRef<HTMLButtonElement>(null);
+  const modalFriendRef = useRef<HTMLDivElement>(null);
+  const modalNotificationRef = useRef<HTMLDivElement>(null);
 
   const handleToggleCollapse = () => setIsCollapsed(!isCollapsed);
 
-  const handleFriendClick = (
-    friend: Friend,
-    e: React.MouseEvent<HTMLDivElement>
-  ) => {
+  const handleFriendClick = (friend: Friend, e: React.MouseEvent<HTMLDivElement>) => {
     if (modalNotificationOpen) setModalNotificationOpen(false);
     const rect = e.currentTarget.getBoundingClientRect();
     setModalY(rect.top + window.scrollY);
     setModalFriend(friend);
   };
 
+  const handleDeleteFriend = async (friendId: string) => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase
+        .from("friendship")
+        .delete()
+        .or(`user_id.eq.'${userId}',friend_id.eq.'${friendId}'`);
+
+      if (error) throw error;
+
+      // 삭제 후 UI에서 친구 제거
+      setFriends(friends.filter((f) => f.id !== friendId));
+      setModalFriend(null); // 모달 닫기
+    } catch (err) {
+      console.error("Failed to delete friend:", err);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
+
+  const handleProfileClick = () => navigate("/profile");
+  const handleSettingsClick = () => navigate("/settings");
+
   const handleNotificationClick = () => {
-    setModalFriend(null); 
+    setModalFriend(null);
     setModalNotificationOpen((prev) => {
       if (!prev && notificationButtonRef.current) {
         const rect = notificationButtonRef.current.getBoundingClientRect();
@@ -251,18 +278,10 @@ export default function Sidebar() {
     });
   };
 
-  const handleLogout = () => {setIsLoggedIn(false); navigate("/");};
-
-  const handleProfileClick = () => navigate("/profile");
-  const handleSettingsClick = () => navigate("/settings");
-
   const closeModals = () => {
     setModalFriend(null);
     setModalNotificationOpen(false);
   };
-
-  const modalFriendRef = useRef<HTMLDivElement>(null);
-  const modalNotificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -278,33 +297,31 @@ export default function Sidebar() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [modalFriend, modalNotificationOpen]);
-
-  // 친구 삭제 기능
-  const handleDeleteFriend = (friendId: number) => {
-    setFriendsData((prev) => prev.filter((f) => f.id !== friendId));
-    setModalFriend(null); // 모달 닫기
-  };
-
 
   return (
     <>
-      <aside className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ml-[50px] ${isLoggedIn ? (isCollapsed ? "h-[110px]" : "h-[852px]") : "h-[255px]"}`}>
+      <aside
+        className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ml-[50px] ${
+          isLoggedIn ? (isCollapsed ? "h-[110px]" : "h-[852px]") : "h-[255px]"
+        }`}
+      >
         <SidebarHeader
           isLoggedIn={isLoggedIn}
           isCollapsed={isCollapsed}
           onToggleCollapse={handleToggleCollapse}
+          email={profile?.email ?? undefined}
+          avatarUrl={profile?.avatar_url ?? undefined}
         />
 
         {!isCollapsed && (
           <>
             {isLoggedIn ? (
               <LoggedInContent
-                friendsData={friendsData}
+                friendsData={friends}
                 onFriendClick={handleFriendClick}
+                onDeleteFriend={handleDeleteFriend}
                 onLogout={handleLogout}
                 onNotificationClick={handleNotificationClick}
                 notificationButtonRef={notificationButtonRef}
@@ -316,10 +333,6 @@ export default function Sidebar() {
                 <button
                   className="w-[200px] h-[50px] bg-[var(--color-main)] text-white rounded-lg hover:bg-[var(--color-main-80)] transition-colors"
                   onClick={() => navigate("/loginPage")}
-                  onDoubleClick={() => {
-                    setIsLoggedIn(true);
-                    navigate("/");
-                  }}
                 >
                   로그인 / 회원가입
                 </button>
@@ -331,20 +344,30 @@ export default function Sidebar() {
 
       {/* Friend 모달 */}
       {modalFriend && (
-        <div ref={modalFriendRef} className="absolute left-[347px] w-[290px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 flex items-center px-4" style={{ top: modalY }}>
+        <div
+          ref={modalFriendRef}
+          className="absolute left-[347px] w-[290px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 flex items-center px-4"
+          style={{ top: modalY }}
+        >
           <div className="relative w-12 h-12">
-            <img src={friendsIcon} alt={modalFriend.name} className="w-full h-full rounded-full" />
-            <span className={`absolute bottom-0 right-0 block w-4 h-4 rounded-full border-2 border-[var(--color-background-sub)] ${modalFriend.status === "online" ? "bg-[var(--color-alert-online)]" : "bg-[var(--color-text-light)]"}`} />
+            <img
+              src={modalFriend.avatarUrl ?? friendsIcon}
+              alt={modalFriend.name}
+              className="w-12 h-12 rounded-full object-cover"
+            />
+            <span
+              className={`absolute bottom-0 right-0 block w-4 h-4 rounded-full border-2 border-[var(--color-background-sub)] ${
+                modalFriend.status === "online"
+                  ? "bg-[var(--color-alert-online)]"
+                  : "bg-[var(--color-text-light)]"
+              }`}
+            />
           </div>
           <div className="ml-4 flex flex-col justify-center">
             <p className="font-medium text-[var(--color-text-main)]">{modalFriend.name}</p>
-            <p className="text-sm text-[var(--color-text-sub)] capitalize">
-              {modalFriend.status === "online" ? "Online" : "Offline"}
-            </p>
+            <p className="text-sm text-[var(--color-text-sub)] capitalize">{modalFriend.status}</p>
           </div>
-
           <div className="ml-auto flex gap-2">
-            {/* 삭제 버튼 */}
             <button
               className="relative w-8 h-8 group"
               onClick={() => handleDeleteFriend(modalFriend.id)}

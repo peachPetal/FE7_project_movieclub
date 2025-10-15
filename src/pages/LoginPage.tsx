@@ -1,5 +1,5 @@
 import SocialBtn from "../components/common/buttons/SocialBtn";
-import supabase from "../../utils/supabase.ts";
+import { supabase } from "../utils/supabase.ts";
 import { useAuthStore } from "../stores/authStore.ts";
 import { useEffect } from "react";
 
@@ -25,7 +25,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {
-          redirectTo: `${import.meta.env.VITE_URL}/login`,
+          redirectTo: `${import.meta.env.VITE_URL}/`,
         },
       });
       if (error) throw error;
