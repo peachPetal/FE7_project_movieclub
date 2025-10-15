@@ -14,8 +14,6 @@ export default function ReviewPostPage() {
   const [movieId, setMovieId] = useState<number | null>(null);
   const [content, setContent] = useState("");
   const [thumbnail, setThumbnail] = useState("");
-  // comobobox 관련 state들
-  // db 설계 후에 { id: number; title: string } 모두 Movie 타입으로 바꿀 것
   const [movies, setMovies] = useState<{ id: number; title: string }[]>([]);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<{
@@ -58,7 +56,6 @@ export default function ReviewPostPage() {
       return;
     }
 
-    // thumbnail 첨부 안 했을 경우 해당 movie poster setThumbnail
   };
 
   return (

@@ -1,4 +1,4 @@
-import SocialBtn from "../components/common/buttons/SocialBtn";
+import SocialBtn from "../components/common/buttons/SocialBtn.tsx";
 import { supabase } from "../utils/supabase.ts";
 import { useAuthStore } from "../stores/authStore.ts";
 import { useEffect } from "react";
