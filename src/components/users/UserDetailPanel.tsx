@@ -1,21 +1,25 @@
 import { useMemo, useState, useCallback } from "react";
-import type { AppUser } from "../../types/User";
+import type { AppUser } from "../../types/appUser";
 import profileIconBlack from "../../assets/person-circle-black.svg";
 import profileIconWhite from "../../assets/person-circle-white.svg";
 import addFriendIcon from "../../assets/addFriend.svg";
 import messageUserIcon from "../../assets/messageUser.svg";
 import UserMessageList from "./UserMessageList";
+import type { MessageDetailData } from "./UserMessageDetail";
 
-type Props = { user: AppUser };
-export default function UserDetailPanel({ user }: Props) {
+type Props = {
+  user: AppUser;
+  onPickMessage?: (msg: MessageDetailData | null) => void; // ← 상위(UsersPage)로 전달
+};
+
+export default function UserDetailPanel({ user, onPickMessage }: Props) {
   const isDark = useMemo(() => localStorage.getItem("theme") === "dark", []);
   const [isMessageOpen, setIsMessageOpen] = useState(false);
+
   const toggleMessage = useCallback(() => setIsMessageOpen((p) => !p), []);
 
   return (
-    // 패널과 메시지 리스트를 감싸는 컨테이너
     <div className="w-full">
-      {/* 기존 상세 패널 */}
       <aside
         className="card-shadow w-full h-[284px] rounded-xl border border-[var(--color-text-placeholder)] bg-[var(--color-background-main)] p-6 text-[var(--color-text-main)] dark:border-[var(--color-text-light)]"
         aria-label="선택된 유저 상세 정보"
@@ -55,13 +59,13 @@ export default function UserDetailPanel({ user }: Props) {
               aria-label="친구로 추가"
               title="친구로 추가"
             />
-            {/* 쪽지: 클릭 시 토글 */}
+            {/* 쪽지 토글 */}
             <img
               src={messageUserIcon}
               className="inline-flex h-10 w-10 items-center justify-center rounded-full cursor-pointer hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-main)]"
               alt=""
-              aria-label="쪽지 보내기"
-              title="쪽지 보내기"
+              aria-label="쪽지 보기"
+              title="쪽지 보기"
               role="button"
               tabIndex={0}
               aria-expanded={isMessageOpen}
@@ -77,10 +81,13 @@ export default function UserDetailPanel({ user }: Props) {
         </div>
       </aside>
 
-      {/* 상세 패널 ‘바로 아래’에 동일 폭으로 렌더링 */}
+      {/* 중앙 영역: 좌측 목록만 (상세는 우측 별도 영역에 표시) */}
       {isMessageOpen && (
-        <div className="mt-4 w-full">
-          <UserMessageList user={user} />
+        <div className="mt-4">
+          <UserMessageList
+            user={user}
+            onSelect={(m) => onPickMessage?.(m)} // 같은 항목 재클릭 → null 전달
+          />
         </div>
       )}
     </div>
