@@ -97,7 +97,8 @@ const LoggedInContent: React.FC<LoggedInContentProps> = ({
   onSettingsClick,
 }) => {
   const [isFriendsMenuOpen, setIsFriendsMenuOpen] = useState(true);
-  const handleToggleFriendsMenu = () => setIsFriendsMenuOpen(!isFriendsMenuOpen);
+  const handleToggleFriendsMenu = () =>
+    setIsFriendsMenuOpen(!isFriendsMenuOpen);
 
   return (
     <div className="flex flex-col flex-1 p-4 overflow-visible">
@@ -231,7 +232,10 @@ export default function Sidebar() {
 
   const handleToggleCollapse = () => setIsCollapsed(!isCollapsed);
 
-  const handleFriendClick = (friend: Friend, e: React.MouseEvent<HTMLDivElement>) => {
+  const handleFriendClick = (
+    friend: Friend,
+    e: React.MouseEvent<HTMLDivElement>
+  ) => {
     if (modalNotificationOpen) setModalNotificationOpen(false);
     const rect = e.currentTarget.getBoundingClientRect();
     setModalY(rect.top + window.scrollY);
@@ -363,8 +367,12 @@ export default function Sidebar() {
             />
           </div>
           <div className="ml-4 flex flex-col justify-center">
-            <p className="font-medium text-[var(--color-text-main)]">{modalFriend.name}</p>
-            <p className="text-sm text-[var(--color-text-sub)] capitalize">{modalFriend.status}</p>
+            <p className="font-medium text-[var(--color-text-main)]">
+              {modalFriend.name}
+            </p>
+            <p className="text-sm text-[var(--color-text-sub)] capitalize">
+              {modalFriend.status}
+            </p>
           </div>
           <div className="ml-auto flex gap-2">
             <button
