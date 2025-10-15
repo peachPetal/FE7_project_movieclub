@@ -1,17 +1,12 @@
+import type { ReviewSubset, ReviewRenderProps } from "../../types/Review";
 import ReviewItem from "./ReviewItem";
-
-interface ReviewRenderProps {
-  data: Review[];
-  variant: "home" | "page";
-  isLoading: boolean;
-}
 
 export default function ReviewsRendering({
   data,
   variant = "page",
   isLoading,
 }: ReviewRenderProps) {
-  const list: (Review | undefined)[] = isLoading
+  const list: (ReviewSubset | undefined)[] = isLoading
     ? Array.from({ length: 5 }).map(() => undefined)
     : data;
   const hasImage = variant === "page" ? true : false;

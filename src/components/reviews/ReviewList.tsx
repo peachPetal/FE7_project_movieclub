@@ -1,26 +1,45 @@
 import { useEffect, useState } from "react";
-import { useReviewStore } from "../../stores/reviewStore";
 import ReviewsRendering from "./ReviewsRendering";
-
-type ReviewsListProps = {
-  variant?: "home" | "page";
-};
+import { supabase } from "../../utils/supabase";
+import type { ReviewSubset, ReviewsListProps } from "../../types/Review";
 
 export default function ReviewList({ variant = "page" }: ReviewsListProps) {
-  const { isLoading, setIsLoading, reviewsData } = useReviewStore();
-  const [data, setData] = useState<Review[]>([]);
+  const [data, setData] = useState<ReviewSubset[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const limit = variant === "home" ? 5 : 20;
-    setData(reviewsData.slice(0, limit + 1));
-  }, [reviewsData, variant]);
+    const fetchPosts = async () => {
+      try {
+        setIsLoading(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(!isLoading);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
+        const { data: reviews, error } = await supabase
+          .from("reviews")
+          .select(
+            `
+            id,
+            title,
+            content,
+            thumbnail,
+            movie_id,
+            created_at,
+            users!inner(
+              name
+            ),
+            likes:review_likes(count)`
+          )
+          .order("created_at", { ascending: false })
+          .range(0, limit);
+
+        if (error) throw error;
+        setData(reviews);
+        setIsLoading(false);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchPosts();
+  }, [variant]);
 
   return (
     <ReviewsRendering data={data} variant={variant} isLoading={isLoading} />
