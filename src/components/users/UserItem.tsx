@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import clsx from "clsx";
+import { useTheme } from "../../hooks/useTheme";
 import type { AppUser } from "../../types/appUser";
 import profileIconBlack from "../../assets/person-circle-black.svg";
 import profileIconWhite from "../../assets/person-circle-white.svg";
@@ -10,74 +11,61 @@ type Props = {
   className?: string;
 };
 
-export default function UserItem({
-  user,
-  selected,
-  onClick,
-  className,
-}: Props) {
-  const { name, isOnline } = user;
+export default function UserItem({ user, selected, onClick, className }: Props) {
+  const { name, is_online, avatar_url } = user;
+  const { isDark } = useTheme();
 
-  // 다크 모드 상태 관리
-  const [isDark, setIsDark] = useState(
-    () => localStorage.getItem("theme") === "dark"
-  );
-
-  useEffect(() => {
-    const handleThemeChange = () => {
-      setIsDark(localStorage.getItem("theme") === "dark");
-    };
-
-    window.addEventListener("storage", handleThemeChange);
-    return () => window.removeEventListener("storage", handleThemeChange);
-  }, []);
+  const fallbackIcon = isDark ? profileIconWhite : profileIconBlack;
 
   return (
     <button
       type="button"
       onClick={() => onClick?.(user)}
-      className={[
-        "shadow-sm w-full flex items-center gap-3 rounded-xl border transition",
-        "px-4 py-3",
-        "border-[var(--color-text-placeholder)]",
-        "hover:border-[var(--color-text-light)] hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-main-20)]",
-        selected
-          ? "border-[var(--color-main)] ring-2 ring-[var(--color-main-10)]"
-          : "",
-        "dark:bg-[var(--color-background-sub)] dark:border-[var(--color-text-light)] dark:hover:border-[var(--color-text-sub)]",
-        className || "",
-        `
-        card-shadow flex items-center gap-4 p-4 rounded-lg cursor-pointer transition
-        ${
-          selected
-            ? "bg-[color:var(--color-main-10)]" // 선택된 상태 (투명도 90%)
-            : "bg-[color:var(--color-background-main)] hover:bg-[color:var(--color-main-10)]"
-        }
-      `,
-      ].join(" ")}
+      className={clsx(
+        // 기본 스타일
+        "flex w-full cursor-pointer items-center gap-4 rounded-lg p-4 text-left transition",
+        // 포커스 스타일
+        "focus:outline-none focus:ring-2 focus:ring-[var(--color-main-20)]",
+        
+        // ✅ 다크 모드 스타일 추가
+        // 그림자와 미세한 테두리를 추가하여 입체감을 줍니다.
+        "dark:shadow-lg dark:shadow-black/20 dark:border dark:border-neutral-800",
+
+        // 선택 상태에 따른 배경색 변경
+        {
+          "bg-[var(--color-main-10)]": selected,
+          "bg-[var(--color-background-main)] hover:bg-[var(--color-main-10)] dark:bg-neutral-900 dark:hover:bg-neutral-800":
+            !selected,
+        },
+        className,
+      )}
       aria-pressed={selected}
     >
-      {/* 다크 모드에 따라 아이콘 변경 */}
-      <div className="relative h-10 w-10 shrink-0 rounded-full bg-[var(--color-background-sub)] overflow-hidden">
+      {/* 아바타 이미지 */}
+      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[var(--color-background-sub)]">
         <img
-          src={isDark ? profileIconWhite : profileIconBlack}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover rounded-full"
+          src={avatar_url || fallbackIcon}
+          alt={`${name}의 프로필 아바타`}
+          className="h-full w-full rounded-full object-cover"
         />
       </div>
 
-      <div className="min-w-0 text-left">
+      {/* 사용자 정보 */}
+      <div className="min-w-0 flex-1">
         <p className="truncate font-medium text-[var(--color-text-main)]">
           {name}
         </p>
-        <p className="mt-0.5 flex items-center gap-1 text-sm text-[var(--color-text-sub)]">
-          {isOnline ? (
+        <p className="mt-0.5 flex items-center gap-1.5 text-sm text-[var(--color-text-sub)]">
+          {is_online ? (
             <>
-              <span className="inline-block h-2 w-2 rounded-full bg-[var(--color-alert-online)]" />
-              온라인
+              <span className="h-2 w-2 rounded-full bg-[var(--color-alert-online)]" />
+              Online
             </>
           ) : (
-            "오프라인"
+            <>
+              <span className="h-2 w-2 rounded-full bg-[var(--color-text-light)]" />
+              Offline
+            </>
           )}
         </p>
       </div>

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
-import TimeAgo from "../TimeAgo";
+import TimeAgo from "./TimeAgo";
 import ReviewItemSkeleton from "../loading/ReviewItemSkeleton";
 import type { ReviewWithDetail } from "../../types/Review";
 

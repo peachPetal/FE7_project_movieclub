@@ -1,6 +1,6 @@
 // src/lib/theme.ts
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark";
 
 // 테마를 즉시 적용하는 함수
 export const applyTheme = (theme: Theme) => {

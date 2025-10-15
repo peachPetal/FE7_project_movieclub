@@ -1,5 +1,6 @@
 import type { FC } from "react";
 
+// --- 타입 정의 ---
 export type MessageDetailData = {
   id: string;
   title: string;
@@ -7,6 +8,23 @@ export type MessageDetailData = {
   bodyFriend: string;
 };
 
+// --- 서브 컴포넌트 ---
+// 반복되는 메시지 블록을 위한 재사용 컴포넌트
+type MessageBlockProps = {
+  label: string;
+  content: string;
+};
+
+const MessageBlock: FC<MessageBlockProps> = ({ label, content }) => (
+  <article>
+    <p className="mb-2 font-medium text-[var(--color-text-main)]">{label}</p>
+    <pre className="whitespace-pre-wrap rounded-md bg-[var(--color-background-sub)] p-3">
+      {content}
+    </pre>
+  </article>
+);
+
+// --- 메인 컴포넌트 ---
 type Props = {
   message: MessageDetailData;
   onReply?: () => void;
@@ -23,23 +41,9 @@ const UserMessageDetail: FC<Props> = ({ message, onReply }) => {
         <h5 className="mb-4 text-xl font-semibold">{message.title}</h5>
 
         <div className="flex-1 space-y-6 text-sm text-[var(--color-text-sub)]">
-          <article>
-            <p className="mb-2 font-medium text-[var(--color-text-main)]">
-              이전에 내가 보낸 메시지
-            </p>
-            <pre className="whitespace-pre-wrap rounded-md bg-[var(--color-background-sub)] p-3">
-              {message.bodyMine}
-            </pre>
-          </article>
-
-          <article>
-            <p className="mb-2 font-medium text-[var(--color-text-main)]">
-              친구가 보낸 메시지
-            </p>
-            <pre className="whitespace-pre-wrap rounded-md bg-[var(--color-background-sub)] p-3">
-              {message.bodyFriend}
-            </pre>
-          </article>
+          {/* ✅ 1. 분리된 MessageBlock 컴포넌트 사용 */}
+          <MessageBlock label="이전에 내가 보낸 메시지" content={message.bodyMine} />
+          <MessageBlock label="친구가 보낸 메시지" content={message.bodyFriend} />
         </div>
 
         <div className="mt-4 flex justify-end">

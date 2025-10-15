@@ -4,7 +4,7 @@ import LikeBtn from "../common/buttons/LikeBtn";
 import Comment from "../comments/Comment";
 import { useEffect, useState } from "react";
 import ReviewsDetailSkeleton from "../loading/ReviewsDetailSkeleton";
-import TimeAgo from "../TimeAgo";
+import TimeAgo from "./TimeAgo";
 
 export default function ReviewsDetail() {
   const { id } = useParams();
