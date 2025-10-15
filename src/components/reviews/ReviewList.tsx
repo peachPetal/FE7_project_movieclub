@@ -26,12 +26,14 @@ export default function ReviewList({ variant = "page" }: ReviewsListProps) {
             users!inner(
               name
             ),
+            comments:comments(count),
             likes:review_likes(count)`
           )
           .order("created_at", { ascending: false })
           .range(0, limit);
 
         if (error) throw error;
+
         setData(reviews);
         setIsLoading(false);
       } catch (e) {

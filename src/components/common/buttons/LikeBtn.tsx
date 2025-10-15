@@ -25,7 +25,7 @@ export default function LikeBtn({ like, isLiked }: LikeBtn) {
 
   return (
     <>
-      <button className="flex justify-center items-center font-bold text-[24px] duration-200 border bg-background-main text-main rounded-[20px] pt-3 pr-5 pb-3 pl-5">
+      <div className="flex justify-center items-center font-bold text-[24px] duration-200 border bg-background-main text-main rounded-[20px] pt-3 pr-5 pb-3 pl-5">
         <button className="cursor-pointer" onClick={onLikedBtnClick}>
           {liked ? (
             <svg
@@ -55,7 +55,7 @@ export default function LikeBtn({ like, isLiked }: LikeBtn) {
           )}
         </button>
         <span className="-translate-y-0.5">{likeCounter}</span>
-      </button>
+      </div>
     </>
   );
 }

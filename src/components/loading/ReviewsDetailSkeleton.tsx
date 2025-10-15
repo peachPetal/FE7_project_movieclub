@@ -18,34 +18,102 @@ export default function ReviewsDetailSkeleton() {
   return (
     <div className="w-[1116px] mr-15">
       {/* 제목 */}
-      <Skeleton width={370} height={40} className="mb-2.5" baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
+      <Skeleton
+        width={370}
+        height={40}
+        className="mb-2.5"
+        baseColor={skeletonBaseColor}
+        highlightColor={skeletonHighlightColor}
+      />
       {/* 부제목 */}
-      <Skeleton width={250} height={24} className="mb-10" baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
+      <Skeleton
+        width={250}
+        height={24}
+        className="mb-10"
+        baseColor={skeletonBaseColor}
+        highlightColor={skeletonHighlightColor}
+      />
 
       {/* 이미지 및 텍스트 */}
       <div className="flex mb-10">
-        <Skeleton width={550} height={325} className="mr-8" baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
+        <Skeleton
+          width={550}
+          height={325}
+          className="mr-8"
+          baseColor={skeletonBaseColor}
+          highlightColor={skeletonHighlightColor}
+        />
 
         {/* 텍스트 9줄 스켈레톤 */}
         <div className="mr-12 w-[500px] space-y-2">
-          <br/>
-          <Skeleton width="100%" height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-          <Skeleton width="100%" height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-          <Skeleton width="100%" height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-          <br/>
-          <Skeleton width="100%" height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-          <Skeleton width="100%" height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-          <Skeleton width="100%" height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-          <br/>
-          <Skeleton width="100%" height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-          <Skeleton width="100%" height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
-          <Skeleton width="100%" height={20} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}/>
+          <br />
+          <Skeleton
+            width="100%"
+            height={20}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
+          <Skeleton
+            width="100%"
+            height={20}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
+          <Skeleton
+            width="100%"
+            height={20}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
+          <br />
+          <Skeleton
+            width="100%"
+            height={20}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
+          <Skeleton
+            width="100%"
+            height={20}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
+          <Skeleton
+            width="100%"
+            height={20}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
+          <br />
+          <Skeleton
+            width="100%"
+            height={20}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
+          <Skeleton
+            width="100%"
+            height={20}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
+          <Skeleton
+            width="100%"
+            height={20}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
         </div>
       </div>
 
       {/* 좋아요 버튼 */}
-      <div className="flex justify-end">
-        <Skeleton width={110} height={62} baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor} />
+      <div className="flex justify-center">
+        <Skeleton
+          width={110}
+          height={62}
+          baseColor={skeletonBaseColor}
+          highlightColor={skeletonHighlightColor}
+        />
       </div>
 
       <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>

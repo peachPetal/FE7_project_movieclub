@@ -42,7 +42,9 @@ export default function ReviewsDetail() {
             <span className="text-main dark:text-main-dark"> #{movie}</span>
           </h1>
           <p className="mb-10 text-text-sub">
-            <span className="text-[var(--color-text-sub)]"><TimeAgo dateString={createdAt} /></span>
+            <span className="text-[var(--color-text-sub)]">
+              <TimeAgo dateString={createdAt} />
+            </span>
             {" by "}
             <span className="review-created-user text-main">{author}</span>
           </p>
@@ -55,7 +57,7 @@ export default function ReviewsDetail() {
                   : "https://plus.unsplash.com/premium_photo-1661675440353-6a6019c95bc7?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               }
             />
-            <p className="mr-12 whitespace-pre-line leading-relaxed text-text-main dark:text-text-main-dark">
+            <p className="mr-12 min-w-[340px] whitespace-pre-line leading-relaxed text-text-main dark:text-text-main-dark">
               {content}
             </p>
           </div>
