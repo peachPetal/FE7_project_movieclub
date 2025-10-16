@@ -8,7 +8,13 @@ type Review = Database["public"]["Tables"]["reviews"]["Row"];
 
 type ReviewSubset = Pick<
   Review,
-  "id" | "title" | "content" | "thumbnail" | "movie_id" | "created_at"
+  | "id"
+  | "title"
+  | "content"
+  | "thumbnail"
+  | "movie_id"
+  | "movie_name"
+  | "created_at"
 >;
 
 type ReviewWithDetail = ReviewSubset & {

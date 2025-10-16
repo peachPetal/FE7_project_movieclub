@@ -1,3 +1,4 @@
+import { supabase } from "../utils/supabase";
 import { tmdb } from "./tmdb";
 
 export const getMovies = async () => {
@@ -34,6 +35,32 @@ export const getMovies = async () => {
         vote_average,
       } = MovieRes.data;
 
+      const imgPath = `https://image.tmdb.org/t/p/original`;
+
+      try {
+        const { data: isMovieExist } = await supabase
+          .from("movies")
+          .select("movie_id")
+          .eq("movie_id", movieId)
+          .single();
+
+        if (!isMovieExist) {
+          const { error } = await supabase
+            .from("movies")
+            .insert([
+              {
+                movie_id: movieId,
+                movie_name: title,
+                backdrop_img: `${imgPath}${backdrop_path}`,
+              },
+            ])
+            .select();
+          if (error) throw error;
+        }
+      } catch (err) {
+        console.error(`supabase insert movies error: ` + err);
+      }
+
       const certificationData = await tmdb
         .get(`/movie/${id}/release_dates`, {
           params: { region: "KR", language: "ko-KR" },
@@ -48,7 +75,6 @@ export const getMovies = async () => {
         ? certificationData["release_dates"][0]["certification"]
         : "";
 
-      const imgPath = `https://image.tmdb.org/t/p/original`;
       const credits = await getCredits(movieId);
       const trailer = await getTrailer(movieId);
 

@@ -39,51 +39,6 @@ export type Database = {
   };
   public: {
     Tables: {
-      comments: {
-        Row: {
-          author_id: string;
-          content: string;
-          created_at: string;
-          depth: number;
-          id: number;
-          parent_comment_id: number | null;
-          review_id: number;
-        };
-        Insert: {
-          author_id?: string;
-          content: string;
-          created_at?: string;
-          depth?: number;
-          id?: number;
-          parent_comment_id?: number | null;
-          review_id: number;
-        };
-        Update: {
-          author_id?: string;
-          content?: string;
-          created_at?: string;
-          depth?: number;
-          id?: number;
-          parent_comment_id?: number | null;
-          review_id?: number;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "comments_author_id_fkey";
-            columns: ["author_id"];
-            isOneToOne: false;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "comments_review_id_fkey";
-            columns: ["review_id"];
-            isOneToOne: false;
-            referencedRelation: "reviews";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       friendship: {
         Row: {
           created_at: string;
@@ -117,53 +72,143 @@ export type Database = {
           },
         ];
       };
-      movies: {
+      movie_likes: {
         Row: {
-          actors: string[] | null;
-          comment_count: number | null;
-          created_at: string | null;
-          description: string | null;
-          director: string | null;
-          genre: string[] | null;
+          created_at: string;
           id: number;
-          like_count: number | null;
-          poster_url: string | null;
-          rating: number | null;
-          runtime: string | null;
-          title: string;
-          year: number | null;
+          movie_id: number;
+          user_id: string;
         };
         Insert: {
-          actors?: string[] | null;
-          comment_count?: number | null;
-          created_at?: string | null;
-          description?: string | null;
-          director?: string | null;
-          genre?: string[] | null;
+          created_at?: string;
           id?: number;
-          like_count?: number | null;
-          poster_url?: string | null;
-          rating?: number | null;
-          runtime?: string | null;
-          title: string;
-          year?: number | null;
+          movie_id: number;
+          user_id?: string;
         };
         Update: {
-          actors?: string[] | null;
-          comment_count?: number | null;
-          created_at?: string | null;
-          description?: string | null;
-          director?: string | null;
-          genre?: string[] | null;
+          created_at?: string;
           id?: number;
-          like_count?: number | null;
-          poster_url?: string | null;
-          rating?: number | null;
-          runtime?: string | null;
-          title?: string;
-          year?: number | null;
+          movie_id?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "movie_likes_movie_id_fkey";
+            columns: ["movie_id"];
+            isOneToOne: false;
+            referencedRelation: "movies";
+            referencedColumns: ["movie_id"];
+          },
+          {
+            foreignKeyName: "movie_likes_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      movies: {
+        Row: {
+          created_at: string | null;
+          id: number;
+          movie_id: number;
+          movie_name: string | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          id?: number;
+          movie_id: number;
+          movie_name?: string | null;
+        };
+        Update: {
+          created_at?: string | null;
+          id?: number;
+          movie_id?: number;
+          movie_name?: string | null;
         };
         Relationships: [];
+      };
+      review_comments: {
+        Row: {
+          author_id: string | null;
+          content: string | null;
+          created_at: string;
+          depth: number | null;
+          id: number;
+          parent_comment_id: number | null;
+          review_id: number | null;
+        };
+        Insert: {
+          author_id?: string | null;
+          content?: string | null;
+          created_at?: string;
+          depth?: number | null;
+          id?: number;
+          parent_comment_id?: number | null;
+          review_id?: number | null;
+        };
+        Update: {
+          author_id?: string | null;
+          content?: string | null;
+          created_at?: string;
+          depth?: number | null;
+          id?: number;
+          parent_comment_id?: number | null;
+          review_id?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "comments_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_review_id_fkey";
+            columns: ["review_id"];
+            isOneToOne: false;
+            referencedRelation: "reviews";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      review_likes: {
+        Row: {
+          created_at: string;
+          id: number;
+          review_id: number | null;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          review_id?: number | null;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          review_id?: number | null;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "review_like_review_id_fkey";
+            columns: ["review_id"];
+            isOneToOne: false;
+            referencedRelation: "reviews";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "review_like_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       reviews: {
         Row: {
@@ -172,6 +217,7 @@ export type Database = {
           created_at: string;
           id: number;
           movie_id: number;
+          movie_name: string;
           thumbnail: string | null;
           title: string;
         };
@@ -181,6 +227,7 @@ export type Database = {
           created_at?: string;
           id?: number;
           movie_id: number;
+          movie_name: string;
           thumbnail?: string | null;
           title: string;
         };
@@ -190,6 +237,7 @@ export type Database = {
           created_at?: string;
           id?: number;
           movie_id?: number;
+          movie_name?: string;
           thumbnail?: string | null;
           title?: string;
         };
@@ -208,25 +256,28 @@ export type Database = {
           avatar_url: string | null;
           bio: string | null;
           created_at: string;
-          email: string;
+          email: string | null;
           id: string;
-          name: string | null;
+          is_online: boolean | null;
+          name: string;
         };
         Insert: {
           avatar_url?: string | null;
           bio?: string | null;
           created_at?: string;
-          email: string;
+          email?: string | null;
           id?: string;
-          name?: string | null;
+          is_online?: boolean | null;
+          name: string;
         };
         Update: {
           avatar_url?: string | null;
           bio?: string | null;
           created_at?: string;
-          email?: string;
+          email?: string | null;
           id?: string;
-          name?: string | null;
+          is_online?: boolean | null;
+          name?: string;
         };
         Relationships: [];
       };
