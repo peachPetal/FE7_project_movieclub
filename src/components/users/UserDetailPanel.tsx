@@ -9,7 +9,6 @@ import profileIconWhite from "../../assets/person-circle-white.svg";
 import addFriendIcon from "../../assets/addFriend.svg";
 import deleteFriendMouseOff from "../../assets/deleteFriendMouseOff.svg";
 import messageUserIcon from "../../assets/messageUser.svg";
-
 import UserMessageList from "./UserMessageList";
 
 // --- 서브 컴포넌트 Props 타입 ---

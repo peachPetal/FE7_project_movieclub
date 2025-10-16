@@ -13,7 +13,7 @@ export const getMovies = async () => {
     },
   });
 
-  const movieIds = movieIdRes.data.results.map((v) => v.id);
+  const movieIds = movieIdRes.data.results.map((v: { id: any; }) => v.id);
 
   const moviesArray: Movie[] = await Promise.all(
     movieIds.map(async (id: number) => {

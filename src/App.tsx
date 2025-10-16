@@ -15,6 +15,7 @@ import UsersPage from "./pages/UsersPage";
 import PublicOnlyRoute from "./components/routes/PublicOnlyRoute";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./utils/queryClient";
+import SearchResultPage from "./pages/searchResultPage";
 
 export default function App() {
   // ProfileImageUpload onUpload 콜백
@@ -48,6 +49,7 @@ export default function App() {
             path="/profile"
             element={<Profile />}
           />
+          <Route path="/search/:query" element={<SearchResultPage />} />
         </Route>
         <Route path="/error" element={<Error />} />
       </Routes>
