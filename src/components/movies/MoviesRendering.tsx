@@ -19,7 +19,7 @@ export default function MoviesRendering({
       className={
         variant === "home"
           ? "flex gap-[30px] flex-wrap"
-          : "flex flex-wrap gap-4"
+          : "flex flex-wrap gap-5"
       }
     >
       {list.map((movie, idx) => (
