@@ -3,31 +3,15 @@ import { useEffect, useState } from "react";
 interface LikeBtn {
   like: number;
   isLiked: boolean;
+  onClick: () => void;
 }
 
-export default function LikeBtn({ like, isLiked }: LikeBtn) {
-  const [liked, setLiked] = useState(false);
-  const [likeCounter, setLikeCounter] = useState(0);
-
-  useEffect(() => {
-    setLikeCounter(like);
-    setLiked(isLiked);
-  }, []);
-
-  const onLikedBtnClick = () => {
-    if (liked) {
-      setLikeCounter((prev) => prev - 1);
-    } else {
-      setLikeCounter((prev) => prev + 1);
-    }
-    setLiked((prev) => !prev);
-  };
-
+export default function LikeBtn({ like, isLiked, onClick }: LikeBtn) {
   return (
     <>
       <div className="flex justify-center items-center font-bold text-[24px] duration-200 border bg-background-main text-main rounded-[20px] pt-3 pr-5 pb-3 pl-5">
-        <button className="cursor-pointer" onClick={onLikedBtnClick}>
-          {liked ? (
+        <button className="cursor-pointer" onClick={onClick}>
+          {isLiked ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -54,7 +38,7 @@ export default function LikeBtn({ like, isLiked }: LikeBtn) {
             </svg>
           )}
         </button>
-        <span className="-translate-y-0.5">{likeCounter}</span>
+        <span className="-translate-y-0.5">{like}</span>
       </div>
     </>
   );

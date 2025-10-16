@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import "react-loading-skeleton/dist/skeleton.css";
 import TrailerBtn from "../components/common/buttons/TrailerBtn";
-import LikeBtn from "../components/common/buttons/LikeBtn";
+import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
 
 export default function MoviesDetail() {
   const location = useLocation();
@@ -23,17 +23,6 @@ export default function MoviesDetail() {
     actors,
     trailer,
   } = movie;
-
-  // const movie = useMemo(() => {
-  //   if (!movies || movies.length === 0 || movieId === undefined)
-  //     return undefined;
-  //   return movies.find((m) => String(m.id) === String(movieId));
-  // }, [movies, movieId]);
-
-  // 해당 영화의 리뷰만 필터링 (reviewStore: review.movie = 영화제목 문자열)
-  // const matchedReviews = useMemo(() => {
-  //   // reviewStore는 초기값이 배열이므로 null 체크 대신 배열 보장
-  //   if (!Array.isArray(reviewsData)) return null;
 
   const Separator = () => <span className="mx-1.5">{`|`}</span>;
   const formatRunTime = (runtime: string) => {
@@ -63,7 +52,7 @@ export default function MoviesDetail() {
   };
 
   return (
-    <div>
+    <div className="max-w-7xl">
       {" "}
       <section className="movie p-4 flex h-[500px] text-[var(--color-text-main)]">
         <img
@@ -71,10 +60,10 @@ export default function MoviesDetail() {
           alt={`${title} poster`}
           className="max-w-[340px] max-h-[500px] object-cover rounded-lg"
         />
-        <div className="movie-detail-area h-full flex flex-col justify-around ml-9">
+        <div className="movie-detail-area w-full h-full flex flex-col justify-around ml-9">
           <div className="movie-info flex items-baseline">
             <h1 className="text-5xl font-bold mr-4">{title}</h1>{" "}
-            {cerfication ? (
+            {cerfication.length === 2 ? (
               <div className="px-[4px] border border-main text-main mr-2">
                 <span>{cerfication}</span>
               </div>
@@ -98,8 +87,7 @@ export default function MoviesDetail() {
           </div>
           <div className="flex items-center gap-6 mt-4">
             <TrailerBtn src={trailer} />
-            
-            <div className="flex items-center gap-1.5"> 
+            <div className="flex items-center gap-1.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -118,13 +106,19 @@ export default function MoviesDetail() {
         </div>
       </section>
       <section className="mt-10">
-        <div className="flex items-baseline gap-2 justify-start mb-4">
-          <h2 className="text-2xl font-bold text-[var(--color-text-main)]">
-            Reviews
-          </h2>
-          <span className="text-2xl text-[var(--color-main)] font-bold">
-            reviewsCount
-          </span>
+        <div className="flex items-baseline gap-2 justify-between mb-4">
+          <div className="review-section_title flex ">
+            <h2 className="text-2xl font-bold text-[var(--color-text-main)] mr-2">
+              Reviews
+            </h2>
+            <span className="text-2xl text-[var(--color-main)] font-bold">
+              reviewsCount
+            </span>
+          </div>
+          <ReviewPostBtn
+            isFloating={false}
+            state={{ id: id, title: title, backdrop: backdrop }}
+          />
         </div>
       </section>
     </div>

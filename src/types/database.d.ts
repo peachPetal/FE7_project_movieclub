@@ -110,18 +110,21 @@ export type Database = {
       };
       movies: {
         Row: {
+          backdrop_img: string | null;
           created_at: string | null;
           id: number;
           movie_id: number;
           movie_name: string | null;
         };
         Insert: {
+          backdrop_img?: string | null;
           created_at?: string | null;
           id?: number;
           movie_id: number;
           movie_name?: string | null;
         };
         Update: {
+          backdrop_img?: string | null;
           created_at?: string | null;
           id?: number;
           movie_id?: number;

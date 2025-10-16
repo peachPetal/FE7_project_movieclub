@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
 import {
   Combobox,
@@ -10,63 +10,70 @@ import { HashtagIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { supabase } from "../utils/supabase";
 import { useAuthStore } from "../stores/authStore";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+
+// !!!!!!!!!!!! 영화 검색 기능 변경 후 주석들 수정하기 !!!!!!!!!!!!!!!!!!
 
 export default function ReviewPostPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const {
+    id: movie_id,
+    title: movie_title,
+    backdrop: backdrop,
+  } = location.state.state;
   const userId = useAuthStore((state) => state.user?.id);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [title, setTitle] = useState("");
-  const [selectMovie, setSelectMovie] = useState<MovieInReview | null>(null);
+  // const [selectMovie, setSelectMovie] = useState<MovieInReview | null>(null);
   const [content, setContent] = useState("");
   const [thumbnail, setThumbnail] = useState("");
 
   // comobobox 관련 state들
-  // db 설계 후에 { id: number; title: string } 모두 Movie 타입으로 바꿀 것
-  const [movies, setMovies] = useState<MovieInReview[]>([]);
-  const [query, setQuery] = useState("");
+  // const [movies, setMovies] = useState<MovieInReview[]>([]);
+  // const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<MovieInReview | null>(null);
   const [isInputFocus, setIsInputFocus] = useState(true);
 
-  useEffect(() => {
-    setIsLoading(true);
+  // useEffect(() => {
+  //   setIsLoading(true);
 
-    const fetchData = async () => {
-      try {
-        const { data, error } = await supabase.from("movies").select("*");
+  //   const fetchData = async () => {
+  //     try {
+  //       const { data, error } = await supabase.from("movies").select("*");
 
-        if (error) throw error;
+  //       if (error) throw error;
 
-        const moviesData: MovieInReview[] = [];
+  //       const moviesData: MovieInReview[] = [];
 
-        data.map(({ movie_id, movie_name, backdrop_img }) =>
-          moviesData.push({
-            id: movie_id,
-            title: movie_name,
-            backdrop: backdrop_img,
-          })
-        );
+  //       data.map(({ movie_id, movie_name, backdrop_img }) =>
+  //         moviesData.push({
+  //           id: movie_id,
+  //           title: movie_name,
+  //           backdrop: backdrop_img,
+  //         })
+  //       );
 
-        setMovies(moviesData);
-      } catch (err) {
-        console.error(
-          `review post page, get movies from supabase error: ` + err
-        );
-      }
-    };
+  //       setMovies(moviesData);
+  //     } catch (err) {
+  //       console.error(
+  //         `review post page, get movies from supabase error: ` + err
+  //       );
+  //     }
+  //   };
 
-    fetchData();
+  //   fetchData();
 
-    setIsLoading(false);
-  }, []);
+  //   setIsLoading(false);
+  // }, []);
 
-  const filteredMovies =
-    query === ""
-      ? movies
-      : movies.filter((movie) => {
-          return movie.title.toLowerCase().includes(query.toLowerCase());
-        });
+  // const filteredMovies =
+  //   query === ""
+  //     ? movies
+  //     : movies.filter((movie) => {
+  //         return movie.title.toLowerCase().includes(query.toLowerCase());
+  //       });
 
   const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -86,29 +93,32 @@ export default function ReviewPostPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let finalThumbnail = thumbnail.trim();
+    // let finalThumbnail = thumbnail.trim();
 
-    if (!finalThumbnail) {
-      finalThumbnail =
-        selectMovie?.backdrop ||
-        "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
-    }
+    // if (!finalThumbnail) {
+    //   finalThumbnail =
+    //     selectMovie?.backdrop ||
+    //     "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
+    // }
 
-    if (!title || !selectMovie || !content) {
-      alert("값을 모두 입력해주세요.");
-      return;
-    }
+    // if (!title || !selectMovie || !content) {
+    //   alert("값을 모두 입력해주세요.");
+    //   return;
+    // }
 
     try {
+      // 영화 검색 기능 변경 후 수정
       const { data, error } = await supabase
         .from("reviews")
         .insert({
           author_id: userId,
           title: title,
           content: content,
-          thumbnail: finalThumbnail,
-          movie_id: selectMovie.id,
-          movie_name: selectMovie.title,
+          thumbnail: backdrop
+            ? backdrop
+            : "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg",
+          movie_id: movie_id,
+          movie_name: movie_title,
         })
         .select()
         .single();
@@ -127,6 +137,7 @@ export default function ReviewPostPage() {
   if (isLoading) {
     return (
       <>
+        {/* 나중에 스켈레톤 넣기 */}
         <p>로딩중...</p>
       </>
     );
@@ -147,7 +158,7 @@ export default function ReviewPostPage() {
               className="text-[28px] pl-3 pb-3 w-full mb-5 outline-0 border-b-1 border-text-light placeholder:text-text-light focus:border-main"
               required
             />
-            <Combobox<MovieInReview>
+            {/* <Combobox<MovieInReview>
               value={selected!}
               onChange={(value) => {
                 if (value !== null) {
@@ -216,7 +227,7 @@ export default function ReviewPostPage() {
                   </ComboboxOption>
                 ))}
               </ComboboxOptions>
-            </Combobox>
+            </Combobox> */}
             <textarea
               id="content"
               rows={20}
