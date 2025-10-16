@@ -1,7 +1,5 @@
-import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Link } from "react-router-dom";
-import { isDarkMode } from "../../lib/theme"; // 테마 상태 확인 함수 import
 import MovieSkeleton from "../loading/MovieSkeleton";
 
 type MovieItemProps = {
@@ -15,19 +13,20 @@ export default function MovieItem({ movie, isLoading }: MovieItemProps) {
     return <MovieSkeleton />;
   }
 
-  const { id, title, posterUrl } = movie;
+  const { id, title, poster } = movie;
 
   return (
     <Link
       to={`/movies/${id}`}
       aria-label={`영화 상세로 이동: ${title}`}
       className="block"
+      state={{ movie }}
     >
       {/* [변경 3] 영화 카드 배경 및 그림자 */}
       <div className="w-[250px] h-[450px] rounded-lg overflow-hidden card-shadow flex flex-col bg-[var(--color-background-sub)] flex-shrink-0 transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl cursor-pointer">
         <div className="w-full h-[358px] overflow-hidden">
           <img
-            src={posterUrl}
+            src={poster}
             alt={title}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
@@ -53,7 +52,7 @@ export default function MovieItem({ movie, isLoading }: MovieItemProps) {
                   fill-opacity="0.38"
                 />
               </svg>
-              <span className="text-sm">{movie.likeCount ?? 0}</span>
+              <span className="text-sm">like</span>
             </div>
             <div className="flex items-center gap-2">
               <svg
@@ -69,7 +68,7 @@ export default function MovieItem({ movie, isLoading }: MovieItemProps) {
                   fill-opacity="0.38"
                 />
               </svg>
-              <span className="text-sm">{movie.commentCount ?? 0}</span>
+              <span className="text-sm">comment</span>
             </div>
             <div>
               <svg

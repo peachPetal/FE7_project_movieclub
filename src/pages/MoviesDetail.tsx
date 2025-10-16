@@ -1,11 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import Skeleton from "react-loading-skeleton";
+import { useLocation } from "react-router-dom";
 import "react-loading-skeleton/dist/skeleton.css";
-import { isDarkMode } from "../lib/theme";
-import { useMovieStore } from "../stores/movieStore";
-import { useReviewStore } from "../stores/reviewStore";
-
 import TrailerBtn from "../components/common/buttons/TrailerBtn";
 import LikeBtn from "../components/common/buttons/LikeBtn";
 
@@ -39,65 +33,34 @@ function MetaRow({
 }
 
 export default function MoviesDetail() {
-  const { id } = useParams();
-  const movieId = useMemo(
-    () => (id ? (Number.isNaN(Number(id)) ? id : Number(id)) : undefined),
-    [id]
-  );
+  const location = useLocation();
+  const movie: Movie = location.state?.movie;
+  const {
+    id,
+    genres: { name: genre },
+    title,
+    original_title,
+    overview,
+    year,
+    rating,
+    runtime,
+    poster,
+    backdrop,
+    director,
+    actors,
+    trailer,
+  } = movie;
 
-  const { movies, isLoading, fetchMovies } = useMovieStore();
-  const { reviewsData } = useReviewStore();
-
-  // 상세 전용 API가 없다고 가정: 목록이 비면 한 번 채워둠
-  useEffect(() => {
-    if (!movies || movies.length === 0) {
-      fetchMovies();
-    }
-  }, [movies, fetchMovies]);
-
-  const movie = useMemo(() => {
-    if (!movies || movies.length === 0 || movieId === undefined)
-      return undefined;
-    return movies.find((m) => String(m.id) === String(movieId));
-  }, [movies, movieId]);
+  // const movie = useMemo(() => {
+  //   if (!movies || movies.length === 0 || movieId === undefined)
+  //     return undefined;
+  //   return movies.find((m) => String(m.id) === String(movieId));
+  // }, [movies, movieId]);
 
   // 해당 영화의 리뷰만 필터링 (reviewStore: review.movie = 영화제목 문자열)
-  const matchedReviews = useMemo(() => {
-    // reviewStore는 초기값이 배열이므로 null 체크 대신 배열 보장
-    if (!Array.isArray(reviewsData)) return null;
-
-    // 영화 데이터가 준비되지 않았으면 로딩 상태 유지
-    if (!movie) return null;
-
-    const norm = (s: unknown) =>
-      String(s ?? "")
-        .trim()
-        .toLowerCase();
-
-    const movieTitleNorm = norm(movie.title);
-
-    const filtered = (reviewsData as any[]).filter((r: any) => {
-      const reviewTitleNorm = norm(r.movie);
-      return reviewTitleNorm === movieTitleNorm;
-    });
-
-    return filtered as Review[];
-  }, [reviewsData, movie]);
-
-  // const reviewsCount = Array.isArray(matchedReviews)
-  //   ? matchedReviews.length
-  //   : 0;
-
-  // --- 스켈레톤 UI를 위한 테마 관리 로직 ---
-  const [isDark, setIsDark] = useState(isDarkMode());
-  useEffect(() => {
-    const handleThemeChange = () => setIsDark(isDarkMode());
-    window.addEventListener("storage", handleThemeChange);
-    return () => window.removeEventListener("storage", handleThemeChange);
-  }, []);
-  const skeletonBaseColor = isDark ? "#3c3c3c" : "#ebebeb";
-  const skeletonHighlightColor = isDark ? "#6b7280" : "#f5f5f5";
-  // ---
+  // const matchedReviews = useMemo(() => {
+  //   // reviewStore는 초기값이 배열이므로 null 체크 대신 배열 보장
+  //   if (!Array.isArray(reviewsData)) return null;
 
   return (
     <div className="w-3/4 p-4 overflow-y-auto">
@@ -105,86 +68,41 @@ export default function MoviesDetail() {
       <div className="flex gap-8">
         {/* 포스터 */}
         <div className="w-[250px] flex-shrink-0">
-          {isLoading || !movie ? (
-            <Skeleton
-              height={358}
-              className="rounded-lg"
-              baseColor={skeletonBaseColor}
-              highlightColor={skeletonHighlightColor}
-            />
-          ) : (
-            <img
-              src={movie.posterUrl}
-              alt={movie.title}
-              className="w-[250px] h-[358px] object-cover rounded-lg card-shadow"
-            />
-          )}
+          <img
+            src={poster}
+            alt={title}
+            className="w-[250px] h-[358px] object-cover rounded-lg card-shadow"
+          />
         </div>
 
         {/* 정보 영역 */}
         <div className="flex-1 flex flex-col gap-4">
           <h1 className="text-5xl font-extrabold text-[var(--color-text-main)]">
-            {isLoading || !movie ? (
-              <Skeleton
-                width={280}
-                baseColor={skeletonBaseColor}
-                highlightColor={skeletonHighlightColor}
-              />
-            ) : (
-              movie.title
-            )}
+            {title}
           </h1>
 
           {/* CTA 버튼 영역 */}
           <div className="flex items-center gap-4 mt-1">
-            <TrailerBtn src="" />
-            <LikeBtn like={movie?.likeCount ?? 0} isLiked={false} />
+            <TrailerBtn src={trailer} />
+            <LikeBtn like={0} isLiked={false} />
           </div>
 
           <div className="flex flex-col gap-2">
-            {isLoading || !movie ? (
-              <>
-                <Skeleton
-                  width={220}
-                  baseColor={skeletonBaseColor}
-                  highlightColor={skeletonHighlightColor}
-                />
-                <Skeleton
-                  width={260}
-                  baseColor={skeletonBaseColor}
-                  highlightColor={skeletonHighlightColor}
-                />
-                <Skeleton
-                  count={2}
-                  baseColor={skeletonBaseColor}
-                  highlightColor={skeletonHighlightColor}
-                />
-              </>
-            ) : (
-              <>
-                <MetaRow label="개봉/연도" value={movie.year} />
-                <MetaRow label="러닝타임" value={movie.runtime} />
-                <MetaRow label="평점" value={movie.rating} />
-                <MetaRow label="장르" value={movie.genre} />
-                <MetaRow label="감독" value={movie.director} />
-                <MetaRow label="출연" value={movie.actors} />
-              </>
-            )}
+            <>
+              <MetaRow label="개봉/연도" value={year} />
+              <MetaRow label="러닝타임" value={runtime} />
+              <MetaRow label="평점" value={rating} />
+              {/* <MetaRow label="장르" value={genre} /> */}
+              <MetaRow label="감독" value={director} />
+              {/* <MetaRow label="출연" value={actors} /> */}
+            </>
           </div>
 
           {/* 시놉시스/설명 */}
           <div className="mt-2">
-            {isLoading || !movie ? (
-              <Skeleton
-                count={4}
-                baseColor={skeletonBaseColor}
-                highlightColor={skeletonHighlightColor}
-              />
-            ) : (
-              <p className="text-[var(--color-text-main)] leading-relaxed whitespace-pre-line">
-                {movie.description}
-              </p>
-            )}
+            <p className="text-[var(--color-text-main)] leading-relaxed whitespace-pre-line">
+              {overview}
+            </p>
           </div>
         </div>
       </div>
