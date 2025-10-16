@@ -1,3 +1,4 @@
+// src/type/Movie.d.ts
 interface Actor {
   adult: boolean;
   gender: number;
