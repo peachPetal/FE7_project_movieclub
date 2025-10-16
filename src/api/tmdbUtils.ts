@@ -13,7 +13,7 @@ export const getMovies = async () => {
     },
   });
 
-  const movieIds = movieIdRes.data.results.map((v: { id: any; }) => v.id);
+  const movieIds = movieIdRes.data.results.map((v: { id: any }) => v.id);
 
   const moviesArray: Movie[] = await Promise.all(
     movieIds.map(async (id: number) => {
@@ -36,30 +36,6 @@ export const getMovies = async () => {
       } = MovieRes.data;
 
       const imgPath = `https://image.tmdb.org/t/p/original`;
-
-      try {
-        const { data: isMovieExist } = await supabase
-          .from("movies")
-          .select("movie_id")
-          .eq("movie_id", movieId)
-          .single();
-
-        if (!isMovieExist) {
-          const { error } = await supabase
-            .from("movies")
-            .insert([
-              {
-                movie_id: movieId,
-                movie_name: title,
-                backdrop_img: `${imgPath}${backdrop_path}`,
-              },
-            ])
-            .select();
-          if (error) throw error;
-        }
-      } catch (err) {
-        console.error(`supabase insert movies error: ` + err);
-      }
 
       const certificationData = await tmdb
         .get(`/movie/${id}/release_dates`, {
