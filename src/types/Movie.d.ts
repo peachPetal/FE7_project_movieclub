@@ -35,3 +35,9 @@ interface Movie {
   actors: Actor[];
   trailer: string;
 }
+
+interface MovieInReview {
+  id: number;
+  title: string;
+  backdrop: string;
+}

@@ -22,11 +22,12 @@ export default function ReviewList({ variant = "page" }: ReviewsListProps) {
             content,
             thumbnail,
             movie_id,
+            movie_name,
             created_at,
             users!inner(
               name
             ),
-            comments:comments(count),
+            comments:review_comments(count),
             likes:review_likes(count)`
           )
           .order("created_at", { ascending: false })

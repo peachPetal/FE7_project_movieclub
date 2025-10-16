@@ -16,7 +16,7 @@ export default function ReviewItem({
   if (isLoading || !review) {
     return <ReviewItemSkeleton hasImage={hasImage} />;
   } else {
-    const { id, content, created_at, movie_id, thumbnail, title } = review;
+    const { id, content, created_at, movie_name, thumbnail, title } = review;
 
     const like = review.likes?.[0]?.count ?? 0;
     const author = review.users?.name ?? "author";
@@ -24,7 +24,7 @@ export default function ReviewItem({
 
     return (
       <>
-        <Link to={`/reviews/${id}`}>
+        <Link to={`/reviews/${id}`} state={{ review }}>
           <div
             key={id}
             className={twMerge(
@@ -43,9 +43,7 @@ export default function ReviewItem({
                   // 첨부한 이미지 없을 경우 해당 리뷰 영화 포스터로
                   <img
                     className="reivew-thumbnail h-[185px] w-full object-cover"
-                    src={
-                      "https://plus.unsplash.com/premium_photo-1661675440353-6a6019c95bc7?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    }
+                    src="https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg"
                   />
                 )}
               </>
@@ -54,7 +52,7 @@ export default function ReviewItem({
             <div className="review-data p-5 h-[227px] flex flex-col justify-between">
               <div className="review-post">
                 <p className="review-title font-bold mb-3 text-[18px] truncate text-[var(--color-text-main)]">
-                  <span className="review-movie text-main">#{movie_id}</span>{" "}
+                  <span className="review-movie text-main">#{movie_name}</span>{" "}
                   {title}
                 </p>
                 <p className="review-content text-xs mb-3 line-clamp-4 leading-relaxed text-text-main">
