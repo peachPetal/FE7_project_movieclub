@@ -16,7 +16,7 @@ export const getMovies = async () => {
 
   const moviesArray: Movie[] = await Promise.all(
     movieIds.map(async (id: number) => {
-      const res = await tmdb.get(`/movie/${id}`, {
+      const MovieRes = await tmdb.get(`/movie/${id}`, {
         params: { region: "KR", language: "ko-KR" },
       });
 
@@ -24,6 +24,7 @@ export const getMovies = async () => {
         id: movieId,
         title,
         genres,
+        origin_country,
         original_title,
         overview,
         backdrop_path,
@@ -31,7 +32,21 @@ export const getMovies = async () => {
         release_date,
         runtime,
         vote_average,
-      } = res.data;
+      } = MovieRes.data;
+
+      const certificationData = await tmdb
+        .get(`/movie/${id}/release_dates`, {
+          params: { region: "KR", language: "ko-KR" },
+        })
+        .then((v) =>
+          v.data.results.find(
+            ({ iso_3166_1 }: { iso_3166_1: string }) => iso_3166_1 === "KR"
+          )
+        );
+
+      const cerfication = certificationData
+        ? certificationData["release_dates"][0]["certification"]
+        : "";
 
       const imgPath = `https://image.tmdb.org/t/p/original`;
       const credits = await getCredits(movieId);
@@ -39,13 +54,15 @@ export const getMovies = async () => {
 
       return {
         id: id,
-        genres: genres,
         title: title,
         original_title: original_title,
         overview: overview,
+        cerfication: cerfication,
         year: release_date.slice(0, 4),
-        rating: vote_average.toFixed(1),
         runtime: runtime,
+        genres: genres,
+        country: origin_country[0],
+        rating: vote_average.toFixed(1),
         poster: `${imgPath}${poster_path}`,
         backdrop: `${imgPath}${backdrop_path}`,
         director: credits.director,

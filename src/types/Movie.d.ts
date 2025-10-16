@@ -13,15 +13,22 @@ interface Actor {
   order: number;
 }
 
+interface Genre {
+  id: number;
+  name: string;
+}
+
 interface Movie {
   id: number;
-  genres: { id: number; name: string }[];
+  genres: Genre[];
   title: string;
   original_title: string;
   overview: string;
+  cerfication: string;
   year: string;
-  rating: number;
   runtime: string;
+  country: string;
+  rating: number;
   poster: string;
   backdrop: string;
   director: string;
