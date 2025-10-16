@@ -12,7 +12,6 @@ export interface Friend {
   status: FriendStatus;
 }
 
-// 이 함수는 변경할 필요 없이 훌륭합니다.
 async function fetchFriends(userId: string): Promise<Friend[]> {
   const { data: friendships, error: friendshipError } = await supabase
     .from("friendship")
