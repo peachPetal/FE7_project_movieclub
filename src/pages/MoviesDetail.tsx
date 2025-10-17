@@ -4,13 +4,18 @@ import TrailerBtn from "../components/common/buttons/TrailerBtn";
 import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
 import { useAuthSession } from "../hooks/useAuthSession";
 import { useEffect, useState } from "react";
+import { getMovieById } from "../api/tmdb/tmdbUtils";
+import MovieDetailSkeleton from "../components/skeleton/MovieDetailSkeleton";
 
 export default function MoviesDetail() {
   const { id: movie_id } = useParams();
   const location = useLocation();
   const movieState: Movie = location.state?.movie;
 
-  const [movie, setMovie] = useState<Movie | null>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [movie, setMovie] = useState<Movie | null>(
+    movieState ? movieState : null
+  );
 
   const { session, loading } = useAuthSession();
   const navigate = useNavigate();
@@ -19,25 +24,8 @@ export default function MoviesDetail() {
     if (movieState) setMovie(movieState);
   }, [movieState]);
 
-  if (!movieState)
-    return <p className="text-center mt-10">영화 정보를 불러올 수 없습니다.</p>;
-
-  const {
-    id,
-    title,
-    overview,
-    cerfication,
-    year,
-    runtime,
-    genres,
-    country,
-    rating,
-    poster,
-    backdrop,
-    director,
-    actors,
-    trailer,
-  } = movieState;
+  // if (!movieState)
+  //   return <p className="text-center mt-10">영화 정보를 불러올 수 없습니다.</p>;
 
   const Separator = () => <span className="mx-1.5">{`|`}</span>;
   const formatRunTime = (runtime: string) => {
@@ -92,23 +80,28 @@ export default function MoviesDetail() {
             <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
               {overview}
             </p>
-          </div>
-          <div className="flex items-center gap-6 mt-4">
-            <TrailerBtn src={trailer} />
-            <div className="flex items-center gap-1.5">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-10 h-10 text-yellow-400"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.116 3.986 1.24 5.383c.292 1.265-.956 2.23-2.052 1.612L12 18.226l-4.634 2.757c-1.096.618-2.344-.347-2.052-1.612l1.24-5.383L2.64 10.955c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="text-4xl font-bold">{rating}</span>
+            <div className="mt-2">
+              <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
+                {movie?.overview}
+              </p>
+            </div>
+            <div className="flex items-center gap-6 mt-4">
+              <TrailerBtn src={String(movie?.trailer)} />
+              <div className="flex items-center gap-1.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-10 h-10 text-yellow-400"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.116 3.986 1.24 5.383c.292 1.265-.956 2.23-2.052 1.612L12 18.226l-4.634 2.757c-1.096.618-2.344-.347-2.052-1.612l1.24-5.383L2.64 10.955c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-4xl font-bold">{movie?.rating}</span>
+              </div>
             </div>
           </div>
         </div>
