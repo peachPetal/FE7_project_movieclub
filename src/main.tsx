@@ -4,7 +4,7 @@ import "./css/index.css";
 import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { initializeTheme } from "./lib/theme.ts";
-import AuthBootstrap from "./components/AuthBootstrap.tsx";
+import AuthBootstrap from "./components/auth/AuthBootstrap.tsx";
 
 initializeTheme();
 

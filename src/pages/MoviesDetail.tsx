@@ -1,15 +1,17 @@
 import { useLocation } from "react-router-dom";
 import "react-loading-skeleton/dist/skeleton.css";
+
 import TrailerBtn from "../components/common/buttons/TrailerBtn";
-import LikeBtn from "../components/common/buttons/LikeBtn";
 
 export default function MoviesDetail() {
+  // location.state에서 영화 데이터 가져오기
   const location = useLocation();
   const movie: Movie = location.state?.movie;
+
+  if (!movie) return <p className="text-center mt-10">영화 정보를 불러올 수 없습니다.</p>;
+
   const {
-    id,
     title,
-    original_title,
     overview,
     cerfication,
     year,
@@ -18,67 +20,48 @@ export default function MoviesDetail() {
     country,
     rating,
     poster,
-    backdrop,
     director,
     actors,
     trailer,
   } = movie;
 
-  // const movie = useMemo(() => {
-  //   if (!movies || movies.length === 0 || movieId === undefined)
-  //     return undefined;
-  //   return movies.find((m) => String(m.id) === String(movieId));
-  // }, [movies, movieId]);
-
-  // 해당 영화의 리뷰만 필터링 (reviewStore: review.movie = 영화제목 문자열)
-  // const matchedReviews = useMemo(() => {
-  //   // reviewStore는 초기값이 배열이므로 null 체크 대신 배열 보장
-  //   if (!Array.isArray(reviewsData)) return null;
-
+  // 구분자 컴포넌트
   const Separator = () => <span className="mx-1.5">{`|`}</span>;
+
+  // 런타임 포맷팅 (분 → "h m" 형식)
   const formatRunTime = (runtime: string) => {
     const h = Math.floor(Number(runtime) / 60);
     const m = Number(runtime) - h * 60;
     return `${h}h ${m}m`;
   };
-  const formatGenres = (genres: Genre[]) => {
-    let result = "";
 
-    if (genres) {
-      const genreNames = genres.map((genre) => genre.name);
-      result = genreNames.join(", ");
-    }
+  // 장르 배열 → 문자열
+  const formatGenres = (genres: Genre[]) => genres?.map((g) => g.name).join(", ") ?? "";
 
-    return result;
-  };
-  const formatActors = (actors: Genre[]) => {
-    let result = "";
-
-    if (genres) {
-      const genreNames = actors.map((actor) => actor.name);
-      result = genreNames.join(", ");
-    }
-
-    return result;
-  };
+  // 배우 배열 → 문자열
+  const formatActors = (actors: Genre[]) => actors?.map((a) => a.name).join(", ") ?? "";
 
   return (
     <div>
-      {" "}
+      {/* 영화 기본 정보 섹션 */}
       <section className="movie p-4 flex h-[500px] text-[var(--color-text-main)]">
+        {/* 포스터 */}
         <img
           src={poster}
           alt={`${title} poster`}
           className="max-w-[340px] max-h-[500px] object-cover rounded-lg"
         />
+
+        {/* 영화 상세 정보 */}
         <div className="movie-detail-area h-full flex flex-col justify-around ml-9">
+          {/* 타이틀, 인증, 연도, 런타임, 장르, 국가 */}
           <div className="movie-info flex items-baseline">
-            <h1 className="text-5xl font-bold mr-4">{title}</h1>{" "}
-            {cerfication ? (
+            <h1 className="text-5xl font-bold mr-4">{title}</h1>
+            {cerfication && (
               <div className="px-[4px] border border-main text-main mr-2">
                 <span>{cerfication}</span>
               </div>
-            ) : null}
+            )}
             <span>{year}</span>
             <Separator />
             <span>{formatRunTime(runtime)}</span>
@@ -87,19 +70,23 @@ export default function MoviesDetail() {
             <Separator />
             <span>{country}</span>
           </div>
+
+          {/* 감독 & 배우 */}
           <p className="movie-credits leading-relaxed whitespace-pre-line">
             <span className="font-bold">감독 | </span> {director} <br />
             <span className="font-bold">출연 | </span> {formatActors(actors)}
           </p>
+
+          {/* 개요 */}
           <div className="mt-2">
-            <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
-              {overview}
-            </p>
+            <p className="max-w-[900px] leading-relaxed whitespace-pre-line">{overview}</p>
           </div>
+
+          {/* 트레일러 & 평점 */}
           <div className="flex items-center gap-6 mt-4">
             <TrailerBtn src={trailer} />
-            
-            <div className="flex items-center gap-1.5"> 
+
+            <div className="flex items-center gap-1.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -117,89 +104,39 @@ export default function MoviesDetail() {
           </div>
         </div>
       </section>
+
+      {/* 리뷰 섹션 */}
       <section className="mt-10">
         <div className="flex items-baseline gap-2 justify-start mb-4">
-          <h2 className="text-2xl font-bold text-[var(--color-text-main)]">
-            Reviews
-          </h2>
-          <span className="text-2xl text-[var(--color-main)] font-bold">
-            reviewsCount
-          </span>
+          <h2 className="text-2xl font-bold text-[var(--color-text-main)]">Reviews</h2>
+          <span className="text-2xl text-[var(--color-main)] font-bold">reviewsCount</span>
         </div>
       </section>
     </div>
   );
 }
 
-// {matchedReviews !== null ? (
-//           <div className="flex flex-col gap-4">
-//             {Array.isArray(matchedReviews) && matchedReviews.length > 0 ? (
-//               <div className="flex flex-wrap gap-[30px]">
-//                 <ReviewsRendering data={matchedReviews} hasImage={false} />
-//               </div>
-//             ) : (
-//               <div className="text-[var(--color-text-sub)] text-sm">
-//                 이 영화의 리뷰가 아직 없습니다.
-//               </div>
-//             )}
-//           </div>
-//         ) : (
-//           <div className="flex gap-[30px] flex-wrap">
-//             {/* 5개의 스켈레톤 카드를 생성 */}
-//             {Array.from({ length: 5 }).map((_, idx) => (
-//               <div
-//                 key={idx}
-//                 // 카드 배경: 테마에 따라 자동 변경 (bg-background-sub)
-//                 // 그림자: 공통 스타일 적용 (card-shadow)
-//                 className="relative w-[320px] h-[250px] bg-[var(--color-background-sub)] rounded-[10px] card-shadow"
-//               >
-//                 <div className="absolute left-[22px] top-[21.34px] w-[277px]">
-//                   <Skeleton
-//                     count={2}
-//                     baseColor={skeletonBaseColor}
-//                     highlightColor={skeletonHighlightColor}
-//                   />
-//                 </div>
-//                 <Skeleton
-//                   className="absolute left-[22px] top-[80.28px]"
-//                   width={277}
-//                   count={3}
-//                   baseColor={skeletonBaseColor}
-//                   highlightColor={skeletonHighlightColor}
-//                 />
-//                 <Skeleton
-//                   className="absolute left-[22px] top-[172.76px]"
-//                   width={180}
-//                   height={16}
-//                   baseColor={skeletonBaseColor}
-//                   highlightColor={skeletonHighlightColor}
-//                 />
-//                 <div className="absolute bottom-0 left-0 right-0 h-[60px] px-[22px] flex items-center">
-//                   <div className="grid grid-cols-3 items-center w-full">
-//                     <Skeleton
-//                       width={40}
-//                       height={20}
-//                       baseColor={skeletonBaseColor}
-//                       highlightColor={skeletonHighlightColor}
-//                     />
-//                     <Skeleton
-//                       width={40}
-//                       height={20}
-//                       className="mx-auto"
-//                       baseColor={skeletonBaseColor}
-//                       highlightColor={skeletonHighlightColor}
-//                     />
-//                     <Skeleton
-//                       circle
-//                       width={24}
-//                       height={24}
-//                       className="ml-auto"
-//                       baseColor={skeletonBaseColor}
-//                       highlightColor={skeletonHighlightColor}
-//                     />
-//                   </div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         )}
+/*
+주석 설명:
+
+1. useLocation
+   - 라우터에서 state로 전달된 영화 데이터를 가져옴
+   - 만약 movie가 없으면 오류 메시지 렌더링
+
+2. formatRunTime
+   - 런타임(분)을 "h m" 형식으로 변환
+
+3. formatGenres, formatActors
+   - 배열 데이터를 문자열로 변환하여 표시
+
+4. JSX 구조
+   - 최상위 div
+   - 영화 섹션: 포스터 + 상세 정보 flex 배치
+   - movie-detail-area: 영화 제목, 인증, 연도, 런타임, 장르, 국가, 감독, 배우, 개요
+   - 트레일러 버튼 + 평점 표시
+   - 리뷰 섹션: Reviews 헤더 + 리뷰 개수
+
+5. 스타일
+   - TailwindCSS 기반
+   - CSS 변수(`--color-text-main`, `--color-main`) 사용
+*/

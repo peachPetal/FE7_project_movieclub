@@ -1,6 +1,6 @@
 import { useState, type FC, type SetStateAction } from "react";
-import { SidePanel } from "../common/SidePanel"; // ✅ 1. 재사용 컴포넌트 import
-import { FormField } from "../common/FormField";
+import { SidePanel } from "../common/side-panel/SidePanel"; // ✅ 1. 재사용 컴포넌트 import
+import { FormField } from "../common/form-field/FormField";
 
 type Props = {
   title: string;

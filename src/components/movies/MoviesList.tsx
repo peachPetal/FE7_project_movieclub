@@ -1,4 +1,4 @@
-import { getMovies } from "../../api/tmdbUtils";
+import { getMovies } from "../../api/tmdb/tmdbUtils";
 import MoviesRendering from "./MoviesRendering";
 import { useEffect, useState } from "react";
 
