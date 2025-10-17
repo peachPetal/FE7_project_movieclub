@@ -1,6 +1,15 @@
 import { Link } from "react-router-dom";
+import { twMerge } from "tailwind-merge";
 
-export default function ReviewPostBtn({ type }: { type?: "submit" }) {
+export default function ReviewPostBtn({
+  type,
+  isFloating = true,
+  state,
+}: {
+  type?: "submit";
+  isFloating?: boolean;
+  state?: object;
+}) {
   if (type) {
     // submit button
     return (
@@ -25,8 +34,13 @@ export default function ReviewPostBtn({ type }: { type?: "submit" }) {
   } else {
     return (
       <>
-        <Link to={`/review/post`}>
-          <button className="flex justify-center items-center w-[50px] h-[50px] rounded-4xl fixed right-10 bottom-10 bg-main cursor-pointer hover:bg-main-80 transition-colors">
+        <Link to={`/review/post`} state={{ state }}>
+          <button
+            className={twMerge(
+              "flex justify-center items-center w-[50px] h-[50px] rounded-4xl bg-main cursor-pointer hover:bg-main-80 transition-colors",
+              isFloating && "fixed right-10 bottom-10"
+            )}
+          >
             <svg
               width="20"
               height="20"

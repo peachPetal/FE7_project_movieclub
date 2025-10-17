@@ -1,4 +1,4 @@
-import type { ReviewSubset, ReviewRenderProps } from "../../types/review";
+import type { ReviewSubset, ReviewRenderProps } from "../../types/Review";
 import ReviewItem from "./ReviewItem";
 
 export default function ReviewsRendering({

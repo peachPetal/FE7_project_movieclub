@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ReviewsRendering from "./ReviewsRendering";
 import { supabase } from "../../utils/supabase";
-import type { ReviewSubset, ReviewsListProps } from "../../types/review";
+import type { ReviewSubset, ReviewsListProps } from "../../types/Review";
 
 export default function ReviewList({ variant = "page" }: ReviewsListProps) {
   const [data, setData] = useState<ReviewSubset[]>([]);

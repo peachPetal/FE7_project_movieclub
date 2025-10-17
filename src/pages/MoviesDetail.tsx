@@ -1,16 +1,61 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import "react-loading-skeleton/dist/skeleton.css";
-
 import TrailerBtn from "../components/common/buttons/TrailerBtn";
+import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
+import { useEffect, useState } from "react";
 
 export default function MoviesDetail() {
-  // location.state에서 영화 데이터 가져오기
+  const { id } = useParams();
   const location = useLocation();
-  const movie: Movie = location.state?.movie;
+  const movieState: Movie = location.state?.movie;
 
-  if (!movie) return <p className="text-center mt-10">영화 정보를 불러올 수 없습니다.</p>;
+  const [movie, setMovie] = useState<Movie | null>();
+
+  const fetchMovie = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select(
+          `
+              id,
+              title,
+              content,
+              thumbnail,
+              movie_id,
+              movie_name,
+              created_at,
+              users:users!inner(
+                name
+              ),
+              comments:review_comments(count),
+              likes:review_likes(count)`
+        )
+        .eq("id", id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setReview({
+          ...data,
+          users: Array.isArray(data.users) ? data.users[0] : data.users,
+        });
+        setLikeCount(data.likes?.[0]?.count);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    if (movieState) setMovie(movieState);
+  }, []);
+
+  if (!movieState)
+    return <p className="text-center mt-10">영화 정보를 불러올 수 없습니다.</p>;
 
   const {
+    id,
     title,
     overview,
     cerfication,
@@ -20,10 +65,11 @@ export default function MoviesDetail() {
     country,
     rating,
     poster,
+    backdrop,
     director,
     actors,
     trailer,
-  } = movie;
+  } = movieState;
 
   // 구분자 컴포넌트
   const Separator = () => <span className="mx-1.5">{`|`}</span>;
@@ -36,32 +82,30 @@ export default function MoviesDetail() {
   };
 
   // 장르 배열 → 문자열
-  const formatGenres = (genres: Genre[]) => genres?.map((g) => g.name).join(", ") ?? "";
+  const formatGenres = (genres: Genre[]) =>
+    genres?.map((g) => g.name).join(", ") ?? "";
 
   // 배우 배열 → 문자열
-  const formatActors = (actors: Genre[]) => actors?.map((a) => a.name).join(", ") ?? "";
+  const formatActors = (actors: Genre[]) =>
+    actors?.map((a) => a.name).join(", ") ?? "";
 
   return (
-    <div>
-      {/* 영화 기본 정보 섹션 */}
+    <div className="max-w-7xl">
+      {" "}
       <section className="movie p-4 flex h-[500px] text-[var(--color-text-main)]">
-        {/* 포스터 */}
         <img
           src={poster}
           alt={`${title} poster`}
           className="max-w-[340px] max-h-[500px] object-cover rounded-lg"
         />
-
-        {/* 영화 상세 정보 */}
-        <div className="movie-detail-area h-full flex flex-col justify-around ml-9">
-          {/* 타이틀, 인증, 연도, 런타임, 장르, 국가 */}
+        <div className="movie-detail-area w-full h-full flex flex-col justify-around ml-9">
           <div className="movie-info flex items-baseline">
-            <h1 className="text-5xl font-bold mr-4">{title}</h1>
-            {cerfication && (
+            <h1 className="text-5xl font-bold mr-4">{title}</h1>{" "}
+            {cerfication.length === 2 ? (
               <div className="px-[4px] border border-main text-main mr-2">
                 <span>{cerfication}</span>
               </div>
-            )}
+            ) : null}
             <span>{year}</span>
             <Separator />
             <span>{formatRunTime(runtime)}</span>
@@ -70,22 +114,17 @@ export default function MoviesDetail() {
             <Separator />
             <span>{country}</span>
           </div>
-
-          {/* 감독 & 배우 */}
           <p className="movie-credits leading-relaxed whitespace-pre-line">
             <span className="font-bold">감독 | </span> {director} <br />
             <span className="font-bold">출연 | </span> {formatActors(actors)}
           </p>
-
-          {/* 개요 */}
           <div className="mt-2">
-            <p className="max-w-[900px] leading-relaxed whitespace-pre-line">{overview}</p>
+            <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
+              {overview}
+            </p>
           </div>
-
-          {/* 트레일러 & 평점 */}
           <div className="flex items-center gap-6 mt-4">
             <TrailerBtn src={trailer} />
-
             <div className="flex items-center gap-1.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -104,39 +143,22 @@ export default function MoviesDetail() {
           </div>
         </div>
       </section>
-
-      {/* 리뷰 섹션 */}
       <section className="mt-10">
-        <div className="flex items-baseline gap-2 justify-start mb-4">
-          <h2 className="text-2xl font-bold text-[var(--color-text-main)]">Reviews</h2>
-          <span className="text-2xl text-[var(--color-main)] font-bold">reviewsCount</span>
+        <div className="flex items-baseline gap-2 justify-between mb-4">
+          <div className="review-section_title flex ">
+            <h2 className="text-2xl font-bold text-[var(--color-text-main)] mr-2">
+              Reviews
+            </h2>
+            <span className="text-2xl text-[var(--color-main)] font-bold">
+              reviewsCount
+            </span>
+          </div>
+          <ReviewPostBtn
+            isFloating={false}
+            state={{ id: id, title: title, backdrop: backdrop }}
+          />
         </div>
       </section>
     </div>
   );
 }
-
-/*
-주석 설명:
-
-1. useLocation
-   - 라우터에서 state로 전달된 영화 데이터를 가져옴
-   - 만약 movie가 없으면 오류 메시지 렌더링
-
-2. formatRunTime
-   - 런타임(분)을 "h m" 형식으로 변환
-
-3. formatGenres, formatActors
-   - 배열 데이터를 문자열로 변환하여 표시
-
-4. JSX 구조
-   - 최상위 div
-   - 영화 섹션: 포스터 + 상세 정보 flex 배치
-   - movie-detail-area: 영화 제목, 인증, 연도, 런타임, 장르, 국가, 감독, 배우, 개요
-   - 트레일러 버튼 + 평점 표시
-   - 리뷰 섹션: Reviews 헤더 + 리뷰 개수
-
-5. 스타일
-   - TailwindCSS 기반
-   - CSS 변수(`--color-text-main`, `--color-main`) 사용
-*/
