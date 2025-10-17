@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { MessageDetailData } from "../components/users/UserMessageDetail";
 
 // MessageItem 타입을 훅 파일에서도 사용할 수 있도록 export 합니다.

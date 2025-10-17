@@ -6,9 +6,9 @@ import type { MessageDetailData } from "./UserMessageDetail";
 // Asset Imports
 import profileIconBlack from "../../assets/person-circle-black.svg";
 import profileIconWhite from "../../assets/person-circle-white.svg";
-import addFriendIcon from "../../assets/addFriend.svg";
-import deleteFriendMouseOff from "../../assets/deleteFriendMouseOff.svg";
-import messageUserIcon from "../../assets/messageUser.svg";
+import addFriendIcon from "../../assets/add-friend.svg";
+import deleteFriendMouseOff from "../../assets/delete-friend-mouse-off.svg";
+import messageUserIcon from "../../assets/message-user.svg";
 import UserMessageList from "./UserMessageList";
 
 // --- 서브 컴포넌트 Props 타입 ---
