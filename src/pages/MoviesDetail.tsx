@@ -3,73 +3,39 @@ import "react-loading-skeleton/dist/skeleton.css";
 import TrailerBtn from "../components/common/buttons/TrailerBtn";
 import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
 import { useEffect, useState } from "react";
+import { getMovieById } from "../api/tmdb/tmdbUtils";
+import MovieDetailSkeleton from "../components/skeleton/MovieDetailSkeleton";
 
 export default function MoviesDetail() {
-  const { id } = useParams();
+  const { id: movie_id } = useParams();
   const location = useLocation();
   const movieState: Movie = location.state?.movie;
 
-  const [movie, setMovie] = useState<Movie | null>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [movie, setMovie] = useState<Movie | null>(
+    movieState ? movieState : null
+  );
 
-  const fetchMovie = async () => {
+  const fetchMovie = async (id: number) => {
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("reviews")
-        .select(
-          `
-              id,
-              title,
-              content,
-              thumbnail,
-              movie_id,
-              movie_name,
-              created_at,
-              users:users!inner(
-                name
-              ),
-              comments:review_comments(count),
-              likes:review_likes(count)`
-        )
-        .eq("id", id)
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        setReview({
-          ...data,
-          users: Array.isArray(data.users) ? data.users[0] : data.users,
-        });
-        setLikeCount(data.likes?.[0]?.count);
-      }
+      const movieData = await getMovieById(Number(id));
+      setMovie(movieData);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    if (movieState) setMovie(movieState);
+    if (movieState) {
+      setMovie(movieState);
+    }
+    fetchMovie(Number(movie_id));
   }, []);
 
-  if (!movieState)
-    return <p className="text-center mt-10">영화 정보를 불러올 수 없습니다.</p>;
-
-  const {
-    id,
-    title,
-    overview,
-    cerfication,
-    year,
-    runtime,
-    genres,
-    country,
-    rating,
-    poster,
-    backdrop,
-    director,
-    actors,
-    trailer,
-  } = movieState;
+  // if (!movieState)
+  //   return <p className="text-center mt-10">영화 정보를 불러올 수 없습니다.</p>;
 
   // 구분자 컴포넌트
   const Separator = () => <span className="mx-1.5">{`|`}</span>;
@@ -89,76 +55,97 @@ export default function MoviesDetail() {
   const formatActors = (actors: Genre[]) =>
     actors?.map((a) => a.name).join(", ") ?? "";
 
-  return (
-    <div className="max-w-7xl">
-      {" "}
-      <section className="movie p-4 flex h-[500px] text-[var(--color-text-main)]">
-        <img
-          src={poster}
-          alt={`${title} poster`}
-          className="max-w-[340px] max-h-[500px] object-cover rounded-lg"
-        />
-        <div className="movie-detail-area w-full h-full flex flex-col justify-around ml-9">
-          <div className="movie-info flex items-baseline">
-            <h1 className="text-5xl font-bold mr-4">{title}</h1>{" "}
-            {cerfication.length === 2 ? (
-              <div className="px-[4px] border border-main text-main mr-2">
-                <span>{cerfication}</span>
-              </div>
-            ) : null}
-            <span>{year}</span>
-            <Separator />
-            <span>{formatRunTime(runtime)}</span>
-            <Separator />
-            <span>{formatGenres(genres)}</span>
-            <Separator />
-            <span>{country}</span>
-          </div>
-          <p className="movie-credits leading-relaxed whitespace-pre-line">
-            <span className="font-bold">감독 | </span> {director} <br />
-            <span className="font-bold">출연 | </span> {formatActors(actors)}
-          </p>
-          <div className="mt-2">
-            <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
-              {overview}
+  if (isLoading) {
+    return <MovieDetailSkeleton />;
+  } else {
+    return (
+      <div className="max-w-7xl">
+        {" "}
+        <section className="movie p-4 flex h-[500px] text-[var(--color-text-main)]">
+          <img
+            src={movie?.poster}
+            alt={`${movie?.title} poster`}
+            className="max-w-[340px] max-h-[500px] object-cover rounded-lg"
+          />
+          <div className="movie-detail-area w-full h-full flex flex-col justify-around ml-9">
+            <div className="movie-info flex items-baseline">
+              <h1 className="text-5xl font-bold mr-4">{movie?.title}</h1>{" "}
+              {movie?.cerfication.length === 2 ? (
+                <div className="px-[4px] border border-main text-main mr-2">
+                  <span>{movie?.cerfication}</span>
+                </div>
+              ) : null}
+              <span>{movie?.year}</span>
+              <Separator />
+              <span>{formatRunTime(movie?.runtime ? movie?.runtime : "")}</span>
+              {movie?.genres ? (
+                <>
+                  <Separator />
+                  <span>{formatGenres(movie?.genres)}</span>
+                </>
+              ) : null}
+              <Separator />
+              <span>{movie?.country}</span>
+            </div>
+            <p className="movie-credits leading-relaxed whitespace-pre-line">
+              <span className="font-bold">감독</span>
+              <Separator />
+              <span>{movie?.director}</span>
+              <br />
+              {movie?.actors ? (
+                <>
+                  <span className="font-bold">출연</span>
+                  <Separator />
+                  <span>{formatActors(movie?.actors)}</span>
+                </>
+              ) : null}
             </p>
-          </div>
-          <div className="flex items-center gap-6 mt-4">
-            <TrailerBtn src={trailer} />
-            <div className="flex items-center gap-1.5">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-10 h-10 text-yellow-400"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.116 3.986 1.24 5.383c.292 1.265-.956 2.23-2.052 1.612L12 18.226l-4.634 2.757c-1.096.618-2.344-.347-2.052-1.612l1.24-5.383L2.64 10.955c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="text-4xl font-bold">{rating}</span>
+            <div className="mt-2">
+              <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
+                {movie?.overview}
+              </p>
+            </div>
+            <div className="flex items-center gap-6 mt-4">
+              <TrailerBtn src={String(movie?.trailer)} />
+              <div className="flex items-center gap-1.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-10 h-10 text-yellow-400"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.116 3.986 1.24 5.383c.292 1.265-.956 2.23-2.052 1.612L12 18.226l-4.634 2.757c-1.096.618-2.344-.347-2.052-1.612l1.24-5.383L2.64 10.955c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-4xl font-bold">{movie?.rating}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-      <section className="mt-10">
-        <div className="flex items-baseline gap-2 justify-between mb-4">
-          <div className="review-section_title flex ">
-            <h2 className="text-2xl font-bold text-[var(--color-text-main)] mr-2">
-              Reviews
-            </h2>
-            <span className="text-2xl text-[var(--color-main)] font-bold">
-              reviewsCount
-            </span>
+        </section>
+        <section className="mt-10">
+          <div className="flex items-baseline gap-2 justify-between mb-4">
+            <div className="review-section_title flex ">
+              <h2 className="text-2xl font-bold text-[var(--color-text-main)] mr-2">
+                Reviews
+              </h2>
+              <span className="text-2xl text-[var(--color-main)] font-bold">
+                reviewsCount
+              </span>
+            </div>
+            <ReviewPostBtn
+              isFloating={false}
+              state={{
+                id: movie_id,
+                title: movie?.title,
+                backdrop: movie?.backdrop,
+              }}
+            />
           </div>
-          <ReviewPostBtn
-            isFloating={false}
-            state={{ id: id, title: title, backdrop: backdrop }}
-          />
-        </div>
-      </section>
-    </div>
-  );
+        </section>
+      </div>
+    );
+  }
 }
