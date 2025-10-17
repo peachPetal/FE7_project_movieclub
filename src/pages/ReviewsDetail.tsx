@@ -5,15 +5,15 @@ import Comment from "../components/comments/Comment";
 import { useEffect, useState } from "react";
 
 import TimeAgo from "../components/common/time-ago/TimeAgo";
-import type { ReviewWithDetail } from "../types/Review";
-import { useAuthStore } from "../stores/authStore";
+import type { ReviewWithDetail } from "../types/review";
 import { supabase } from "../utils/supabase";
 import ReviewsDetailSkeleton from "../components/skeleton/ReviewsDetailSkeleton";
+import { useAuthSession } from "../hooks/useAuthSession"; // <-- 추가
 
 export default function ReviewsDetail() {
-  const { id } = useParams();
-  const userId = useAuthStore((state) => state.user?.id);
+  const { user } = useAuthSession(); // <-- 로그인 상태
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const location = useLocation();
   const reviewState: ReviewWithDetail = location.state?.review;
@@ -21,18 +21,17 @@ export default function ReviewsDetail() {
   const [review, setReview] = useState<ReviewWithDetail | null>(
     reviewState ? reviewState : null
   );
-
   const [isLoading, setIsLoading] = useState(true);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
   const fetchLiked = async () => {
     try {
-      if (userId) {
+      if (user?.id) {
         const { data, error } = await supabase
           .from("review_likes")
           .select("*")
-          .eq("user_id", userId)
+          .eq("user_id", user.id)
           .eq("review_id", id)
           .maybeSingle();
 
@@ -42,7 +41,7 @@ export default function ReviewsDetail() {
         }
 
         if (data) setIsLiked(true);
-      } else return;
+      }
     } catch (err) {
       console.error(err);
     }
@@ -102,60 +101,47 @@ export default function ReviewsDetail() {
   }, []);
 
   const handleLike = async () => {
-    if (userId) {
-      try {
-        if (!isLiked) {
-          try {
-            setLikeCount((prev) => prev + 1);
+    if (!user) {
+      navigate("/login"); // <-- 로그인 체크 후 이동
+      return;
+    }
 
-            const { error } = await supabase
-              .from("review_likes")
-              .insert([{ user_id: userId, review_id: id }])
-              .select()
-              .single();
+    try {
+      if (!isLiked) {
+        setLikeCount((prev) => prev + 1);
 
-            if (error) throw error;
+        const { error } = await supabase
+          .from("review_likes")
+          .insert([{ user_id: user.id, review_id: id }])
+          .select()
+          .single();
 
-            setIsLiked(true);
-          } catch (err) {
-            console.error("review insert error: ");
-            console.error(err);
-          }
-        } else {
-          try {
-            const { error } = await supabase
-              .from("review_likes")
-              .delete()
-              .eq("user_id", userId)
-              .eq("review_id", id);
+        if (error) throw error;
 
-            if (error) throw error;
+        setIsLiked(true);
+      } else {
+        const { error } = await supabase
+          .from("review_likes")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("review_id", id);
 
-            setLikeCount((prev) => prev - 1);
-            setIsLiked(false);
-          } catch (err) {
-            console.error("review delete error: ");
-            console.error(err);
-          }
-        }
-      } catch (err) {
-        console.error(`reviews detail handle Like error: `);
-        console.error(err);
+        if (error) throw error;
+
+        setLikeCount((prev) => prev - 1);
+        setIsLiked(false);
       }
-    } else {
-      alert("로그인이 필요한 기능입니다.");
-      navigate("/login");
+    } catch (err) {
+      console.error("Like 처리 오류: ", err);
     }
   };
 
   return (
     <>
-      {" "}
       {isLoading ? (
         <ReviewsDetailSkeleton />
       ) : (
         <div className="mr-15">
-          {" "}
           <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">
             {review?.title}
             <span className="text-main dark:text-main-dark">
@@ -165,9 +151,7 @@ export default function ReviewsDetail() {
           </h1>
           <p className="mb-10 text-text-sub">
             <span className="text-[var(--color-text-sub)]">
-              <TimeAgo
-                dateString={review?.created_at ? review?.created_at : ""}
-              />
+              <TimeAgo dateString={review?.created_at ?? ""} />
             </span>
             {" by "}
             <span className="review-created-user text-main">
@@ -179,7 +163,7 @@ export default function ReviewsDetail() {
               className="min-w-[550px] max-h-[325px] object-cover mr-7"
               src={
                 review?.thumbnail
-                  ? review?.thumbnail
+                  ? review.thumbnail
                   : "https://plus.unsplash.com/premium_photo-1661675440353-6a6019c95bc7?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               }
             />
@@ -199,6 +183,7 @@ export default function ReviewsDetail() {
     </>
   );
 }
+
 
 /*
           <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">

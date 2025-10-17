@@ -1,7 +1,8 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import "react-loading-skeleton/dist/skeleton.css";
 import TrailerBtn from "../components/common/buttons/TrailerBtn";
 import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
+import { useAuthSession } from "../hooks/useAuthSession";
 import { useEffect, useState } from "react";
 import { getMovieById } from "../api/tmdb/tmdbUtils";
 import MovieDetailSkeleton from "../components/skeleton/MovieDetailSkeleton";
@@ -16,89 +17,68 @@ export default function MoviesDetail() {
     movieState ? movieState : null
   );
 
-  const fetchMovie = async (id: number) => {
-    setIsLoading(true);
-    try {
-      const movieData = await getMovieById(Number(id));
-      setMovie(movieData);
-    } catch (err) {
-      console.error(err);
-    }
-    setIsLoading(false);
-  };
+  const { session, loading } = useAuthSession();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (movieState) {
-      setMovie(movieState);
-    }
-    fetchMovie(Number(movie_id));
-  }, []);
+    if (movieState) setMovie(movieState);
+  }, [movieState]);
 
   // if (!movieState)
   //   return <p className="text-center mt-10">영화 정보를 불러올 수 없습니다.</p>;
 
-  // 구분자 컴포넌트
   const Separator = () => <span className="mx-1.5">{`|`}</span>;
-
-  // 런타임 포맷팅 (분 → "h m" 형식)
   const formatRunTime = (runtime: string) => {
     const h = Math.floor(Number(runtime) / 60);
     const m = Number(runtime) - h * 60;
     return `${h}h ${m}m`;
   };
-
-  // 장르 배열 → 문자열
   const formatGenres = (genres: Genre[]) =>
     genres?.map((g) => g.name).join(", ") ?? "";
-
-  // 배우 배열 → 문자열
   const formatActors = (actors: Genre[]) =>
     actors?.map((a) => a.name).join(", ") ?? "";
 
-  if (isLoading) {
-    return <MovieDetailSkeleton />;
-  } else {
-    return (
-      <div className="max-w-7xl">
-        {" "}
-        <section className="movie p-4 flex h-[500px] text-[var(--color-text-main)]">
-          <img
-            src={movie?.poster}
-            alt={`${movie?.title} poster`}
-            className="max-w-[340px] max-h-[500px] object-cover rounded-lg"
-          />
-          <div className="movie-detail-area w-full h-full flex flex-col justify-around ml-9">
-            <div className="movie-info flex items-baseline">
-              <h1 className="text-5xl font-bold mr-4">{movie?.title}</h1>{" "}
-              {movie?.cerfication.length === 2 ? (
-                <div className="px-[4px] border border-main text-main mr-2">
-                  <span>{movie?.cerfication}</span>
-                </div>
-              ) : null}
-              <span>{movie?.year}</span>
-              <Separator />
-              <span>{formatRunTime(movie?.runtime ? movie?.runtime : "")}</span>
-              {movie?.genres ? (
-                <>
-                  <Separator />
-                  <span>{formatGenres(movie?.genres)}</span>
-                </>
-              ) : null}
-              <Separator />
-              <span>{movie?.country}</span>
-            </div>
-            <p className="movie-credits leading-relaxed whitespace-pre-line">
-              <span className="font-bold">감독</span>
-              <Separator />
-              <span>{movie?.director}</span>
-              <br />
-              {movie?.actors ? (
-                <>
-                  <span className="font-bold">출연</span>
-                  <Separator />
-                  <span>{formatActors(movie?.actors)}</span>
-                </>
-              ) : null}
+  // 리뷰 작성 버튼 클릭 처리
+  const handleReviewClick = () => {
+    if (loading) return;
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+    // 실제 리뷰 작성 로직은 ReviewPostBtn 내부에서 실행됨
+  };
+
+  return (
+    <div className="max-w-7xl">
+      <section className="movie p-4 flex h-[500px] text-[var(--color-text-main)]">
+        <img
+          src={poster}
+          alt={`${title} poster`}
+          className="max-w-[340px] max-h-[500px] object-cover rounded-lg"
+        />
+        <div className="movie-detail-area w-full h-full flex flex-col justify-around ml-9">
+          <div className="movie-info flex items-baseline">
+            <h1 className="text-5xl font-bold mr-4">{title}</h1>
+            {cerfication.length === 2 && (
+              <div className="px-[4px] border border-main text-main mr-2">
+                <span>{cerfication}</span>
+              </div>
+            )}
+            <span>{year}</span>
+            <Separator />
+            <span>{formatRunTime(runtime)}</span>
+            <Separator />
+            <span>{formatGenres(genres)}</span>
+            <Separator />
+            <span>{country}</span>
+          </div>
+          <p className="movie-credits leading-relaxed whitespace-pre-line">
+            <span className="font-bold">감독 | </span> {director} <br />
+            <span className="font-bold">출연 | </span> {formatActors(actors)}
+          </p>
+          <div className="mt-2">
+            <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
+              {overview}
             </p>
             <div className="mt-2">
               <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
@@ -124,28 +104,29 @@ export default function MoviesDetail() {
               </div>
             </div>
           </div>
-        </section>
-        <section className="mt-10">
-          <div className="flex items-baseline gap-2 justify-between mb-4">
-            <div className="review-section_title flex ">
-              <h2 className="text-2xl font-bold text-[var(--color-text-main)] mr-2">
-                Reviews
-              </h2>
-              <span className="text-2xl text-[var(--color-main)] font-bold">
-                reviewsCount
-              </span>
-            </div>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <div className="flex items-baseline gap-2 justify-between mb-4">
+          <div className="review-section_title flex">
+            <h2 className="text-2xl font-bold text-[var(--color-text-main)] mr-2">
+              Reviews
+            </h2>
+            <span className="text-2xl text-[var(--color-main)] font-bold">
+              reviewsCount
+            </span>
+          </div>
+
+          {/* 로그인 상태 체크 후 Review 버튼 클릭 */}
+          <div onClick={handleReviewClick}>
             <ReviewPostBtn
               isFloating={false}
-              state={{
-                id: movie_id,
-                title: movie?.title,
-                backdrop: movie?.backdrop,
-              }}
+              state={{ id: id, title: title, backdrop: backdrop }}
             />
           </div>
-        </section>
-      </div>
-    );
-  }
+        </div>
+      </section>
+    </div>
+  );
 }

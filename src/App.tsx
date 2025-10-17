@@ -18,37 +18,42 @@ import Settings from "./pages/Settings";
 import UsersPage from "./pages/UsersPage";
 import SearchResultPage from "./pages/SearchResult";
 import Error from "./pages/Error";
+import ProtectedRoute from "./components/routes/ProtectedRoute";
 
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
         {/* Layout 적용 영역 */}
-        <Route element={<DefaultLayout />}>
-          <Route path="/" element={<HomeContent />} />
+          <Route element={<DefaultLayout />}>
+            <Route path="/" element={<HomeContent />} />
 
-          {/* 로그인 페이지는 PublicOnlyRoute 적용 */}
-          <Route element={<PublicOnlyRoute />}>
-            <Route path="/login" element={<LoginPage />} />
+            {/* 로그인 페이지는 PublicOnlyRoute 적용 */}
+            <Route element={<PublicOnlyRoute />}>
+              <Route path="/login" element={<LoginPage />} />
+            </Route>
+
+            {/* ProtectedRoute 적용: 로그인 필요 */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/review/post" element={<ReviewPostPage />} />
+            </Route>
+
+            {/* 리뷰 관련 페이지 (로그인 필요 없음) */}
+            <Route path="/reviews" element={<ReviewsPage />} />
+            <Route path="/reviews/:id" element={<ReviewsDetail />} />
+
+            {/* 영화 관련 페이지 */}
+            <Route path="/movies" element={<MoviesPage />} />
+            <Route path="/movies/:id" element={<MoviesDetail />} />
+
+            {/* 사용자 관련 페이지 */}
+            <Route path="/users" element={<UsersPage />} />
+
+            {/* 기타 페이지 */}
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/search/:query" element={<SearchResultPage />} />
           </Route>
-
-          {/* 리뷰 관련 페이지 */}
-          <Route path="/review/post" element={<ReviewPostPage />} />
-          <Route path="/reviews" element={<ReviewsPage />} />
-          <Route path="/reviews/:id" element={<ReviewsDetail />} />
-
-          {/* 영화 관련 페이지 */}
-          <Route path="/movies" element={<MoviesPage />} />
-          <Route path="/movies/:id" element={<MoviesDetail />} />
-
-          {/* 사용자 관련 페이지 */}
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/users" element={<UsersPage />} />
-
-          {/* 기타 페이지 */}
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/search/:query" element={<SearchResultPage />} />
-        </Route>
 
         {/* Layout 없이 독립 페이지 */}
         <Route path="/error" element={<Error />} />
