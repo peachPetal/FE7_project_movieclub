@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LikeBtn from "../common/buttons/LikeBtn";
 import Comment from "../comments/Comment";
 import TimeAgo from "./TimeAgo";
@@ -9,20 +9,19 @@ import { useEffect, useState } from "react";
 import ReviewsDetailSkeleton from "../loading/ReviewsDetailSkeleton";
 
 export default function ReviewsDetail() {
+  const { id } = useParams();
   const userId = useAuthStore((state) => state.user?.id);
   const navigate = useNavigate();
 
   const location = useLocation();
   const reviewState: ReviewWithDetail = location.state?.review;
 
-  const [review, setReview] = useState(reviewState);
-
-  const like = review.likes?.[0]?.count;
-  // const author = reviewState.users?.name ?? "author";
-  const comment = reviewState.comments?.[0]?.count ?? 0;
+  const [review, setReview] = useState<ReviewWithDetail | null>(
+    reviewState ? reviewState : null
+  );
 
   const [isLoading, setIsLoading] = useState(true);
-  const [likeCount, setLikeCount] = useState(like ? like : 0);
+  const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
   const fetchLiked = async () => {
@@ -32,7 +31,7 @@ export default function ReviewsDetail() {
           .from("review_likes")
           .select("*")
           .eq("user_id", userId)
-          .eq("review_id", review.id)
+          .eq("review_id", id)
           .maybeSingle();
 
         if (error) {
@@ -66,7 +65,7 @@ export default function ReviewsDetail() {
             comments:review_comments(count),
             likes:review_likes(count)`
         )
-        .eq("id", review.id)
+        .eq("id", id)
         .single();
 
       if (error) throw error;
@@ -84,10 +83,20 @@ export default function ReviewsDetail() {
   };
 
   useEffect(() => {
-    setIsLoading(true);
-    fetchLiked();
-    fetchReview();
-    setIsLoading(false);
+    if (reviewState) setReview(reviewState);
+
+    const fetchAll = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([fetchLiked(), fetchReview()]);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAll();
   }, []);
 
   const handleLike = async () => {
@@ -99,7 +108,7 @@ export default function ReviewsDetail() {
 
             const { error } = await supabase
               .from("review_likes")
-              .insert([{ user_id: userId, review_id: review.id }])
+              .insert([{ user_id: userId, review_id: id }])
               .select()
               .single();
 
@@ -116,7 +125,7 @@ export default function ReviewsDetail() {
               .from("review_likes")
               .delete()
               .eq("user_id", userId)
-              .eq("review_id", review.id);
+              .eq("review_id", id);
 
             if (error) throw error;
 
@@ -146,41 +155,39 @@ export default function ReviewsDetail() {
         <div className="mr-15">
           {" "}
           <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">
-            {review.title}
+            {review?.title}
             <span className="text-main dark:text-main-dark">
               {" "}
-              #{review.movie_name}
+              #{review?.movie_name}
             </span>
           </h1>
           <p className="mb-10 text-text-sub">
             <span className="text-[var(--color-text-sub)]">
-              <TimeAgo dateString={review.created_at} />
+              <TimeAgo dateString={review?.created_at} />
             </span>
             {" by "}
             <span className="review-created-user text-main">
-              {review.users?.name}
+              {review?.users?.name}
             </span>
           </p>
           <div className="flex mb-10">
             <img
               className="min-w-[550px] max-h-[325px] object-cover mr-7"
               src={
-                review.thumbnail
-                  ? review.thumbnail
+                review?.thumbnail
+                  ? review?.thumbnail
                   : "https://plus.unsplash.com/premium_photo-1661675440353-6a6019c95bc7?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               }
             />
             <p className="mr-12 min-w-[340px] whitespace-pre-line leading-relaxed text-text-main dark:text-text-main-dark">
-              {review.content}
+              {review?.content}
             </p>
           </div>
           <div className="flex justify-center">
             <LikeBtn like={likeCount!} isLiked={isLiked} onClick={handleLike} />
           </div>
           <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
-          <div>
-            <Comment comment={comment} />
-          </div>
+          <div>{/* <Comment comment={comment} /> */}</div>
         </div>
       )}
     </>
