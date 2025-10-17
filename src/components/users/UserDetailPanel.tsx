@@ -1,4 +1,6 @@
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthSession } from "../../hooks/useAuthSession";
 import { useTheme } from "../../hooks/useTheme";
 import type { AppUser } from "../../types/appUser";
 import type { MessageDetailData } from "./UserMessageDetail";
@@ -34,8 +36,15 @@ const UserProfileHeader = ({ user, isDark }: { user: AppUser; isDark: boolean })
       <div className="min-w-0 flex-1">
         <h3 className="truncate text-2xl font-bold">{user.name}</h3>
         <p className="mt-1 flex items-center gap-1.5 text-sm text-[var(--color-text-sub)]">
-          {user.is_online ? ( <><span className="h-2 w-2 rounded-full bg-[var(--color-alert-online)]" /> Online</> ) : 
-          ( <><span className="h-2 w-2 rounded-full bg-[var(--color-text-light)]" /> Offline</> )}
+          {user.is_online ? (
+            <>
+              <span className="h-2 w-2 rounded-full bg-[var(--color-alert-online)]" /> Online
+            </>
+          ) : (
+            <>
+              <span className="h-2 w-2 rounded-full bg-[var(--color-text-light)]" /> Offline
+            </>
+          )}
         </p>
         <p className="mt-2 text-sm text-[var(--color-text-sub)]">
           가입일: {user.joinedAt ?? "정보 없음"}
@@ -57,8 +66,13 @@ const UserActions = ({ onToggleMessage, isMessageOpen, onAddFriend, isAddingFrie
       <img src={deleteFriendMouseOff} alt="친구 추가" className="w-10 h-10 opacity-100 group-hover:opacity-0 transition-opacity duration-200" />
       <img src={addFriendIcon} alt="친구 추가 호버" className="w-10 h-10 absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
     </button>
-    <button onClick={onToggleMessage} aria-expanded={isMessageOpen} aria-label="쪽지 보기" title="쪽지 보기"
-      className="flex h-10 w-10 items-center justify-center rounded-full hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-main)]">
+    <button
+      onClick={onToggleMessage}
+      aria-expanded={isMessageOpen}
+      aria-label="쪽지 보기"
+      title="쪽지 보기"
+      className="flex h-10 w-10 items-center justify-center rounded-full hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-main)]"
+    >
       <img src={messageUserIcon} alt="" className="h-full w-full" />
     </button>
   </div>
@@ -76,8 +90,27 @@ type Props = {
 // --- 메인 컴포넌트 ---
 export default function UserDetailPanel({ user, currentUserId, onPickMessage, onAddFriend, isAddingFriend }: Props) {
   const { isDark } = useTheme();
+  const { session, loading } = useAuthSession();
+  const navigate = useNavigate();
+
   const [isMessageOpen, setIsMessageOpen] = useState(false);
-  const toggleMessage = useCallback(() => setIsMessageOpen((p) => !p), []);
+  const toggleMessage = useCallback(() => {
+    if (loading) return;
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+    setIsMessageOpen((p) => !p);
+  }, [loading, session, navigate]);
+
+  const handleAddFriend = useCallback(() => {
+    if (loading) return;
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+    onAddFriend();
+  }, [loading, session, navigate, onAddFriend]);
 
   return (
     <div className="w-full">
@@ -90,7 +123,7 @@ export default function UserDetailPanel({ user, currentUserId, onPickMessage, on
           <UserActions
             onToggleMessage={toggleMessage}
             isMessageOpen={isMessageOpen}
-            onAddFriend={onAddFriend}
+            onAddFriend={handleAddFriend}
             isAddingFriend={isAddingFriend}
           />
         )}
