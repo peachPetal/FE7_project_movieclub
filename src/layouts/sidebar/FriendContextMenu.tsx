@@ -2,8 +2,8 @@ import React from "react";
 import { type Friend } from "../../hooks/useFriends";
 import friendsIcon from "../../assets/person-circle-black.svg";
 import messageIcon from "../../assets/message.svg";
-import deleteFriendMouseOff from "../../assets/deleteFriendMouseOff.svg";
-import deleteFriendMouseOn from "../../assets/deleteFriendMouseOn.svg";
+import deleteFriendMouseOff from "../../assets/delete-friend-mouse-off.svg";
+import deleteFriendMouseOn from "../../assets/delete-friend-mouse-on.svg";
 
 interface FriendContextMenuProps {
   friend: Friend;
@@ -20,11 +20,16 @@ export const FriendContextMenu: React.FC<FriendContextMenuProps> = ({
   isDeleting,
   modalRef,
 }) => {
+  const statusColor =
+    friend.status === "online"
+      ? "var(--color-alert-online)"
+      : "var(--color-text-light)";
+
   return (
     <div
       ref={modalRef}
-      className="absolute w-[290px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 flex items-center px-4"
-      style={{ top: position.top, left: position.left + 15 }}
+      className="absolute w-[320px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 flex items-center px-4"
+      style={{ top: position.top, left: position.left + 15}}
     >
       <div className="relative w-12 h-12">
         <img
@@ -33,26 +38,22 @@ export const FriendContextMenu: React.FC<FriendContextMenuProps> = ({
           className="w-12 h-12 rounded-full object-cover"
         />
         <span
-          className={`absolute bottom-0 right-0 block w-4 h-4 rounded-full border-2 border-[var(--color-background-sub)] ${
-            friend.status === "online"
-              ? "bg-[var(--color-alert-online)]"
-              : "bg-[var(--color-text-light)]"
-          }`}
+          className={`absolute bottom-0 right-0 block w-4 h-4 rounded-full border-2 border-[var(--color-background-sub)]`}
+          style={{ backgroundColor: statusColor }}
         />
       </div>
+
       <div className="ml-4 flex flex-col justify-center">
-        <p className="font-medium text-[var(--color-text-main)]">
-          {friend.name}
-        </p>
-        <p className="text-sm text-[var(--color-text-sub)] capitalize">
-          {friend.status}
-        </p>
+        <p className="font-medium text-[var(--color-text-main)]">{friend.name}</p>
+        <p className="text-sm text-[var(--color-text-sub)] capitalize">{friend.status}</p>
       </div>
+
       <div className="ml-auto flex gap-2">
         <button
-          className="relative w-8 h-8 group"
+          className={`relative w-8 h-8 group ${isDeleting ? "opacity-50 cursor-not-allowed" : ""}`}
           onClick={onDelete}
           disabled={isDeleting}
+          aria-label="Delete Friend"
         >
           <img
             src={deleteFriendMouseOff}
@@ -65,7 +66,8 @@ export const FriendContextMenu: React.FC<FriendContextMenuProps> = ({
             className="w-8 h-8 absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           />
         </button>
-        <button className="w-8 h-8">
+
+        <button className="w-8 h-8" aria-label="Send Message">
           <img src={messageIcon} className="w-8 h-8" alt="message" />
         </button>
       </div>

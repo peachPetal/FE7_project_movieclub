@@ -1,7 +1,5 @@
 import { createPortal } from "react-dom";
 import { useUsersPageLogic } from "../hooks/useUsersPageLogic";
-import FilterDropdown from "../components/common/buttons/FilterDropdown";
-import UserItem from "../components/users/UserItem";
 import UserList from "../components/users/UserList";
 import UserDetailPanel from "../components/users/UserDetailPanel";
 import UserMessageDetail, { type MessageDetailData } from "../components/users/UserMessageDetail";
@@ -42,7 +40,7 @@ const UserDetails = ({ selectedUser, pickedMessage, onPickMessage, onReply, curr
 // --- 메인 페이지 컴포넌트 ---
 export default function UsersPage() {
   const {
-    users, isLoading, isError, error, currentUserId, selectedId, selectedUser,
+    users, isLoading, error, currentUserId, selectedId, selectedUser,
     pickedMessage, isReplyOpen, handleSelectUser, setPickedMessage, handleAddFriend,
     isAddingFriend, openReply, closeReply,
   } = useUsersPageLogic();

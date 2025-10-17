@@ -1,4 +1,4 @@
-import { supabase } from "../utils/supabase";
+import { supabase } from "../../utils/supabase";
 import { tmdb } from "./tmdb";
 
 export const getMovies = async () => {

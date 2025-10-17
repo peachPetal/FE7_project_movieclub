@@ -1,13 +1,5 @@
 import { useState } from "react";
 import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
-import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-} from "@headlessui/react";
-import { HashtagIcon } from "@heroicons/react/20/solid";
-import clsx from "clsx";
 import { supabase } from "../utils/supabase";
 import { useAuthStore } from "../stores/authStore";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -33,8 +25,8 @@ export default function ReviewPostPage() {
   // comobobox 관련 state들
   // const [movies, setMovies] = useState<MovieInReview[]>([]);
   // const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<MovieInReview | null>(null);
-  const [isInputFocus, setIsInputFocus] = useState(true);
+  // const [selected, setSelected] = useState<MovieInReview | null>(null);
+  // const [isInputFocus, setIsInputFocus] = useState(true);
 
   // useEffect(() => {
   //   setIsLoading(true);
@@ -158,6 +150,8 @@ export default function ReviewPostPage() {
               className="text-[28px] pl-3 pb-3 w-full mb-5 outline-0 border-b-1 border-text-light placeholder:text-text-light focus:border-main"
               required
             />
+
+            {/* 영화 검색 영역 */}
             {/* <Combobox<MovieInReview>
               value={selected!}
               onChange={(value) => {

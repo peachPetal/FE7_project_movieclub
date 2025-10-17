@@ -1,12 +1,14 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import LikeBtn from "../common/buttons/LikeBtn";
-import Comment from "../comments/Comment";
-import TimeAgo from "./TimeAgo";
-import type { ReviewWithDetail } from "../../types/Review";
-import { useAuthStore } from "../../stores/authStore";
-import { supabase } from "../../utils/supabase";
+import LikeBtn from "../components/common/buttons/LikeBtn";
+import Comment from "../components/comments/Comment";
+
 import { useEffect, useState } from "react";
-import ReviewsDetailSkeleton from "../loading/ReviewsDetailSkeleton";
+
+import TimeAgo from "../components/common/time-ago/TimeAgo";
+import type { ReviewWithDetail } from "../types/Review";
+import { useAuthStore } from "../stores/authStore";
+import { supabase } from "../utils/supabase";
+import ReviewsDetailSkeleton from "../components/skeleton/ReviewsDetailSkeleton";
 
 export default function ReviewsDetail() {
   const { id } = useParams();
@@ -163,7 +165,9 @@ export default function ReviewsDetail() {
           </h1>
           <p className="mb-10 text-text-sub">
             <span className="text-[var(--color-text-sub)]">
-              <TimeAgo dateString={review?.created_at} />
+              <TimeAgo
+                dateString={review?.created_at ? review?.created_at : ""}
+              />
             </span>
             {" by "}
             <span className="review-created-user text-main">
@@ -187,7 +191,9 @@ export default function ReviewsDetail() {
             <LikeBtn like={likeCount!} isLiked={isLiked} onClick={handleLike} />
           </div>
           <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
-          <div>{/* <Comment comment={comment} /> */}</div>
+          <div>
+            <Comment comment={0} />
+          </div>
         </div>
       )}
     </>

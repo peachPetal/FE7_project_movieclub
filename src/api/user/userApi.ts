@@ -1,5 +1,5 @@
-import { supabase } from "../utils/supabase";
-import type { AppUser } from "../types/appUser";
+import { supabase } from "../../utils/supabase";
+import type { AppUser } from "../../types/appUser";
 
 /**
  * Supabase의 'users' 테이블에서 모든 사용자 목록을 조회합니다.

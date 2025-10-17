@@ -28,8 +28,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
   onSettingsClick,
 }) => {
   const [isFriendsMenuOpen, setIsFriendsMenuOpen] = useState(true);
-  const handleToggleFriendsMenu = () =>
-    setIsFriendsMenuOpen(!isFriendsMenuOpen);
+  const handleToggleFriendsMenu = () => setIsFriendsMenuOpen((prev) => !prev);
 
   return (
     <div className="flex flex-col flex-1 p-4 overflow-visible">
@@ -41,10 +40,11 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
             onClick={onNotificationClick}
             className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
           >
-            <img src={notificationsIcon} alt="" className="w-6 h-6 mr-3" />
+            <img src={notificationsIcon} alt="Notifications" className="w-6 h-6 mr-3" />
             Notifications
           </button>
         </li>
+
         {/* Friends Menu */}
         <li>
           <button
@@ -53,7 +53,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
             className="flex w-full items-center p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
             aria-expanded={isFriendsMenuOpen}
           >
-            <img src={friendsIcon} alt="" className="w-6 h-6 mr-3" />
+            <img src={friendsIcon} alt="Friends" className="w-6 h-6 mr-3" />
             <span>Friends</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -65,13 +65,10 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
                 isFriendsMenuOpen ? "" : "-rotate-180"
               }`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m4.5 15.75 7.5-7.5 7.5 7.5"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
             </svg>
           </button>
+
           <div
             className={`overflow-hidden transition-all duration-300 ${
               isFriendsMenuOpen ? "max-h-120" : "max-h-0"
@@ -117,7 +114,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
               className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
               onClick={onProfileClick}
             >
-              <img src={profileIcon} alt="" className="w-6 h-6 mr-3" />
+              <img src={profileIcon} alt="Profile" className="w-6 h-6 mr-3" />
               Profile
             </button>
           </li>
@@ -126,7 +123,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
               className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
               onClick={onSettingsClick}
             >
-              <img src={settingIcon} alt="" className="w-6 h-6 mr-3" />
+              <img src={settingIcon} alt="Settings" className="w-6 h-6 mr-3" />
               Settings
             </button>
           </li>
@@ -135,7 +132,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
               className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
               onClick={onLogout}
             >
-              <img src={logoutIcon} alt="" className="w-6 h-6 mr-3" />
+              <img src={logoutIcon} alt="Logout" className="w-6 h-6 mr-3" />
               Logout
             </button>
           </li>

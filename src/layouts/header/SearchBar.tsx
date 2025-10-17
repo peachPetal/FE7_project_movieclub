@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // useNavigate import
-import searchIcon from "../../assets/searchBar.svg";
+import searchIcon from "../../assets/search-bar.svg";
 
 export default function SearchBar() {
   const [isFocused, setIsFocused] = useState(false);

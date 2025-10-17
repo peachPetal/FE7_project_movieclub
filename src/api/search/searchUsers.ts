@@ -1,6 +1,6 @@
 // src/api/searchUsers.ts
 
-import { supabase } from '../utils/supabase'; // Supabase 클라이언트 경로
+import { supabase } from '../../utils/supabase'; // Supabase 클라이언트 경로
 
 // 컴포넌트에서 사용할 사용자 정보 타입을 export 합니다.
 export interface UserProfile {
@@ -10,7 +10,7 @@ export interface UserProfile {
 }
 
 /**
- * 🕵️ Supabase 'users' 테이블에서 사용자 이름(name)으로 프로필을 검색합니다.
+ * Supabase 'users' 테이블에서 사용자 이름(name)으로 프로필을 검색합니다.
  * @param query - '@'로 시작하는 검색어 (예: "@JohnDoe")
  * @returns {Promise<UserProfile[]>} - 검색된 사용자 프로필 목록
  */

@@ -1,15 +1,62 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import "react-loading-skeleton/dist/skeleton.css";
 import TrailerBtn from "../components/common/buttons/TrailerBtn";
 import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
+import { useEffect, useState } from "react";
 
 export default function MoviesDetail() {
+  const { id } = useParams();
   const location = useLocation();
-  const movie: Movie = location.state?.movie;
+  const movieState: Movie = location.state?.movie;
+
+  const [movie, setMovie] = useState<Movie | null>();
+
+  const fetchMovie = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select(
+          `
+              id,
+              title,
+              content,
+              thumbnail,
+              movie_id,
+              movie_name,
+              created_at,
+              users:users!inner(
+                name
+              ),
+              comments:review_comments(count),
+              likes:review_likes(count)`
+        )
+        .eq("id", id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setReview({
+          ...data,
+          users: Array.isArray(data.users) ? data.users[0] : data.users,
+        });
+        setLikeCount(data.likes?.[0]?.count);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    if (movieState) setMovie(movieState);
+  }, []);
+
+  if (!movieState)
+    return <p className="text-center mt-10">영화 정보를 불러올 수 없습니다.</p>;
+
   const {
     id,
     title,
-    original_title,
     overview,
     cerfication,
     year,
@@ -22,34 +69,25 @@ export default function MoviesDetail() {
     director,
     actors,
     trailer,
-  } = movie;
+  } = movieState;
 
+  // 구분자 컴포넌트
   const Separator = () => <span className="mx-1.5">{`|`}</span>;
+
+  // 런타임 포맷팅 (분 → "h m" 형식)
   const formatRunTime = (runtime: string) => {
     const h = Math.floor(Number(runtime) / 60);
     const m = Number(runtime) - h * 60;
     return `${h}h ${m}m`;
   };
-  const formatGenres = (genres: Genre[]) => {
-    let result = "";
 
-    if (genres) {
-      const genreNames = genres.map((genre) => genre.name);
-      result = genreNames.join(", ");
-    }
+  // 장르 배열 → 문자열
+  const formatGenres = (genres: Genre[]) =>
+    genres?.map((g) => g.name).join(", ") ?? "";
 
-    return result;
-  };
-  const formatActors = (actors: Genre[]) => {
-    let result = "";
-
-    if (genres) {
-      const genreNames = actors.map((actor) => actor.name);
-      result = genreNames.join(", ");
-    }
-
-    return result;
-  };
+  // 배우 배열 → 문자열
+  const formatActors = (actors: Genre[]) =>
+    actors?.map((a) => a.name).join(", ") ?? "";
 
   return (
     <div className="max-w-7xl">
@@ -124,76 +162,3 @@ export default function MoviesDetail() {
     </div>
   );
 }
-
-// {matchedReviews !== null ? (
-//           <div className="flex flex-col gap-4">
-//             {Array.isArray(matchedReviews) && matchedReviews.length > 0 ? (
-//               <div className="flex flex-wrap gap-[30px]">
-//                 <ReviewsRendering data={matchedReviews} hasImage={false} />
-//               </div>
-//             ) : (
-//               <div className="text-[var(--color-text-sub)] text-sm">
-//                 이 영화의 리뷰가 아직 없습니다.
-//               </div>
-//             )}
-//           </div>
-//         ) : (
-//           <div className="flex gap-[30px] flex-wrap">
-//             {/* 5개의 스켈레톤 카드를 생성 */}
-//             {Array.from({ length: 5 }).map((_, idx) => (
-//               <div
-//                 key={idx}
-//                 // 카드 배경: 테마에 따라 자동 변경 (bg-background-sub)
-//                 // 그림자: 공통 스타일 적용 (card-shadow)
-//                 className="relative w-[320px] h-[250px] bg-[var(--color-background-sub)] rounded-[10px] card-shadow"
-//               >
-//                 <div className="absolute left-[22px] top-[21.34px] w-[277px]">
-//                   <Skeleton
-//                     count={2}
-//                     baseColor={skeletonBaseColor}
-//                     highlightColor={skeletonHighlightColor}
-//                   />
-//                 </div>
-//                 <Skeleton
-//                   className="absolute left-[22px] top-[80.28px]"
-//                   width={277}
-//                   count={3}
-//                   baseColor={skeletonBaseColor}
-//                   highlightColor={skeletonHighlightColor}
-//                 />
-//                 <Skeleton
-//                   className="absolute left-[22px] top-[172.76px]"
-//                   width={180}
-//                   height={16}
-//                   baseColor={skeletonBaseColor}
-//                   highlightColor={skeletonHighlightColor}
-//                 />
-//                 <div className="absolute bottom-0 left-0 right-0 h-[60px] px-[22px] flex items-center">
-//                   <div className="grid grid-cols-3 items-center w-full">
-//                     <Skeleton
-//                       width={40}
-//                       height={20}
-//                       baseColor={skeletonBaseColor}
-//                       highlightColor={skeletonHighlightColor}
-//                     />
-//                     <Skeleton
-//                       width={40}
-//                       height={20}
-//                       className="mx-auto"
-//                       baseColor={skeletonBaseColor}
-//                       highlightColor={skeletonHighlightColor}
-//                     />
-//                     <Skeleton
-//                       circle
-//                       width={24}
-//                       height={24}
-//                       className="ml-auto"
-//                       baseColor={skeletonBaseColor}
-//                       highlightColor={skeletonHighlightColor}
-//                     />
-//                   </div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         )}

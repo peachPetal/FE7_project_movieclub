@@ -1,4 +1,4 @@
-import { supabase } from "../utils/supabase";
+import { supabase } from "../../utils/supabase";
 
 /**
  * 'friendship' 테이블에 새로운 친구 관계를 추가합니다.

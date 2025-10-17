@@ -1,10 +1,10 @@
 // src/api/searchReviews.ts
 
-import { supabase } from '../utils/supabase';
-import type { ReviewSubset } from '../types/Review';
+import { supabase } from '../../utils/supabase';
+import type { ReviewSubset } from '../../types/review';
 
 /**
- * 🎬 Supabase 'reviews' 테이블에서 영화 이름(movie_name)으로 리뷰를 검색합니다.
+ * Supabase 'reviews' 테이블에서 영화 이름(movie_name)으로 리뷰를 검색합니다.
  * ReviewList 컴포넌트의 데이터 조회 스타일과 통일성을 맞춘 버전입니다.
  * @param query - 검색할 영화 이름
  * @returns {Promise<ReviewSubset[]>} - 검색된 리뷰 목록

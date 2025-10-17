@@ -1,6 +1,6 @@
 import "react-loading-skeleton/dist/skeleton.css";
 import { Link } from "react-router-dom";
-import MovieSkeleton from "../loading/MovieSkeleton";
+import MovieSkeleton from "../skeleton/MovieSkeleton";
 
 type MovieItemProps = {
   movie?: Movie; // 로딩/플레이스홀더 상황에서 undefined 허용

@@ -1,4 +1,4 @@
-import { supabase } from "../utils/supabase";
+import { supabase } from "../../utils/supabase";
 
 export async function deleteFriend(userId: string, friendId: string): Promise<void> {
   const { error } = await supabase

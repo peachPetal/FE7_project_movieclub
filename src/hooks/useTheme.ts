@@ -1,36 +1,42 @@
+// src/hooks/useTheme.ts
 import { useState, useEffect, useCallback } from "react";
-import { isDarkMode, toggleTheme as toggleThemeUtil, type Theme } from "../lib/theme";
+import {
+  isDarkMode,
+  toggleTheme as toggleThemeUtil,
+  type Theme,
+} from "../lib/theme";
 
 /**
- * React 컴포넌트에서 테마 상태를 반응형으로 사용하고,
- * 테마를 토글할 수 있는 기능을 제공하는 커스텀 훅.
- * lib/theme.ts의 유틸리티를 활용합니다.
+ * React 앱에서 다크/라이트 테마를 제어하고 동기화하는 커스텀 훅.
+ * - 현재 테마 상태 제공
+ * - 테마 토글 기능 제공
+ * - 로컬스토리지 및 다른 탭과의 상태 동기화
  */
 export const useTheme = () => {
-  // 1. React의 state를 사용. 초기값은 유틸리티 함수로 가져옴.
-  const [theme, setTheme] = useState<Theme>(isDarkMode() ? "dark" : "light");
+  // 현재 테마 상태 (초기값은 실제 시스템/저장 상태 기반)
+  const [theme, setTheme] = useState<Theme>(() =>
+    isDarkMode() ? "dark" : "light"
+  );
 
-  // 2. 테마를 토글하는 함수 (메모이제이션)
+  // 테마 토글 (함수형 업데이트 + 유틸 호출)
   const toggleTheme = useCallback(() => {
-    // 유틸리티 함수로 실제 테마 변경 로직 실행
     toggleThemeUtil();
-    // React state도 함께 변경하여 리렌더링 유발
-    setTheme(prevTheme => (prevTheme === "light" ? "dark" : "light"));
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
-  // 3. 다른 탭이나 창에서 테마가 변경될 때 상태를 동기화
+  // 다른 탭(또는 창)에서 변경 시 테마 동기화
   useEffect(() => {
-    const handleStorageChange = () => {
+    const syncThemeAcrossTabs = () => {
       setTheme(isDarkMode() ? "dark" : "light");
     };
 
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    window.addEventListener("storage", syncThemeAcrossTabs);
+    return () => window.removeEventListener("storage", syncThemeAcrossTabs);
   }, []);
 
-  return { 
-    theme, 
-    isDark: theme === 'dark', 
-    toggleTheme 
+  return {
+    theme,
+    isDark: theme === "dark",
+    toggleTheme,
   };
 };

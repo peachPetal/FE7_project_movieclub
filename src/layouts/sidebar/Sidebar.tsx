@@ -6,8 +6,7 @@ import { useFriends, type Friend } from "../../hooks/useFriends";
 import { supabase } from "../../utils/supabase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-// 분리된 컴포넌트 및 API 임포트
-import { deleteFriend } from "../../api/deleteFriendApi";
+import { deleteFriend } from "../../api/friend/deleteFriendApi";
 import { SidebarHeader } from "./sidebarHeader";
 import { LoggedInContent } from "./LoggedInContent";
 import { FriendContextMenu } from "./FriendContextMenu";
@@ -24,18 +23,19 @@ export default function Sidebar() {
   const isLoggedIn = !!user;
   const userId = user?.id;
 
-  // UI 상태 관리
+  // UI 상태
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [modalFriend, setModalFriend] = useState<Friend | null>(null);
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [modalNotificationOpen, setModalNotificationOpen] = useState(false);
   const [notificationY, setNotificationY] = useState(0);
 
-  // DOM 요소 참조
+  // DOM 참조
   const notificationButtonRef = useRef<HTMLButtonElement>(null);
   const modalFriendRef = useRef<HTMLDivElement>(null);
   const modalNotificationRef = useRef<HTMLDivElement>(null);
 
+  // 친구 삭제 뮤테이션
   const deleteFriendMutation = useMutation({
     mutationFn: (friendId: string) => {
       if (!userId) throw new Error("User not logged in");
@@ -47,6 +47,7 @@ export default function Sidebar() {
     },
   });
 
+  // 이벤트 핸들러
   const handleToggleCollapse = useCallback(() => setIsCollapsed((prev) => !prev), []);
 
   const handleFriendClick = useCallback(
@@ -60,9 +61,7 @@ export default function Sidebar() {
   );
 
   const handleDeleteFriend = useCallback(() => {
-    if (modalFriend) {
-      deleteFriendMutation.mutate(modalFriend.id);
-    }
+    if (modalFriend) deleteFriendMutation.mutate(modalFriend.id);
   }, [modalFriend, deleteFriendMutation]);
 
   const handleLogout = useCallback(async () => {
@@ -89,44 +88,16 @@ export default function Sidebar() {
     setModalNotificationOpen(false);
   }, []);
 
-//   useEffect(() => {
-//     const handleClickOutside = (event: MouseEvent) => {
-//       const target = event.target as Node;
-//       if (modalFriendRef.current && !modalFriendRef.current.contains(target)) {
-//         setModalFriend(null);
-//       }
-//       if (modalNotificationRef.current && !modalNotificationRef.current.contains(target)) {
-//         setModalNotificationOpen(false);
-//       }
-//     };
-//     document.addEventListener("mousedown", handleClickOutside);
-//     return () => document.removeEventListener("mousedown", handleClickOutside);
-//   }, []);
-
-useEffect(() => {
-  const handleClickOutside = (event: MouseEvent) => {
-    const target = event.target as Node;
-
-    // 모달 DOM 요소를 변수로 추출
-    const friendModal = modalFriendRef.current;
-    const notificationModal = modalNotificationRef.current;
-    // 👍 Friend 모달이 열려있고, 바깥을 클릭했을 때
-    if (friendModal && !friendModal.contains(target)) {
-      closeModals();
-    }
-    
-    // 👍 Notification 모달이 열려있고, 바깥을 클릭했을 때
-    if (notificationModal && !notificationModal.contains(target)) {
-      closeModals();
-    }
-  };
-
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, [closeModals]); // ✅ useCallback으로 감싼 closeModals를 의존성 배열에 추가
-
+  // 바깥 클릭 시 모달 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (modalFriendRef.current && !modalFriendRef.current.contains(target)) closeModals();
+      if (modalNotificationRef.current && !modalNotificationRef.current.contains(target)) closeModals();
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [closeModals]);
 
   return (
     <>
@@ -186,7 +157,7 @@ useEffect(() => {
 
       {modalNotificationOpen && (
         <NotificationModal
-          position={{ top: notificationY, left: modalPosition.left}}
+          position={{ top: notificationY, left: modalPosition.left }}
           modalRef={modalNotificationRef}
         />
       )}
