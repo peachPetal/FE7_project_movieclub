@@ -170,15 +170,19 @@ export default function ReviewItem({
     );
   } else {
     return (
-      <Link to={`/reviews/${review?.id}`} state={{ review }}>
+      <Link
+        to={`/reviews/${review?.id}`}
+        aria-label={`리뷰 상세로 이동: ${review.title}`}
+        state={{ review }}
+      >
         <div
           className={`review-item relative w-80 rounded-lg card-shadow flex flex-col flex-shrink-0 bg-[var(--color-background-sub)] ${
             hasImage ? "h-[410px]" : "h-[230px]"
-          }`}
+          } duration-300 ease-in-out hover:-translate-y-2 hover:shadow-lg`}
         >
           {hasImage && (
             <img
-              className="review-thumbnail h-[185px] w-full object-cover rounded-t-lg"
+              className="review-thumbnail w-full h-[350px] object-cover rounded-t-lg "
               src={
                 review?.thumbnail ||
                 "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg"
@@ -243,7 +247,6 @@ export default function ReviewItem({
                     <path
                       d="M17.7709 1.8256C17.7709 0.917662 16.9865 0.174805 16.017 0.174805H1.9153C0.945808 0.174805 0.152588 0.917662 0.152588 1.8256V11.7304C0.152588 12.6383 0.945808 13.3812 1.9153 13.3812H14.2543L17.7797 16.6827L17.7709 1.8256Z"
                       fill="#00000061"
-                      className="group-hover:fill-main-50"
                     />
                   </svg>
                 </button>

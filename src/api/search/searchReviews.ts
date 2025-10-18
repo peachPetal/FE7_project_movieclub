@@ -1,7 +1,7 @@
 // src/api/searchReviews.ts
 
-import { supabase } from '../../utils/supabase';
-import type { ReviewSubset } from '../../types/review';
+import { supabase } from "../../utils/supabase";
+import type { ReviewSubset, ReviewWithDetail } from "../../types/review";
 
 /**
  * Supabase 'reviews' 테이블에서 영화 이름(movie_name)으로 리뷰를 검색합니다.
@@ -38,17 +38,25 @@ export const searchReviews = async (query: string): Promise<ReviewSubset[]> => {
       .ilike("movie_name", `%${query}%`) // 검색 기능 추가
       .order("created_at", { ascending: false });
 
+    const finalData: ReviewWithDetail[] = [];
+    reviews?.map((review) =>
+      finalData.push({
+        ...review,
+        comments: review.comments[0].count,
+        likes: review.likes[0].count,
+      })
+    );
+
     // 에러가 발생하면 에러를 던집니다.
     if (error) {
       throw error;
     }
 
     // Supabase가 null을 반환할 경우를 대비해 빈 배열을 반환합니다.
-    return reviews || [];
-
+    return finalData || [];
   } catch (e) {
     // try 블록에서 던져진 에러를 여기서 처리합니다.
-    console.error('[API Function Error] searchReviews:', e);
+    console.error("[API Function Error] searchReviews:", e);
     // UI 중단을 막기 위해 빈 배열을 반환합니다.
     return [];
   }

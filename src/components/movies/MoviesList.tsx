@@ -19,6 +19,7 @@ export default function MoviesList({ variant = "page" }: MoviesListProps) {
       const data = await getMovies();
       setMovies(data.slice(0, limit));
       setIsLoading(false);
+      console.log(data);
     };
 
     fetchData();
