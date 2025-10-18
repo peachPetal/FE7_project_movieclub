@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { getMovieById } from "../api/tmdb/tmdbUtils";
 import MovieDetailSkeleton from "../components/skeleton/MovieDetailSkeleton";
 import { useAuthSession } from "../hooks/useAuthSession";
+import ReviewsRendering from "../components/reviews/ReviewsRendering";
+import ReviewList from "../components/reviews/ReviewList";
 
 export default function MoviesDetail() {
   const { id: movie_id } = useParams();
@@ -65,9 +67,9 @@ export default function MoviesDetail() {
     return <MovieDetailSkeleton />;
   } else {
     return (
-      <div className="max-w-7xl">
+      <div className="w-[90%]">
         {" "}
-        <section className="movie p-4 flex h-[500px] text-[var(--color-text-main)]">
+        <section className="movie p-4 flex min- h-[500px] text-[var(--color-text-main)]">
           <img
             src={movie?.poster}
             alt={`${movie?.title} poster`}
@@ -138,7 +140,7 @@ export default function MoviesDetail() {
                 Reviews
               </h2>
               <span className="text-2xl text-[var(--color-main)] font-bold">
-                reviewsCount
+                {movie?.reviews?.length}
               </span>
             </div>
             {/* 로그인 상태 체크 후 Review 버튼 클릭 */}
@@ -152,6 +154,9 @@ export default function MoviesDetail() {
                 }}
               />
             </div>
+          </div>
+          <div>
+            <ReviewList movie_id={movie?.id} />
           </div>
         </section>
       </div>

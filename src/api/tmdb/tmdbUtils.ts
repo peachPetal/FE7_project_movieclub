@@ -59,7 +59,6 @@ export const getMovieById = async (id: number) => {
 
   const credits = await getCredits(movieId);
   const trailer = await getTrailer(movieId);
-
   const reviews = await getReviews(movieId);
 
   return {
@@ -78,7 +77,7 @@ export const getMovieById = async (id: number) => {
     director: credits.director,
     actors: credits.actors,
     trailer: trailer,
-    reviews: reviews[0] ?? [],
+    reviews: reviews ?? [],
   };
 };
 
@@ -154,7 +153,8 @@ export const getReviews = async (id: string) => {
   const { data, error } = await supabase
     .from("reviews")
     .select("*")
-    .eq("movie_id", id);
+    .eq("movie_id", id)
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
 

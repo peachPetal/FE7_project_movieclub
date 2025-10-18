@@ -10,8 +10,6 @@ type MovieItemProps = {
 
 export default function MovieItem({ movie, isLoading }: MovieItemProps) {
   // 로딩 중이거나 movie가 아직 없는 경우: HomeContent 스타일의 스켈레톤 카드 반환
-
-  console.log(movie);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
   if (isLoading || !movie) {
     return <MovieSkeleton />;
