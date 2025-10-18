@@ -6,7 +6,7 @@ export default function ReviewsRendering({
   variant = "page",
   isLoading,
 }: ReviewRenderProps) {
-  const list: (ReviewSubset | undefined)[] = isLoading
+  const list: (Review | ReviewSubset | undefined)[] = isLoading
     ? Array.from({ length: 5 }).map(() => undefined)
     : data;
   const hasImage = variant === "page" ? true : false;

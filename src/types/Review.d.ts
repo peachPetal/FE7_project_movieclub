@@ -2,6 +2,7 @@ import type { Database } from "./database";
 
 type ReviewsListProps = {
   variant?: "home" | "page";
+  movie_id?: number;
 };
 
 type Review = Database["public"]["Tables"]["reviews"]["Row"];
@@ -26,7 +27,7 @@ type ReviewWithDetail = ReviewSubset & {
 };
 
 interface ReviewRenderProps {
-  data: ReviewSubset[];
-  variant: "home" | "page";
+  data: Review[] | ReviewSubset[];
+  variant?: "home" | "page";
   isLoading: boolean;
 }

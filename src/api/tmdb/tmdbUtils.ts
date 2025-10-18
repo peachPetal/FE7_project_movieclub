@@ -1,3 +1,4 @@
+import { supabase } from "../../utils/supabase";
 import { tmdb } from "./tmdb";
 
 export const getMovies = async () => {
@@ -58,6 +59,7 @@ export const getMovieById = async (id: number) => {
 
   const credits = await getCredits(movieId);
   const trailer = await getTrailer(movieId);
+  const reviews = await getReviews(movieId);
 
   return {
     id: id,
@@ -75,6 +77,7 @@ export const getMovieById = async (id: number) => {
     director: credits.director,
     actors: credits.actors,
     trailer: trailer,
+    reviews: reviews ?? [],
   };
 };
 
@@ -144,4 +147,16 @@ const getTrailer = async (id: string) => {
     .catch((err) => console.error(`tmdbGetTrailer: ${err}`));
 
   return url;
+};
+
+export const getReviews = async (id: string) => {
+  const { data, error } = await supabase
+    .from("reviews")
+    .select("*")
+    .eq("movie_id", id)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+
+  return data;
 };
