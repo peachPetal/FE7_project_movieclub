@@ -178,7 +178,7 @@ export default function ReviewsDetail() {
           </div>
           <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
           <section id="comment-section">
-            <Comment comment={0} />
+            <Comment review_id={id ?? ""} />
           </section>
         </div>
       )}

@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { getMovieById } from "../api/tmdb/tmdbUtils";
 import MovieDetailSkeleton from "../components/skeleton/MovieDetailSkeleton";
 import { useAuthSession } from "../hooks/useAuthSession";
-import ReviewsRendering from "../components/reviews/ReviewsRendering";
 import ReviewList from "../components/reviews/ReviewList";
 
 export default function MoviesDetail() {
@@ -69,7 +68,7 @@ export default function MoviesDetail() {
     return (
       <div className="w-[90%]">
         {" "}
-        <section className="movie p-4 flex min- h-[500px] text-[var(--color-text-main)]">
+        <section className="box-content movie p-4 flex min-w-4xl h-[500px] mb-10 text-[var(--color-text-main)]">
           <img
             src={movie?.poster}
             alt={`${movie?.title} poster`}
@@ -155,9 +154,16 @@ export default function MoviesDetail() {
               />
             </div>
           </div>
-          <div>
-            <ReviewList movie_id={movie?.id} />
-          </div>
+          {movie?.reviews?.length ? (
+            <div>
+              {" "}
+              <ReviewList movie_id={movie?.id} />
+            </div>
+          ) : (
+            <p className="flex justify-center w-full my-10 text-text-sub">
+              아직 등록된 리뷰가 없습니다.
+            </p>
+          )}
         </section>
       </div>
     );
