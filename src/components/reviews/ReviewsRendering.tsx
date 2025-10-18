@@ -1,4 +1,4 @@
-import type { ReviewSubset, ReviewRenderProps } from "../../types/review";
+import type { ReviewSubset, ReviewRenderProps } from "../../types/Review";
 import ReviewItem from "./ReviewItem";
 
 export default function ReviewsRendering({
@@ -19,14 +19,16 @@ export default function ReviewsRendering({
           : "flex flex-wrap gap-4"
       }
     >
-      {list.map((review, idx) => (
-        <ReviewItem
-          key={(review && review.id) ?? `skeleton-${idx}`}
-          review={review}
-          isLoading={isLoading}
-          hasImage={hasImage}
-        />
-      ))}
+      {list.map((review, idx) => {
+        return (
+          <ReviewItem
+            key={(review && review.id) ?? `skeleton-${idx}`}
+            review={review}
+            isLoading={isLoading}
+            hasImage={hasImage}
+          />
+        );
+      })}
     </div>
   );
 }

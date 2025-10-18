@@ -1,20 +1,19 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LikeBtn from "../components/common/buttons/LikeBtn";
 import Comment from "../components/comments/Comment";
-
 import { useEffect, useState } from "react";
-
 import TimeAgo from "../components/common/time-ago/TimeAgo";
-import type { ReviewWithDetail } from "../types/review";
+import type { ReviewWithDetail } from "../types/Review";
 import { supabase } from "../utils/supabase";
 import ReviewsDetailSkeleton from "../components/skeleton/ReviewsDetailSkeleton";
 import { useAuthSession } from "../hooks/useAuthSession"; // <-- 추가
+import { useAuthStore } from "../stores/authStore";
 
 export default function ReviewsDetail() {
   const { user } = useAuthSession(); // <-- 로그인 상태
+  const userId = useAuthStore((state) => state.user?.id);
   const navigate = useNavigate();
   const { id } = useParams();
-
   const location = useLocation();
   const reviewState: ReviewWithDetail = location.state?.review;
 
@@ -27,18 +26,15 @@ export default function ReviewsDetail() {
 
   const fetchLiked = async () => {
     try {
-      if (user?.id) {
+      if (userId) {
         const { data, error } = await supabase
           .from("review_likes")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .eq("review_id", id)
           .maybeSingle();
 
-        if (error) {
-          console.error(error);
-          return;
-        }
+        if (error) throw error;
 
         if (data) setIsLiked(true);
       }
@@ -74,7 +70,9 @@ export default function ReviewsDetail() {
       if (data) {
         setReview({
           ...data,
-          users: Array.isArray(data.users) ? data.users[0] : data.users,
+          comments: data.comments[0].count,
+          likes: data.likes[0].count,
+          user: data.users?.[0]?.name,
         });
         setLikeCount(data.likes?.[0]?.count);
       }
@@ -106,33 +104,37 @@ export default function ReviewsDetail() {
       return;
     }
 
-    try {
-      if (!isLiked) {
-        setLikeCount((prev) => prev + 1);
+    const { data: hasLiked, error } = await supabase
+      .from("review_likes")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("review_id", review?.id)
+      .maybeSingle();
 
-        const { error } = await supabase
-          .from("review_likes")
-          .insert([{ user_id: user.id, review_id: id }])
-          .select()
-          .single();
+    if (error) throw error;
 
-        if (error) throw error;
+    if (hasLiked) {
+      setLikeCount((prev) => prev - 1);
+      setIsLiked(false);
 
-        setIsLiked(true);
-      } else {
-        const { error } = await supabase
-          .from("review_likes")
-          .delete()
-          .eq("user_id", user.id)
-          .eq("review_id", id);
+      const { error: deleteError } = await supabase
+        .from("review_likes")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("review_id", review?.id);
 
-        if (error) throw error;
+      if (deleteError) throw deleteError;
+    } else {
+      setLikeCount((prev) => prev + 1);
+      setIsLiked(true);
 
-        setLikeCount((prev) => prev - 1);
-        setIsLiked(false);
-      }
-    } catch (err) {
-      console.error("Like 처리 오류: ", err);
+      const { error: insertError } = await supabase
+        .from("review_likes")
+        .insert([{ user_id: user.id, review_id: review?.id }])
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
     }
   };
 
@@ -175,15 +177,14 @@ export default function ReviewsDetail() {
             <LikeBtn like={likeCount!} isLiked={isLiked} onClick={handleLike} />
           </div>
           <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
-          <div>
+          <section id="comment-section">
             <Comment comment={0} />
-          </div>
+          </section>
         </div>
       )}
     </>
   );
 }
-
 
 /*
           <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">
