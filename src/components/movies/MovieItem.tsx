@@ -71,7 +71,7 @@ export default function MovieItem({ movie, isLoading }: MovieItemProps) {
                 <span className="text-sm">{movie.reviews?.length}</span>
               </div>
               <div
-                className="share group"
+                className="share group flex"
                 onClick={(e) => {
                   e.preventDefault();
                   const url = `${window.location.origin}/movies/${movie.id}`;
@@ -105,7 +105,7 @@ export default function MovieItem({ movie, isLoading }: MovieItemProps) {
                   </svg>
                 </button>
                 {showCopyPopup && (
-                  <div className="absolute z-10 -bottom-4.5 left-41.5">
+                  <div className="absolute z-10 -bottom-4.5 left-39.5">
                     <div
                       className="absolute -top-[7px] left-1/2 -translate-x-1/2 
               w-0 h-0 border-l-[7.5px] border-l-transparent 
