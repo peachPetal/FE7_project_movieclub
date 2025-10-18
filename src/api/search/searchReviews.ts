@@ -1,7 +1,7 @@
 // src/api/searchReviews.ts
 
 import { supabase } from "../../utils/supabase";
-import type { ReviewSubset, ReviewWithDetail } from "../../types/review";
+import type { ReviewSubset, ReviewWithDetail } from "../../types/Review";
 
 /**
  * Supabase 'reviews' 테이블에서 영화 이름(movie_name)으로 리뷰를 검색합니다.

@@ -19,6 +19,17 @@ interface Genre {
   name: string;
 }
 
+interface Review {
+  id: number;
+  created_at: string;
+  author_id: string;
+  title: string;
+  content: string;
+  thumbnail: string;
+  movie_id: number;
+  movie_name: string;
+}
+
 interface Movie {
   id: number;
   genres: Genre[];
@@ -35,6 +46,7 @@ interface Movie {
   director: string;
   actors: Actor[];
   trailer: string;
+  reviews?: Review[];
 }
 
 interface MovieInReview {
