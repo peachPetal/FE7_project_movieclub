@@ -14,7 +14,7 @@ export default function DefaultLayout() {
         <Sidebar />
 
         {/* 메인 콘텐츠 영역 */}
-        <div className="flex-1 ml-[46px] justify-center items-center min-h-[80vh] w-full">
+        <div className="flex-1 ml-[46px] mb-36 justify-center items-center min-h-[80vh] w-full">
           {/* 라우팅된 페이지 컴포넌트가 렌더링되는 Outlet */}
           <Outlet />
         </div>

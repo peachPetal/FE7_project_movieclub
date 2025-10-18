@@ -18,9 +18,11 @@ type ReviewSubset = Pick<
 >;
 
 type ReviewWithDetail = ReviewSubset & {
-  likes?: { count: number }[];
-  comments?: { count: number }[];
-  users?: { name: string };
+  likes?: number;
+  comments?: number;
+  users?: { name: string }[];
+  user?: { name: string };
+  like_users?: { user_id: string }[];
 };
 
 interface ReviewRenderProps {
