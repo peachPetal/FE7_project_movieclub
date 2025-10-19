@@ -57,7 +57,7 @@ export default function LoginPage() {
   }, [user]);
 
   return (
-    <div className="w-full h-full flex justify-center items-center mt-[-50px]">
+    <div className="w-full h-full flex ml-[340px] mt-[50px]">
       <div className="login-container w-[470px] h-[500px]">
         {/* 페이지 타이틀 */}
         <h1 className="text-4xl font-bold mb-11 text-center text-[var(--color-text-main)]">

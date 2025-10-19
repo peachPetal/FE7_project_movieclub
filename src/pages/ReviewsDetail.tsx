@@ -1,27 +1,25 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LikeBtn from "../components/common/buttons/LikeBtn";
 import Comment from "../components/comments/Comment";
-
 import { useEffect, useState } from "react";
-
 import TimeAgo from "../components/common/time-ago/TimeAgo";
 import type { ReviewWithDetail } from "../types/Review";
-import { useAuthStore } from "../stores/authStore";
 import { supabase } from "../utils/supabase";
 import ReviewsDetailSkeleton from "../components/skeleton/ReviewsDetailSkeleton";
+import { useAuthSession } from "../hooks/useAuthSession"; // <-- 추가
+import { useAuthStore } from "../stores/authStore";
 
 export default function ReviewsDetail() {
-  const { id } = useParams();
+  const { user } = useAuthSession(); // <-- 로그인 상태
   const userId = useAuthStore((state) => state.user?.id);
   const navigate = useNavigate();
-
+  const { id } = useParams();
   const location = useLocation();
   const reviewState: ReviewWithDetail = location.state?.review;
 
   const [review, setReview] = useState<ReviewWithDetail | null>(
     reviewState ? reviewState : null
   );
-
   const [isLoading, setIsLoading] = useState(true);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -37,12 +35,12 @@ export default function ReviewsDetail() {
           .maybeSingle();
 
         if (error) {
-          console.error(error);
+          navigate("/error");
           return;
         }
 
         if (data) setIsLiked(true);
-      } else return;
+      }
     } catch (err) {
       console.error(err);
     }
@@ -70,12 +68,17 @@ export default function ReviewsDetail() {
         .eq("id", id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        navigate("/error");
+        return;
+      }
 
       if (data) {
         setReview({
           ...data,
-          users: Array.isArray(data.users) ? data.users[0] : data.users,
+          comments: data.comments[0].count,
+          likes: data.likes[0].count,
+          user: data.users?.[0]?.name,
         });
         setLikeCount(data.likes?.[0]?.count);
       }
@@ -92,7 +95,7 @@ export default function ReviewsDetail() {
       try {
         await Promise.all([fetchLiked(), fetchReview()]);
       } catch (err) {
-        console.error(err);
+        navigate("/error");
       } finally {
         setIsLoading(false);
       }
@@ -102,60 +105,51 @@ export default function ReviewsDetail() {
   }, []);
 
   const handleLike = async () => {
-    if (userId) {
-      try {
-        if (!isLiked) {
-          try {
-            setLikeCount((prev) => prev + 1);
+    if (!user) {
+      navigate("/login"); // <-- 로그인 체크 후 이동
+      return;
+    }
 
-            const { error } = await supabase
-              .from("review_likes")
-              .insert([{ user_id: userId, review_id: id }])
-              .select()
-              .single();
+    const { data: hasLiked, error } = await supabase
+      .from("review_likes")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("review_id", review?.id)
+      .maybeSingle();
 
-            if (error) throw error;
+    if (error) throw error;
 
-            setIsLiked(true);
-          } catch (err) {
-            console.error("review insert error: ");
-            console.error(err);
-          }
-        } else {
-          try {
-            const { error } = await supabase
-              .from("review_likes")
-              .delete()
-              .eq("user_id", userId)
-              .eq("review_id", id);
+    if (hasLiked) {
+      setLikeCount((prev) => prev - 1);
+      setIsLiked(false);
 
-            if (error) throw error;
+      const { error: deleteError } = await supabase
+        .from("review_likes")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("review_id", review?.id);
 
-            setLikeCount((prev) => prev - 1);
-            setIsLiked(false);
-          } catch (err) {
-            console.error("review delete error: ");
-            console.error(err);
-          }
-        }
-      } catch (err) {
-        console.error(`reviews detail handle Like error: `);
-        console.error(err);
-      }
+      if (deleteError) throw deleteError;
     } else {
-      alert("로그인이 필요한 기능입니다.");
-      navigate("/login");
+      setLikeCount((prev) => prev + 1);
+      setIsLiked(true);
+
+      const { error: insertError } = await supabase
+        .from("review_likes")
+        .insert([{ user_id: user.id, review_id: review?.id }])
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
     }
   };
 
   return (
     <>
-      {" "}
       {isLoading ? (
         <ReviewsDetailSkeleton />
       ) : (
         <div className="mr-15">
-          {" "}
           <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">
             {review?.title}
             <span className="text-main dark:text-main-dark">
@@ -165,9 +159,7 @@ export default function ReviewsDetail() {
           </h1>
           <p className="mb-10 text-text-sub">
             <span className="text-[var(--color-text-sub)]">
-              <TimeAgo
-                dateString={review?.created_at ? review?.created_at : ""}
-              />
+              <TimeAgo dateString={review?.created_at ?? ""} />
             </span>
             {" by "}
             <span className="review-created-user text-main">
@@ -179,7 +171,7 @@ export default function ReviewsDetail() {
               className="min-w-[550px] max-h-[325px] object-cover mr-7"
               src={
                 review?.thumbnail
-                  ? review?.thumbnail
+                  ? review.thumbnail
                   : "https://plus.unsplash.com/premium_photo-1661675440353-6a6019c95bc7?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               }
             />
@@ -191,49 +183,11 @@ export default function ReviewsDetail() {
             <LikeBtn like={likeCount!} isLiked={isLiked} onClick={handleLike} />
           </div>
           <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
-          <div>
-            <Comment comment={0} />
-          </div>
+          <section id="comment-section">
+            <Comment review_id={id ?? ""} />
+          </section>
         </div>
       )}
     </>
   );
 }
-
-/*
-          <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">
-            {title}
-            <span className="text-main dark:text-main-dark">
-              {" "}
-              #{movie_name}
-            </span>
-          </h1>
-          <p className="mb-10 text-text-sub">
-            <span className="text-[var(--color-text-sub)]">
-              <TimeAgo dateString={created_at} />
-            </span>
-            {" by "}
-            <span className="review-created-user text-main">{author}</span>
-          </p>
-          <div className="flex mb-10">
-            <img
-              className="min-w-[550px] max-h-[325px] object-cover mr-7"
-              src={
-                thumbnail
-                  ? thumbnail
-                  : "https://plus.unsplash.com/premium_photo-1661675440353-6a6019c95bc7?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              }
-            />
-            <p className="mr-12 min-w-[340px] whitespace-pre-line leading-relaxed text-text-main dark:text-text-main-dark">
-              {content}
-            </p>
-          </div>
-          <div className="flex justify-center">
-            <LikeBtn like={like} isLiked={isLiked} onClick={handleLike} />
-          </div>
-          <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
-          <div>
-            <Comment comment={comments} />
-          </div>
-
-          */

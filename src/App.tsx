@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 
 import { queryClient } from "./utils/queryClient";
@@ -12,12 +12,13 @@ import MoviesPage from "./pages/Movies";
 import MoviesDetail from "./pages/MoviesDetail";
 import ReviewsPage from "./pages/Reviews";
 import ReviewsDetail from "./pages/ReviewsDetail";
-import ReviewPostPage from "./pages/ReviewPost";
+import ReviewPostPage from "./pages/ReviewPostPage";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import UsersPage from "./pages/UsersPage";
 import SearchResultPage from "./pages/SearchResult";
 import Error from "./pages/Error";
+import ProtectedRoute from "./components/routes/ProtectedRoute";
 
 export default function App() {
   return (
@@ -32,8 +33,13 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
           </Route>
 
-          {/* 리뷰 관련 페이지 */}
-          <Route path="/review/post" element={<ReviewPostPage />} />
+          {/* ProtectedRoute 적용: 로그인 필요 */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/review/post" element={<ReviewPostPage />} />
+          </Route>
+
+          {/* 리뷰 관련 페이지 (로그인 필요 없음) */}
           <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/reviews/:id" element={<ReviewsDetail />} />
 
@@ -42,7 +48,6 @@ export default function App() {
           <Route path="/movies/:id" element={<MoviesDetail />} />
 
           {/* 사용자 관련 페이지 */}
-          <Route path="/profile" element={<Profile />} />
           <Route path="/users" element={<UsersPage />} />
 
           {/* 기타 페이지 */}
@@ -52,6 +57,7 @@ export default function App() {
 
         {/* Layout 없이 독립 페이지 */}
         <Route path="/error" element={<Error />} />
+        <Route path="*" element={<Navigate to="/error" replace />} />
       </Routes>
     </QueryClientProvider>
   );

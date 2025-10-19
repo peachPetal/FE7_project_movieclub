@@ -1,10 +1,57 @@
+import { useNavigate, useParams } from "react-router-dom";
 import DefaultBtn from "../common/buttons/DefaultBtn";
+import { useAuthSession } from "../../hooks/useAuthSession";
+import { useState } from "react";
+import { useUserProfile } from "../../hooks/useUserProfile";
+import { supabase } from "../../utils/supabase";
 
 export default function CommentInput() {
+  const { id: review_id } = useParams();
+  const navigate = useNavigate();
+  const { session, loading } = useAuthSession();
+  const { profile } = useUserProfile();
+
+  const [content, setContent] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (loading) return; // 아직 로딩 중이면 아무것도 안 함
+
+    if (!session) {
+      // 로그인하지 않은 경우 /login으로 이동
+      navigate("/login");
+      return;
+    }
+
+    if (!content) {
+      alert("댓글 내용을 입력해주세요.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("review_comments")
+      .insert([
+        { author_id: profile?.id, review_id: review_id, content: content },
+      ])
+      .select();
+
+    if (error) throw error;
+
+    alert("댓글이 등록되었습니다.");
+
+    setContent("");
+  };
+
   return (
-    <>
-      <div className="comment-input_container flex ">
-        {/* svg: 현재 로그인 한 유저 프로필 이미지 */}
+    <form className="comment-input_container flex" onSubmit={handleSubmit}>
+      {profile?.avatar_url ? (
+        <img
+          src={profile?.avatar_url}
+          alt="my profile image"
+          className="w-[50px] h-[50px] rounded-4xl"
+        />
+      ) : (
         <svg
           width="50"
           height="50"
@@ -12,7 +59,7 @@ export default function CommentInput() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <g clip-path="url(#clip0_2248_859)">
+          <g clipPath="url(#clip0_2248_859)">
             <path
               d="M34.375 18.75C34.375 21.2364 33.3873 23.621 31.6291 25.3791C29.871 27.1373 27.4864 28.125 25 28.125C22.5136 28.125 20.129 27.1373 18.3709 25.3791C16.6127 23.621 15.625 21.2364 15.625 18.75C15.625 16.2636 16.6127 13.879 18.3709 12.1209C20.129 10.3627 22.5136 9.375 25 9.375C27.4864 9.375 29.871 10.3627 31.6291 12.1209C33.3873 13.879 34.375 16.2636 34.375 18.75Z"
               fill="#6E6E6E"
@@ -30,23 +77,23 @@ export default function CommentInput() {
             </clipPath>
           </defs>
         </svg>
-        <div className="comment-input flex flex-col w-full ml-2.5">
-          <input
-            type="text"
-            placeholder="댓글을 입력하세요"
-            className="pl-2 pb-2 mt-2 mb-2 border-b border-text-light  placeholder:text-text-gborder-text-light focus:border-main-80 outline-0"
-          />
-          <div className="flex justify-end">
-            {" "}
-            <DefaultBtn
-              size="sm"
-              text="등록"
-              highlight={true}
-              onClickFn={() => {}}
-            />
-          </div>
+      )}
+
+      <div className="comment-input flex flex-col w-full ml-2.5">
+        <input
+          type="text"
+          placeholder="댓글을 입력하세요"
+          value={content}
+          className="pl-2 pb-2 mt-2 mb-2 border-b border-text-light placeholder:text-text-gborder-text-light focus:border-main-80 outline-0"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setContent(e.target.value);
+          }}
+          required
+        />
+        <div className="flex justify-end">
+          <DefaultBtn size="sm" text="등록" highlight={true} type="submit" />
         </div>
       </div>
-    </>
+    </form>
   );
 }

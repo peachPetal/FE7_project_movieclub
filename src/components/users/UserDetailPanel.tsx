@@ -1,4 +1,6 @@
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthSession } from "../../hooks/useAuthSession";
 import { useTheme } from "../../hooks/useTheme";
 import type { AppUser } from "../../types/appUser";
 import type { MessageDetailData } from "./UserMessageDetail";
@@ -42,13 +44,11 @@ const UserProfileHeader = ({
         <p className="mt-1 flex items-center gap-1.5 text-sm text-[var(--color-text-sub)]">
           {user.is_online ? (
             <>
-              <span className="h-2 w-2 rounded-full bg-[var(--color-alert-online)]" />{" "}
-              Online
+              <span className="h-2 w-2 rounded-full bg-[var(--color-alert-online)]" /> Online
             </>
           ) : (
             <>
-              <span className="h-2 w-2 rounded-full bg-[var(--color-text-light)]" />{" "}
-              Offline
+              <span className="h-2 w-2 rounded-full bg-[var(--color-text-light)]" /> Offline
             </>
           )}
         </p>
@@ -117,8 +117,27 @@ export default function UserDetailPanel({
   refreshKey,
 }: Props) {
   const { isDark } = useTheme();
+  const { session, loading } = useAuthSession();
+  const navigate = useNavigate();
+
   const [isMessageOpen, setIsMessageOpen] = useState(false);
-  const toggleMessage = useCallback(() => setIsMessageOpen((p) => !p), []);
+  const toggleMessage = useCallback(() => {
+    if (loading) return;
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+    setIsMessageOpen((p) => !p);
+  }, [loading, session, navigate]);
+
+  const handleAddFriend = useCallback(() => {
+    if (loading) return;
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+    onAddFriend();
+  }, [loading, session, navigate, onAddFriend]);
 
   return (
     <div className="w-full">
@@ -131,7 +150,7 @@ export default function UserDetailPanel({
           <UserActions
             onToggleMessage={toggleMessage}
             isMessageOpen={isMessageOpen}
-            onAddFriend={onAddFriend}
+            onAddFriend={handleAddFriend}
             isAddingFriend={isAddingFriend}
           />
         )}
