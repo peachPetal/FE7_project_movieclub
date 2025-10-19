@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 
 import { queryClient } from "./utils/queryClient";
@@ -57,6 +57,7 @@ export default function App() {
 
         {/* Layout 없이 독립 페이지 */}
         <Route path="/error" element={<Error />} />
+        <Route path="*" element={<Navigate to="/error" replace />} />
       </Routes>
     </QueryClientProvider>
   );

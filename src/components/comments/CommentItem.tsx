@@ -27,9 +27,9 @@ export default function CommentItem({ comment }: { comment: ReviewComment }) {
     setReplyListClicked((prev) => !prev);
   };
 
+  // 스켈레톤으로 바꿀 것
   if (!comment) return <p>로딩중...</p>;
   else {
-    console.log(comment);
     return (
       <>
         <div className="comment-item flex">

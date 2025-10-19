@@ -25,11 +25,13 @@ export default function MoviesDetail() {
     setIsLoading(true);
     try {
       const movieData = await getMovieById(Number(id));
-      setMovie(movieData);
+      if (!movieData) navigate("/error");
+      else setMovie(movieData);
     } catch (err) {
-      console.error(err);
+      if (err) navigate("/error");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function MoviesDetail() {
       setMovie(movieState);
     }
     fetchMovie(Number(movie_id));
-  }, [movieState, movie_id]);
+  }, []);
 
   const Separator = () => <span className="mx-1.5">{`|`}</span>;
 

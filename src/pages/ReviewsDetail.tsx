@@ -34,7 +34,10 @@ export default function ReviewsDetail() {
           .eq("review_id", id)
           .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          navigate("/error");
+          return;
+        }
 
         if (data) setIsLiked(true);
       }
@@ -65,7 +68,10 @@ export default function ReviewsDetail() {
         .eq("id", id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        navigate("/error");
+        return;
+      }
 
       if (data) {
         setReview({
@@ -89,7 +95,7 @@ export default function ReviewsDetail() {
       try {
         await Promise.all([fetchLiked(), fetchReview()]);
       } catch (err) {
-        console.error(err);
+        navigate("/error");
       } finally {
         setIsLoading(false);
       }
@@ -185,41 +191,3 @@ export default function ReviewsDetail() {
     </>
   );
 }
-
-/*
-          <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">
-            {title}
-            <span className="text-main dark:text-main-dark">
-              {" "}
-              #{movie_name}
-            </span>
-          </h1>
-          <p className="mb-10 text-text-sub">
-            <span className="text-[var(--color-text-sub)]">
-              <TimeAgo dateString={created_at} />
-            </span>
-            {" by "}
-            <span className="review-created-user text-main">{author}</span>
-          </p>
-          <div className="flex mb-10">
-            <img
-              className="min-w-[550px] max-h-[325px] object-cover mr-7"
-              src={
-                thumbnail
-                  ? thumbnail
-                  : "https://plus.unsplash.com/premium_photo-1661675440353-6a6019c95bc7?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              }
-            />
-            <p className="mr-12 min-w-[340px] whitespace-pre-line leading-relaxed text-text-main dark:text-text-main-dark">
-              {content}
-            </p>
-          </div>
-          <div className="flex justify-center">
-            <LikeBtn like={like} isLiked={isLiked} onClick={handleLike} />
-          </div>
-          <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
-          <div>
-            <Comment comment={comments} />
-          </div>
-
-          */
