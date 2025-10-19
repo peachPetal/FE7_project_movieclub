@@ -169,7 +169,6 @@ export default function ReviewItem({
       </div>
     );
   } else {
-    console.log(review);
     return (
       <Link
         to={`/reviews/${review?.id}`}

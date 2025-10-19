@@ -1,3 +1,4 @@
+import axios from "axios";
 import { supabase } from "../../utils/supabase";
 import { tmdb } from "./tmdb";
 
@@ -23,62 +24,69 @@ export const getMovies = async () => {
 };
 
 export const getMovieById = async (id: number) => {
-  const MovieRes = await tmdb.get(`/movie/${id}`, {
-    params: { region: "KR", language: "ko-KR" },
-  });
-
-  const {
-    id: movieId,
-    title,
-    genres,
-    origin_country,
-    original_title,
-    overview,
-    backdrop_path,
-    poster_path,
-    release_date,
-    runtime,
-    vote_average,
-  } = MovieRes.data;
-
-  const imgPath = `https://image.tmdb.org/t/p/original`;
-
-  const certificationData = await tmdb
-    .get(`/movie/${id}/release_dates`, {
+  try {
+    const MovieRes = await tmdb.get(`/movie/${id}`, {
       params: { region: "KR", language: "ko-KR" },
-    })
-    .then((v) =>
-      v.data.results.find(
-        ({ iso_3166_1 }: { iso_3166_1: string }) => iso_3166_1 === "KR"
-      )
-    );
+    });
 
-  const cerfication = certificationData
-    ? certificationData["release_dates"][0]["certification"]
-    : "";
+    const {
+      id: movieId,
+      title,
+      genres,
+      origin_country,
+      original_title,
+      overview,
+      backdrop_path,
+      poster_path,
+      release_date,
+      runtime,
+      vote_average,
+    } = MovieRes.data;
 
-  const credits = await getCredits(movieId);
-  const trailer = await getTrailer(movieId);
-  const reviews = await getReviews(movieId);
+    const imgPath = `https://image.tmdb.org/t/p/original`;
 
-  return {
-    id: id,
-    title: title,
-    original_title: original_title,
-    overview: overview,
-    cerfication: cerfication,
-    year: release_date.slice(0, 4),
-    runtime: runtime,
-    genres: genres,
-    country: origin_country[0],
-    rating: vote_average.toFixed(1),
-    poster: `${imgPath}${poster_path}`,
-    backdrop: `${imgPath}${backdrop_path}`,
-    director: credits.director,
-    actors: credits.actors,
-    trailer: trailer,
-    reviews: reviews ?? [],
-  };
+    const certificationData = await tmdb
+      .get(`/movie/${id}/release_dates`, {
+        params: { region: "KR", language: "ko-KR" },
+      })
+      .then((v) =>
+        v.data.results.find(
+          ({ iso_3166_1 }: { iso_3166_1: string }) => iso_3166_1 === "KR"
+        )
+      );
+
+    const cerfication = certificationData
+      ? certificationData["release_dates"][0]["certification"]
+      : "";
+
+    const credits = await getCredits(movieId);
+    const trailer = await getTrailer(movieId);
+    const reviews = await getReviews(movieId);
+
+    return {
+      id: id,
+      title: title,
+      original_title: original_title,
+      overview: overview,
+      cerfication: cerfication,
+      year: release_date.slice(0, 4),
+      runtime: runtime,
+      genres: genres,
+      country: origin_country[0],
+      rating: vote_average.toFixed(1),
+      poster: `${imgPath}${poster_path}`,
+      backdrop: `${imgPath}${backdrop_path}`,
+      director: credits.director,
+      actors: credits.actors,
+      trailer: trailer,
+      reviews: reviews ?? [],
+    };
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) {
+      return null;
+    }
+    throw err;
+  }
 };
 
 const getCredits = async (id: string) => {
