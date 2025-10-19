@@ -85,13 +85,13 @@ export default function ReviewPostPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // let finalThumbnail = thumbnail.trim();
+    let finalThumbnail = thumbnail.trim();
 
-    // if (!finalThumbnail) {
-    //   finalThumbnail =
-    //     selectMovie?.backdrop ||
-    //     "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
-    // }
+    if (!finalThumbnail) {
+      finalThumbnail =
+        backdrop ||
+        "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
+    }
 
     // if (!title || !selectMovie || !content) {
     //   alert("값을 모두 입력해주세요.");
@@ -106,9 +106,7 @@ export default function ReviewPostPage() {
           author_id: userId,
           title: title,
           content: content,
-          thumbnail: backdrop
-            ? backdrop
-            : "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg",
+          thumbnail: finalThumbnail,
           movie_id: movie_id,
           movie_name: movie_title,
         })
