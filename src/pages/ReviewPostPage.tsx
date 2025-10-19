@@ -107,7 +107,7 @@ export default function ReviewPostPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // let finalThumbnail = thumbnail.trim();
+    let finalThumbnail = thumbnail.trim();
 
     // if (!finalThumbnail) {
     //   finalThumbnail =
