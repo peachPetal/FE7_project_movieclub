@@ -28,7 +28,10 @@ export default function Sidebar() {
   const [modalFriend, setModalFriend] = useState<Friend | null>(null);
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [modalNotificationOpen, setModalNotificationOpen] = useState(false);
-  const [notificationY, setNotificationY] = useState(0);
+  const [notificationPosition, setNotificationPosition] = useState({
+    top: 0,
+    left: 0,
+  });
 
   // DOM 참조
   const notificationButtonRef = useRef<HTMLButtonElement>(null);
@@ -48,13 +51,19 @@ export default function Sidebar() {
   });
 
   // 이벤트 핸들러
-  const handleToggleCollapse = useCallback(() => setIsCollapsed((prev) => !prev), []);
+  const handleToggleCollapse = useCallback(
+    () => setIsCollapsed((prev) => !prev),
+    []
+  );
 
   const handleFriendClick = useCallback(
     (friend: Friend, e: React.MouseEvent<HTMLDivElement>) => {
       if (modalNotificationOpen) setModalNotificationOpen(false);
       const rect = e.currentTarget.getBoundingClientRect();
-      setModalPosition({ top: rect.top + window.scrollY, left: rect.right + 10 });
+      setModalPosition({
+        top: rect.top + window.scrollY,
+        left: rect.right + 10,
+      });
       setModalFriend(friend);
     },
     [modalNotificationOpen]
@@ -69,15 +78,25 @@ export default function Sidebar() {
     navigate("/login");
   }, [navigate]);
 
-  const handleProfileClick = useCallback(() => navigate("/profile"), [navigate]);
-  const handleSettingsClick = useCallback(() => navigate("/settings"), [navigate]);
+  const handleProfileClick = useCallback(
+    () => navigate("/profile"),
+    [navigate]
+  );
+  const handleSettingsClick = useCallback(
+    () => navigate("/settings"),
+    [navigate]
+  );
 
+  // 알림 버튼 클릭
   const handleNotificationClick = useCallback(() => {
     setModalFriend(null);
     setModalNotificationOpen((prev) => {
       if (!prev && notificationButtonRef.current) {
         const rect = notificationButtonRef.current.getBoundingClientRect();
-        setNotificationY(rect.top + window.scrollY);
+        setNotificationPosition({
+          top: rect.top + window.scrollY,
+          left: rect.right + 10,
+        });
       }
       return !prev;
     });
@@ -92,8 +111,13 @@ export default function Sidebar() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (modalFriendRef.current && !modalFriendRef.current.contains(target)) closeModals();
-      if (modalNotificationRef.current && !modalNotificationRef.current.contains(target)) closeModals();
+      if (modalFriendRef.current && !modalFriendRef.current.contains(target))
+        closeModals();
+      if (
+        modalNotificationRef.current &&
+        !modalNotificationRef.current.contains(target)
+      )
+        closeModals();
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -157,8 +181,9 @@ export default function Sidebar() {
 
       {modalNotificationOpen && (
         <NotificationModal
-          position={{ top: notificationY, left: modalPosition.left }}
+          position={notificationPosition}
           modalRef={modalNotificationRef}
+          userId={userId}
         />
       )}
     </>

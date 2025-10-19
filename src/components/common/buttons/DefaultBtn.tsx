@@ -39,15 +39,18 @@ export default function DefaultBtn({
   text,
   highlight,
   onClickFn,
+  type = "button",
 }: {
   size: ButtonType;
   text: string;
   highlight: boolean;
-  onClickFn: () => void;
+  onClickFn?: () => void;
+  type: "button" | "submit" | "reset" | undefined;
 }) {
   return (
     <>
       <button
+        type={type}
         className={buttonStyle({ size: size, highlight: highlight })}
         onClick={onClickFn}
       >

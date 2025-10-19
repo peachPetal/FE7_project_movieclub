@@ -1,17 +1,17 @@
 // src/pages/SearchResultPage.tsx
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 // --- API, 컴포넌트, 타입 import ---
-import { tmdbSearch } from '../api/search/movieSearch';
-import { searchReviews } from '../api/search/searchReviews';
-import { searchUsers } from '../api/search/searchUsers';
-import MoviesRendering from '../components/movies/MoviesRendering';
-import ReviewsRendering from '../components/reviews/ReviewsRendering';
-import UserList from '../components/users/UserList';
-import type { ReviewSubset } from '../types/review';
-import type { AppUser } from '../types/appUser';
+import { tmdbSearch } from "../api/search/movieSearch";
+import { searchReviews } from "../api/search/searchReviews";
+import { searchUsers } from "../api/search/searchUsers";
+import MoviesRendering from "../components/movies/MoviesRendering";
+import ReviewsRendering from "../components/reviews/ReviewsRendering";
+import UserList from "../components/users/UserList";
+import type { ReviewSubset } from "../types/Review";
+import type { AppUser } from "../types/appUser";
 
 const SearchResultPage = () => {
   const { query } = useParams<{ query: string }>();
@@ -32,10 +32,10 @@ const SearchResultPage = () => {
       setReviews([]);
       setUsers([]);
 
-      if (query.startsWith('@')) {
+      if (query.startsWith("@")) {
         // --- 사용자 검색 ---
         const userProfiles = await searchUsers(query);
-        const appUsers: AppUser[] = userProfiles.map(profile => ({
+        const appUsers: AppUser[] = userProfiles.map((profile) => ({
           ...profile,
           created_at: new Date().toISOString(), // 임시 데이터
         }));
@@ -56,7 +56,7 @@ const SearchResultPage = () => {
     fetchData();
   }, [query]);
 
-  const isUserSearch = query?.startsWith('@') ?? false;
+  const isUserSearch = query?.startsWith("@") ?? false;
 
   return (
     <div className="bg-[var(--color-background-main)] text-[var(--color-text-main)] min-h-screen p-8">
@@ -76,7 +76,7 @@ const SearchResultPage = () => {
             <h2 className="text-2xl font-semibold text-[var(--color-text-secondary)] my-6">
               사용자
               <span className="text-[var(--color-main)]">
-                {!isLoading ? users.length : '...'}
+                {!isLoading ? users.length : "..."}
               </span>
               건
             </h2>
@@ -97,11 +97,15 @@ const SearchResultPage = () => {
             <h2 className="text-[40px] font-semibold text-[var(--color-text-secondary)] my-6">
               영화
               <span className="text-[var(--color-main)]">
-                {!isLoading ? movies.length : '...'}
+                {!isLoading ? movies.length : "..."}
               </span>
               건
             </h2>
-            <MoviesRendering data={movies} isLoading={isLoading} variant="page" />
+            <MoviesRendering
+              data={movies}
+              isLoading={isLoading}
+              variant="page"
+            />
 
             <br />
 
@@ -111,11 +115,15 @@ const SearchResultPage = () => {
             <h2 className="text-[40px] font-semibold text-[var(--color-text-secondary)] mb-6">
               리뷰
               <span className="text-[var(--color-main)]">
-                {!isLoading ? reviews.length : '...'}
+                {!isLoading ? reviews.length : "..."}
               </span>
               건
             </h2>
-            <ReviewsRendering data={reviews} isLoading={isLoading} variant="page" />
+            <ReviewsRendering
+              data={reviews}
+              isLoading={isLoading}
+              variant="page"
+            />
           </>
         )}
       </div>
