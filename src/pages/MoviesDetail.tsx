@@ -5,47 +5,47 @@ import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
 import { useEffect, useState } from "react";
 
 export default function MoviesDetail() {
-  const { id } = useParams();
+  const { id: movie_id } = useParams();
   const location = useLocation();
   const movieState: Movie = location.state?.movie;
 
   const [movie, setMovie] = useState<Movie | null>();
 
-  const fetchMovie = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("reviews")
-        .select(
-          `
-              id,
-              title,
-              content,
-              thumbnail,
-              movie_id,
-              movie_name,
-              created_at,
-              users:users!inner(
-                name
-              ),
-              comments:review_comments(count),
-              likes:review_likes(count)`
-        )
-        .eq("id", id)
-        .single();
+  // const fetchMovie = async () => {
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from("reviews")
+  //       .select(
+  //         `
+  //             id,
+  //             title,
+  //             content,
+  //             thumbnail,
+  //             movie_id,
+  //             movie_name,
+  //             created_at,
+  //             users:users!inner(
+  //               name
+  //             ),
+  //             comments:review_comments(count),
+  //             likes:review_likes(count)`
+  //       )
+  //       .eq("id", id)
+  //       .single();
 
-      if (error) throw error;
+  //     if (error) throw error;
 
-      if (data) {
-        setReview({
-          ...data,
-          users: Array.isArray(data.users) ? data.users[0] : data.users,
-        });
-        setLikeCount(data.likes?.[0]?.count);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  //     if (data) {
+  //       setReview({
+  //         ...data,
+  //         users: Array.isArray(data.users) ? data.users[0] : data.users,
+  //       });
+  //       setLikeCount(data.likes?.[0]?.count);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   useEffect(() => {
     if (movieState) setMovie(movieState);
