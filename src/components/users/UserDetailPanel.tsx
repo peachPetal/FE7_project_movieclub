@@ -22,7 +22,13 @@ type UserActionsProps = {
 };
 
 // --- 서브 컴포넌트 정의 ---
-const UserProfileHeader = ({ user, isDark }: { user: AppUser; isDark: boolean }) => {
+const UserProfileHeader = ({
+  user,
+  isDark,
+}: {
+  user: AppUser;
+  isDark: boolean;
+}) => {
   const fallbackIcon = isDark ? profileIconWhite : profileIconBlack;
   return (
     <div className="flex items-start gap-4">
@@ -54,7 +60,12 @@ const UserProfileHeader = ({ user, isDark }: { user: AppUser; isDark: boolean })
   );
 };
 
-const UserActions = ({ onToggleMessage, isMessageOpen, onAddFriend, isAddingFriend }: UserActionsProps) => (
+const UserActions = ({
+  onToggleMessage,
+  isMessageOpen,
+  onAddFriend,
+  isAddingFriend,
+}: UserActionsProps) => (
   <div className="flex items-end self-stretch gap-2">
     <button
       onClick={onAddFriend}
@@ -63,8 +74,16 @@ const UserActions = ({ onToggleMessage, isMessageOpen, onAddFriend, isAddingFrie
       aria-label="친구로 추가"
       title="친구로 추가"
     >
-      <img src={deleteFriendMouseOff} alt="친구 추가" className="w-10 h-10 opacity-100 group-hover:opacity-0 transition-opacity duration-200" />
-      <img src={addFriendIcon} alt="친구 추가 호버" className="w-10 h-10 absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+      <img
+        src={deleteFriendMouseOff}
+        alt="친구 추가"
+        className="w-10 h-10 opacity-100 group-hover:opacity-0 transition-opacity duration-200"
+      />
+      <img
+        src={addFriendIcon}
+        alt="친구 추가 호버"
+        className="w-10 h-10 absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+      />
     </button>
     <button
       onClick={onToggleMessage}
@@ -85,10 +104,18 @@ type Props = {
   onPickMessage?: (msg: MessageDetailData | null) => void;
   onAddFriend: () => void;
   isAddingFriend: boolean;
+  refreshKey?: number;
 };
 
 // --- 메인 컴포넌트 ---
-export default function UserDetailPanel({ user, currentUserId, onPickMessage, onAddFriend, isAddingFriend }: Props) {
+export default function UserDetailPanel({
+  user,
+  currentUserId,
+  onPickMessage,
+  onAddFriend,
+  isAddingFriend,
+  refreshKey,
+}: Props) {
   const { isDark } = useTheme();
   const { session, loading } = useAuthSession();
   const navigate = useNavigate();
@@ -130,7 +157,11 @@ export default function UserDetailPanel({ user, currentUserId, onPickMessage, on
       </aside>
       {isMessageOpen && (
         <div className="mt-4">
-          <UserMessageList user={user} onSelect={(m) => onPickMessage?.(m)} />
+          <UserMessageList
+            user={user}
+            onSelect={(m) => onPickMessage?.(m)}
+            refreshKey={refreshKey}
+          />
         </div>
       )}
     </div>

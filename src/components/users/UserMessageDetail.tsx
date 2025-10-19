@@ -41,9 +41,15 @@ const UserMessageDetail: FC<Props> = ({ message, onReply }) => {
         <h5 className="mb-4 text-xl font-semibold">{message.title}</h5>
 
         <div className="flex-1 space-y-6 text-sm text-[var(--color-text-sub)]">
-          {/* ✅ 1. 분리된 MessageBlock 컴포넌트 사용 */}
-          <MessageBlock label="이전에 내가 보낸 메시지" content={message.bodyMine} />
-          <MessageBlock label="친구가 보낸 메시지" content={message.bodyFriend} />
+          {/* 1. 분리된 MessageBlock 컴포넌트 사용 */}
+          <MessageBlock
+            label="이전에 내가 보낸 메시지"
+            content={message.bodyMine}
+          />
+          <MessageBlock
+            label="친구가 보낸 메시지"
+            content={message.bodyFriend}
+          />
         </div>
 
         <div className="mt-4 flex justify-end">
