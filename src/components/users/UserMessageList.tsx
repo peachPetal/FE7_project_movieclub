@@ -4,6 +4,10 @@ import type { MessageDetailData } from "./UserMessageDetail";
 import { useUserMessages, type MessageItem } from "../../hooks/useUserMessages"; // 1. 커스텀 훅과 타입 import
 import clsx from "clsx";
 
+import { createPortal } from "react-dom";
+import { supabase } from "../../utils/supabase";
+import UserMessageReply from "./UserMessageReply";
+
 type MessageListItemProps = {
   message: MessageItem;
   isActive: boolean;
@@ -52,6 +56,8 @@ export default function UserMessageList({ user, onSelect, refreshKey }: Props) {
   const { messages, markAsRead, refetch } = useUserMessages(user.id);
   // UI 상태(선택된 ID)만 직접 관리
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // 메세지 보내기 모달 상태
+  const [isComposeOpen, setIsComposeOpen] = useState(false);
 
   useEffect(() => {
     // user 변경이나 상위에서 refreshKey가 증가할 때 목록 재조회
@@ -94,22 +100,60 @@ export default function UserMessageList({ user, onSelect, refreshKey }: Props) {
   );
 
   return (
-    <section
-      className="card-shadow rounded-xl border border-[var(--color-text-placeholder)] bg-[var(--color-background-main)] p-4 text-[var(--color-text-main)] dark:border-[var(--color-text-light)]"
-      aria-label={`${user.name}님과의 메시지 목록`}
-    >
-      <h4 className="mb-3 text-lg font-bold">받은 메시지</h4>
-      <ul className="flex flex-col gap-2">
-        {/* 서브 컴포넌트를 사용하여 렌더링 로직 위임 */}
-        {messages.map((message) => (
-          <MessageListItem
-            key={message.id}
-            message={message}
-            isActive={selectedId === message.id}
-            onClick={handleSelect}
-          />
-        ))}
-      </ul>
-    </section>
+    <>
+      <section
+        className="card-shadow rounded-xl border border-[var(--color-text-placeholder)] bg-[var(--color-background-main)] p-4 text-[var(--color-text-main)] dark:border-[var(--color-text-light)]"
+        aria-label={`${user.name}님과의 메시지 목록`}
+      >
+        <h4 className="mb-3 text-lg font-bold">받은 메시지</h4>
+        <ul className="flex flex-col gap-2">
+          {/* 서브 컴포넌트를 사용하여 렌더링 로직 위임 */}
+          {messages.map((message) => (
+            <MessageListItem
+              key={message.id}
+              message={message}
+              isActive={selectedId === message.id}
+              onClick={handleSelect}
+            />
+          ))}
+        </ul>
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            className="rounded-md bg-[var(--color-main)] px-4 py-2 text-white hover:opacity-90"
+            onClick={() => setIsComposeOpen(true)}
+          >
+            메시지 보내기
+          </button>
+        </div>
+      </section>
+      {isComposeOpen &&
+        createPortal(
+          <UserMessageReply
+            title={`${user.name}님에게 새 메시지`}
+            onClose={() => setIsComposeOpen(false)}
+            onSend={async ({ title, body }) => {
+              // 실패 시 throw → 폼 컴포넌트가 catch + alert
+              const senderId = (await supabase.auth.getUser()).data.user?.id;
+              if (!senderId) {
+                throw new Error("로그인이 필요합니다.");
+              }
+
+              const { error } = await supabase.from("friends_messages").insert({
+                sender_id: senderId,
+                receiver_id: user.id,
+                title,
+                text: body,
+              });
+              if (error) throw error;
+
+              // ✅ 성공: 목록 즉시 갱신 + 모달 닫기
+              await refetch();
+              setIsComposeOpen(false);
+            }}
+          />,
+          document.body
+        )}
+    </>
   );
 }
