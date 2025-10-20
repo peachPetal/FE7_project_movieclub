@@ -15,14 +15,13 @@ type Props = {
 // ✅ 3. 'filter' prop이 전달되지 않을 경우 사용할 기본값
 const DEFAULT_FILTER: FilterOption = {
   // (FILTER_OPTIONS.MyPosts[0]와 동일한 값을 사용하세요. 임시값입니다.)
-  id: "default_latest", 
-  name: "최신순",
   value: "최신순",
 };
 
 export default function ReviewList({
   variant = "page",
   filter = DEFAULT_FILTER, // ✅ 4. 'filter' prop에 기본값 할당
+  movie_id,
   authorId,
 }: Props) {
   const [data, setData] = useState<ReviewSubset[]>([]);
@@ -30,7 +29,7 @@ export default function ReviewList({
 
   const fetchPosts = async (
     limit: number,
-    author: string | null | undefined,
+    author: string | null | undefined
   ) => {
     try {
       setIsLoading(true);
@@ -40,9 +39,14 @@ export default function ReviewList({
         query = query.eq("author_id", author);
       }
 
-      // ✅ 5. 'filter'가 항상 존재하므로 'filter.value' 접근이 안전합니다.
       if (filter.value === "인기순") {
-        query = query.order("likes", { ascending: false });
+        if (movie_id)
+          query = query
+            .eq("movie_id", movie_id)
+            .order("likes", { ascending: false });
+        else {
+          query = query.order("likes", { ascending: false });
+        }
       } else {
         // "최신순" (기본값)
         query = query.order("created_at", { ascending: false });
@@ -62,10 +66,9 @@ export default function ReviewList({
 
   useEffect(() => {
     const limit = variant === "home" ? 5 : 20;
-    
+
     fetchPosts(limit, authorId);
-    
-  }, [filter, variant, authorId]); 
+  }, [filter, variant, authorId]);
 
   return (
     <ReviewsRendering data={data} variant={variant} isLoading={isLoading} />
