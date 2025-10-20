@@ -1,5 +1,3 @@
-// src/types/Filter.ts
-
 export type FilterType = "Movies" | "Reviews" | string;
 
 // 공통 필터 옵션 포맷: value(라벨) + 선택적 meta
@@ -7,7 +5,7 @@ export type FilterOption = {
   value: string;
   // TMDB discover/movie 파라미터로 바로 쓰일 값들
   meta?: {
-    type?: "genre" | "year" | "sort"; // ✅ 필터 종류 구분용
+    type?: "genre" | "year" | "sort"; // 필터 종류 구분용
     genreId?: number; // TMDB 장르 ID
     genreName?: string; // TMDB 장르 영문명 (선택)
     year?: number; // primary_release_year
@@ -22,11 +20,7 @@ export const FILTER_OPTIONS: Record<FilterType, FilterOption[]> = {
     { value: "전체보기", meta: { type: "sort" } },
     // { value: "인기순", meta: { type: "sort" } },
     // { value: "평점순", meta: { type: "sort" } },
-    // ✅ 정렬
-    { value: "최신순", meta: { type: "sort" } },
-    { value: "인기순", meta: { type: "sort" } },
-    { value: "평점순", meta: { type: "sort" } },
-
+    
     // 장르 (TMDB v3 기준)
     {
       value: "액션",

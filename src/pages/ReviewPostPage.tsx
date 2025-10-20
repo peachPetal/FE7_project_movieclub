@@ -21,17 +21,7 @@ export default function ReviewPostPage() {
   const navigate = useNavigate();
   const userId = useAuthStore((state) => state.user?.id);
 
-  // const location = useLocation();
-
-  /* ------------------------
-      Local States
-  ------------------------ */
-  const [isLoading, setIsLoading] = useState(false);
-  // const {
-  //   id: movie_id,
-  //   title: movie_title,
-  //   backdrop: backdrop,
-  // } = location.state.state;
+  const location = useLocation();
 
   const [title, setTitle] = useState("");
   const [selectMovie, setSelectMovie] = useState<MovieInReview | null>(null);
@@ -48,6 +38,10 @@ export default function ReviewPostPage() {
       Fetch Movies from TMDB
   ------------------------ */
   useEffect(() => {
+    if (location.state) {
+      setSelected(location.state.state);
+      setSelectMovie(location.state.state);
+    }
     if (!query) {
       setMovies([]);
       return;
@@ -148,18 +142,6 @@ export default function ReviewPostPage() {
     }
   };
 
-  /* ------------------------
-      Render Form
-  ------------------------ */
-
-  // if (isLoading) {
-  //   return (
-  //     <>
-  //       {/* 나중에 스켈레톤 넣기 */}
-  //       <p>로딩중...</p>
-  //     </>
-  //   );
-  // } else {
   return (
     <>
       <div className="review-post text-text-main">

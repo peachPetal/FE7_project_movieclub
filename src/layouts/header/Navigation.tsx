@@ -13,13 +13,20 @@ export default function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
+  const [indicatorStyle, setIndicatorStyle] = useState({
+    left: 0,
+    width: 0,
+    opacity: 0,
+  });
   const navListRef = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
     const updateIndicator = () => {
-      const activeIndex = NAV_ITEMS.findIndex(item => item.path === location.pathname);
-      const activeItem = activeIndex !== -1 ? navListRef.current[activeIndex] : null;
+      const activeIndex = NAV_ITEMS.findIndex(
+        (item) => item.path === location.pathname
+      );
+      const activeItem =
+        activeIndex !== -1 ? navListRef.current[activeIndex] : null;
 
       if (activeItem) {
         setIndicatorStyle({
@@ -41,21 +48,27 @@ export default function Navigation() {
     <div className="flex items-center space-x-[121px]">
       {/* Logo */}
       <button onClick={() => navigate("/")} className="flex-shrink-0">
-        <img src={logo} alt="MOVIECLUB Logo" className="w-[165px] h-[48px]" />
+        <img src={logo} alt="MOVIECLUB Logo" className="w-[165px] h-[32px]" />
       </button>
 
       {/* Navigation */}
       <nav className="relative">
         <ul className="flex relative">
           {NAV_ITEMS.map((item, index) => (
-            <li key={item.id} ref={el => { navListRef.current[index] = el; }}>
+            <li
+              key={item.id}
+              ref={(el) => {
+                navListRef.current[index] = el;
+              }}
+            >
               <button
                 onClick={() => navigate(item.path)}
-                className={`w-[120px] h-[45px] flex items-center justify-center
+                className={`w-[120px] h-[65px] flex items-center justify-center
                   text-[20px] font-medium tracking-wider transition-colors duration-300
-                  ${location.pathname === item.path
-                    ? "text-[var(--color-main)]"
-                    : "text-[var(--color-text-sub)] hover:text-[var(--color-text-main)]"
+                  ${
+                    location.pathname === item.path
+                      ? "text-[var(--color-main)]"
+                      : "text-[var(--color-text-sub)] hover:text-[var(--color-text-main)]"
                   }`}
               >
                 {item.name}
@@ -65,7 +78,7 @@ export default function Navigation() {
 
           {/* Active indicator */}
           <div
-            className="absolute -bottom-1 h-[3px] bg-[var(--color-main)] rounded-full transition-all duration-300 ease-in-out"
+            className="absolute bottom-0 h-[3px] bg-[var(--color-main)] rounded-full transition-all duration-300 ease-in-out"
             style={indicatorStyle}
           />
         </ul>

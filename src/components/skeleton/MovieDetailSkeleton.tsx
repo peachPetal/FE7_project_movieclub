@@ -1,4 +1,3 @@
-import Comment from "../comments/Comment";
 import Skeleton from "react-loading-skeleton";
 import { useState, useEffect } from "react";
 import { isDarkMode } from "../../lib/theme"; // 다크모드 감지 유틸
