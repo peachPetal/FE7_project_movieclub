@@ -104,8 +104,9 @@ export const FILTER_OPTIONS: Record<FilterType, FilterOption[]> = {
   ],
 
   // 다른 페이지용 예시
-  Reviews: [
-    { value: "최신순", meta: { type: "sort" } },
-    { value: "인기순", meta: { type: "sort" } },
-  ],
+  Reviews: [{ value: "최신순" }, { value: "인기순" }],
+  Comments: [{ value: "최신순" }, { value: "인기순" }],
+  Users: [{ value: "모든 유저" }, { value: "친구" }],
+  MyPosts: [{ value: "리뷰" }, { value: "댓글" }],
+  Likes: [{ value: "리뷰" }, { value: "댓글" }],
 };
