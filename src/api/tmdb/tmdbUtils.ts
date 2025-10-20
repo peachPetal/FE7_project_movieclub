@@ -2,7 +2,7 @@ import axios from "axios";
 import { supabase } from "../../utils/supabase";
 import { tmdb } from "./tmdb";
 
-export const getMovies = async () => {
+export const getMovies = async (page: number = 1) => {
   const movieIdRes = await tmdb.get("/discover/movie", {
     params: {
       region: "KR",
@@ -11,16 +11,17 @@ export const getMovies = async () => {
       sort_by: "primary_release_date.desc",
       "vote_average.gte": "7",
       "vote_count.gte": "1000",
+      page,
     },
   });
 
   const movieIds = movieIdRes.data.results.map((v: { id: number }) => v.id);
-
-  const moviesArray: Movie[] = await Promise.all(
+  const moviesArray: (Movie | null)[] = await Promise.all(
     movieIds.map(async (id: number) => getMovieById(id))
   );
 
-  return moviesArray;
+  // 404 등으로 null인 항목은 제거
+  return moviesArray.filter(Boolean) as Movie[];
 };
 
 export const getMovieById = async (id: number) => {
