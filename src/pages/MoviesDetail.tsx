@@ -159,7 +159,7 @@ export default function MoviesDetail() {
           {movie?.reviews?.length ? (
             <div>
               {" "}
-              <ReviewList movie_id={movie?.id} />
+              <ReviewList filter={{ value: "인기순" }} movie_id={movie?.id} />
             </div>
           ) : (
             <p className="flex justify-center w-full my-10 text-text-sub">

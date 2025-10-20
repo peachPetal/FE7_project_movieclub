@@ -98,7 +98,7 @@ export default function ReplyItem({
           <img
             src={reply.users.avatar_url}
             alt="reply user profile img"
-            className="w-[35px] h-[35px]"
+            className="w-[35px] h-[35px] rounded-4xl"
           ></img>
         ) : (
           <svg

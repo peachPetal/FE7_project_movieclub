@@ -8,8 +8,10 @@ import useLoginRequiredAlert from "../alert/useLoginRequiredAlert";
 
 export default function CommentInput({
   profile,
+  getComments,
 }: {
   profile: UserProfile | undefined | null;
+  getComments: () => Promise<void>;
 }) {
   const { id: review_id } = useParams();
   const navigate = useNavigate();
@@ -45,6 +47,7 @@ export default function CommentInput({
     if (error) throw error;
 
     alert("댓글이 등록되었습니다.");
+    getComments();
 
     setContent("");
   };

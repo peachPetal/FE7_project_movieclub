@@ -5,58 +5,13 @@ import CommentInput from "./CommentInput";
 import CommentList from "./CommentList";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import { FILTER_OPTIONS, type FilterOption } from "../../types/Filter";
+import CommentItemSkeleton from "../skeleton/CommentItemSkeleton";
 
 export default function Comment({ review_id }: { review_id: string }) {
+  const { profile } = useUserProfile();
   const [isLoading, setIsLoading] = useState(true);
   const [commentCount, setCommentCount] = useState(0);
   const [comment, setComment] = useState<ReviewComment[]>();
-  const { profile } = useUserProfile();
-
-  const getComments = async () => {
-    if (review_id) {
-      setIsLoading(true);
-      const { data, error } = await supabase
-        .from("review_comments")
-        .select(
-          "*, users!inner(name, avatar_url), likes:review_comment_likes(count)"
-        )
-        .eq("review_id", Number(review_id))
-        .eq("depth", 0)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      const commentData = data.map((d) => {
-        return {
-          id: d.id,
-          created_at: d.created_at,
-          author_id: d.author_id,
-          content: d.content,
-          depth: d.depth,
-          parent_comment_id: d.parent_comment_id,
-          name: d.users["name"],
-          avatar_url: d.users["avatar_url"],
-          likes: d.likes[0].count,
-        };
-      });
-
-      setComment(commentData);
-
-      const { data: commentCountData, error: commentCountError } =
-        await supabase
-          .from("review_comments")
-          .select("*, users!inner(name, avatar_url)")
-          .eq("review_id", Number(review_id))
-          .order("created_at", { ascending: false });
-
-      if (commentCountError) throw error;
-
-      setCommentCount(commentCountData?.length ?? 0);
-
-      setIsLoading(false);
-    }
-  };
-
   const [filter, setFilter] = useState<FilterOption>(
     FILTER_OPTIONS.Comments[0]
   );
@@ -64,13 +19,52 @@ export default function Comment({ review_id }: { review_id: string }) {
     setFilter(filter);
   };
 
+  const getComments = async () => {
+    setIsLoading(true);
+    if (review_id) {
+      if (filter.value === "최신순") {
+        const { data, error } = await supabase
+          .from("comment_detail")
+          .select("*")
+          .eq("review_id", Number(review_id))
+          .eq("depth", 0)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        setComment(data);
+      } else if (filter.value === "인기순") {
+        const { data, error } = await supabase
+          .from("comment_detail")
+          .select("*")
+          .eq("review_id", Number(review_id))
+          .eq("depth", 0)
+          .order("likes", { ascending: false });
+
+        if (error) throw error;
+
+        setComment(data);
+        setCommentCount(data?.length ?? 0);
+      }
+      const { data, error } = await supabase
+        .from("comment_detail")
+        .select("*")
+        .eq("review_id", Number(review_id));
+
+      if (error) throw error;
+
+      setCommentCount(data?.length ?? 0);
+    }
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     getComments();
-  }, []);
+  }, [filter]);
 
-  if (isLoading && !profile) {
+  if (isLoading) {
     // 스켈레톤으로 바꾸기
-    return <p>로딩중...</p>;
+    return <CommentItemSkeleton />;
   } else {
     return (
       <>
@@ -85,7 +79,7 @@ export default function Comment({ review_id }: { review_id: string }) {
               handleChangeFilter={handleChangeFilter}
             />
           </div>
-          <CommentInput profile={profile} />
+          <CommentInput profile={profile} getComments={getComments} />
           {comment?.length ? (
             <CommentList profile={profile} comments={comment} />
           ) : (

@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import LikeBtn from "../components/common/buttons/LikeBtn";
 import Comment from "../components/comments/Comment";
 import { useEffect, useState } from "react";
@@ -49,22 +49,8 @@ export default function ReviewsDetail() {
   const fetchReview = async () => {
     try {
       const { data, error } = await supabase
-        .from("reviews")
-        .select(
-          `
-            id,
-            title,
-            content,
-            thumbnail,
-            movie_id,
-            movie_name,
-            created_at,
-            users:users!inner(
-              name
-            ),
-            comments:review_comments(count),
-            likes:review_likes(count)`
-        )
+        .from("review_detail")
+        .select("*")
         .eq("id", id)
         .single();
 
@@ -74,13 +60,8 @@ export default function ReviewsDetail() {
       }
 
       if (data) {
-        setReview({
-          ...data,
-          comments: data.comments[0].count,
-          likes: data.likes[0].count,
-          user: data.users?.[0]?.name,
-        });
-        setLikeCount(data.likes?.[0]?.count);
+        setReview(data);
+        setLikeCount(data.likes);
       }
     } catch (err) {
       console.log(err);
@@ -152,10 +133,12 @@ export default function ReviewsDetail() {
         <div className="mr-15">
           <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">
             {review?.title}
-            <span className="text-main dark:text-main-dark">
-              {" "}
-              #{review?.movie_name}
-            </span>
+            <Link to={`/movies/${review?.movie_id}`}>
+              <span className="text-main dark:text-main-dark">
+                {" "}
+                #{review?.movie_name}
+              </span>
+            </Link>
           </h1>
           <p className="mb-10 text-text-sub">
             <span className="text-[var(--color-text-sub)]">
@@ -163,7 +146,7 @@ export default function ReviewsDetail() {
             </span>
             {" by "}
             <span className="review-created-user text-main">
-              {review?.users?.name}
+              {review?.author_name}
             </span>
           </p>
           <div className="flex mb-10">

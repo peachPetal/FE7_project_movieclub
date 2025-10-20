@@ -211,7 +211,7 @@ export default function ReviewItem({
                 </span>{" "}
                 by{" "}
                 <span className="review-created-user text-main">
-                  {review?.users?.name}
+                  {review.author_name}
                 </span>
               </p>
               <div className="review-social-buttons flex justify-around items-center text-text-sub">
