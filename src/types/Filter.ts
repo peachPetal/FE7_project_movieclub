@@ -9,7 +9,7 @@ export type FilterOption = {
     genreId?: number; // TMDB 장르 ID
     genreName?: string; // TMDB 장르 영문명 (선택)
     year?: number; // primary_release_year
-    [key: string]: any; // 필요시 확장
+    [key: string]: unknown; // 필요시 확장
   };
 };
 
@@ -17,10 +17,10 @@ export type FilterOption = {
 export const FILTER_OPTIONS: Record<FilterType, FilterOption[]> = {
   Movies: [
     // 정렬
-    { value: "최신순", meta: { type: "sort" } },
-    { value: "인기순", meta: { type: "sort" } },
-    { value: "평점순", meta: { type: "sort" } },
-
+    { value: "전체보기", meta: { type: "sort" } },
+    // { value: "인기순", meta: { type: "sort" } },
+    // { value: "평점순", meta: { type: "sort" } },
+    
     // 장르 (TMDB v3 기준)
     {
       value: "액션",
@@ -97,10 +97,10 @@ export const FILTER_OPTIONS: Record<FilterType, FilterOption[]> = {
     },
 
     // 연도 (예시)
-    { value: "2025", meta: { type: "year", year: 2025 } },
-    { value: "2024", meta: { type: "year", year: 2024 } },
-    { value: "2023", meta: { type: "year", year: 2023 } },
-    { value: "2022", meta: { type: "year", year: 2022 } },
+    // { value: "2025", meta: { type: "year", year: 2025 } },
+    // { value: "2024", meta: { type: "year", year: 2024 } },
+    // { value: "2023", meta: { type: "year", year: 2023 } },
+    // { value: "2022", meta: { type: "year", year: 2022 } },
   ],
 
   // 다른 페이지용 예시
