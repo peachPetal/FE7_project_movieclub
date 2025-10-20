@@ -7,10 +7,6 @@ import clsx from "clsx";
 import { createPortal } from "react-dom";
 import UserMessageReply from "./UserMessageReply";
 
-import { createPortal } from "react-dom";
-import { supabase } from "../../utils/supabase";
-import UserMessageReply from "./UserMessageReply";
-
 type MessageListItemProps = {
   message: MessageItem;
   isActive: boolean;
