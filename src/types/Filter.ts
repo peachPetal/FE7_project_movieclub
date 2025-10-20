@@ -16,5 +16,5 @@ export const FILTER_OPTIONS: Record<FilterType, FilterOption[]> = {
   Comments: [{ value: "최신순" }, { value: "인기순" }],
   Users: [{ value: "모든 유저" }, { value: "친구" }],
   MyPosts: [{ value: "리뷰" }, { value: "댓글" }],
-  Likes: [{ value: "영화" }, { value: "리뷰" }],
+  Likes: [{ value: "리뷰" }, { value: "댓글" }],
 };
