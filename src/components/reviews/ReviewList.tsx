@@ -52,7 +52,7 @@ export default function ReviewList({
         query = query.order("created_at", { ascending: false });
       }
 
-      const { data: reviews, error } = await query.range(0, limit);
+      const { data: reviews, error } = await query.range(0, limit - 1);
 
       if (error) throw error;
       setData(reviews || []);

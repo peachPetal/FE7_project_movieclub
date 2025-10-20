@@ -95,7 +95,7 @@ const SearchResultPage = () => {
                 영화 검색 결과
             ------------------------------- */}
             <h2 className="text-[40px] font-semibold text-[var(--color-text-secondary)] my-6">
-              영화
+              영화{" "}
               <span className="text-[var(--color-main)]">
                 {!isLoading ? movies.length : "..."}
               </span>
@@ -113,7 +113,7 @@ const SearchResultPage = () => {
                 리뷰 검색 결과
             ------------------------------- */}
             <h2 className="text-[40px] font-semibold text-[var(--color-text-secondary)] mb-6">
-              리뷰
+              리뷰{" "}
               <span className="text-[var(--color-main)]">
                 {!isLoading ? reviews.length : "..."}
               </span>
