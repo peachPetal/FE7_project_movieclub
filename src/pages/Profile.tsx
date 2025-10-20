@@ -5,6 +5,7 @@ import FilterDropdown from "../components/common/buttons/FilterDropdown";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../utils/supabase";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { FILTER_OPTIONS, type FilterOption } from "../types/Filter";
 
 /* -----------------------------------------------
   Helper Functions
@@ -22,7 +23,9 @@ async function uploadAvatar(userId: string, file: File): Promise<string> {
   if (uploadError) throw uploadError;
 
   // 2. Public URL 가져오기 + 캐시 방지
-  const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(fileName);
+  const { data: urlData } = supabase.storage
+    .from("avatars")
+    .getPublicUrl(fileName);
   const publicUrl = urlData.publicUrl;
   const cacheBustingUrl = `${publicUrl}?t=${new Date().getTime()}`;
 
@@ -37,18 +40,26 @@ async function uploadAvatar(userId: string, file: File): Promise<string> {
 }
 
 // 아바타 삭제
-async function deleteAvatar(userId: string, currentUrl: string | null | undefined): Promise<void> {
+async function deleteAvatar(
+  userId: string,
+  currentUrl: string | null | undefined
+): Promise<void> {
   if (!currentUrl) return;
 
   const urlWithoutQuery = currentUrl.split("?")[0];
   const pathInBucket = urlWithoutQuery.split("/avatars/")[1];
 
   if (pathInBucket) {
-    const { error: removeError } = await supabase.storage.from("avatars").remove([pathInBucket]);
+    const { error: removeError } = await supabase.storage
+      .from("avatars")
+      .remove([pathInBucket]);
     if (removeError) throw removeError;
   }
 
-  const { error: dbError } = await supabase.from("users").update({ avatar_url: null }).eq("id", userId);
+  const { error: dbError } = await supabase
+    .from("users")
+    .update({ avatar_url: null })
+    .eq("id", userId);
   if (dbError) throw dbError;
 }
 
@@ -111,7 +122,13 @@ export const Profile: React.FC = () => {
   const handleClick = () => fileInputRef.current?.click();
   const handleDelete = () => deleteMutation.mutate();
 
-  const isLoading = isProfileLoading || uploadMutation.isPending || deleteMutation.isPending;
+  const isLoading =
+    isProfileLoading || uploadMutation.isPending || deleteMutation.isPending;
+
+  const [filter, setFilter] = useState<FilterOption>(FILTER_OPTIONS.MyPosts[0]);
+  const handleChangeFilter = (filter: FilterOption) => {
+    setFilter(filter);
+  };
 
   /* ------------------------
       JSX
@@ -159,16 +176,25 @@ export const Profile: React.FC = () => {
             내 프로필 이미지를 올려주세요
             <br />
             이미지는{" "}
-            <span className="text-[var(--color-main)] font-medium">JPG, JPEG, PNG</span> 형식만 업로드할 수 있습니다.
+            <span className="text-[var(--color-main)] font-medium">
+              JPG, JPEG, PNG
+            </span>{" "}
+            형식만 업로드할 수 있습니다.
           </div>
         </div>
       </div>
 
       {/* 내 게시물 필터 */}
       <div className="w-[650px] flex flex-col items-start mt-80">
-        <h1 className="text-[32px] font-bold text-[var(--color-text-main)] mb-2">내 게시물</h1>
+        <h1 className="text-[32px] font-bold text-[var(--color-text-main)] mb-2">
+          내 게시물
+        </h1>
         <div className="w-[200px] h-[40px]">
-          <FilterDropdown type="MyPosts" />
+          <FilterDropdown
+            type="MyPosts"
+            filter={filter}
+            handleChangeFilter={handleChangeFilter}
+          />
         </div>
       </div>
 

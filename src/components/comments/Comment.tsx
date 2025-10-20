@@ -4,6 +4,7 @@ import FilterDropdown from "../common/buttons/FilterDropdown";
 import CommentInput from "./CommentInput";
 import CommentList from "./CommentList";
 import { useUserProfile } from "../../hooks/useUserProfile";
+import { FILTER_OPTIONS, type FilterOption } from "../../types/Filter";
 
 export default function Comment({ review_id }: { review_id: string }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +57,13 @@ export default function Comment({ review_id }: { review_id: string }) {
     }
   };
 
+  const [filter, setFilter] = useState<FilterOption>(
+    FILTER_OPTIONS.Comments[0]
+  );
+  const handleChangeFilter = (filter: FilterOption) => {
+    setFilter(filter);
+  };
+
   useEffect(() => {
     getComments();
   }, []);
@@ -71,7 +79,11 @@ export default function Comment({ review_id }: { review_id: string }) {
             <h1 className="text-3xl font-bold mr-3.5">
               Comments <span className="text-main">{commentCount}</span>
             </h1>
-            <FilterDropdown type="Comments" />
+            <FilterDropdown
+              type="Comments"
+              filter={filter}
+              handleChangeFilter={handleChangeFilter}
+            />
           </div>
           <CommentInput profile={profile} />
           {comment?.length ? (

@@ -2,6 +2,7 @@ import type { Database } from "./database";
 
 type ReviewsListProps = {
   variant?: "home" | "page";
+  filter: FilterOption;
   movie_id?: number;
 };
 
