@@ -1,43 +1,36 @@
 import { Fragment, useEffect, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
+import {
+  FILTER_OPTIONS,
+  type FilterType,
+  type FilterOption,
+} from "../../../types/Filter";
 
-export default function FilterDropdown({ type }: { type: FilterType }) {
-  const [options, setOptions] = useState<FilterOption[]>([]);
-  const [selected, setSelected] = useState<FilterOption | null>(null);
-
-  useEffect(() => {
-    if (type === "Movies") {
-      // 나중에 api 데이터 들어오면 해당하는 장르로 바꿀 것
-      setOptions([
-        { value: "전체 보기" },
-        { value: "로맨스" },
-        { value: "액션" },
-      ]);
-    } else if (type === "Reviews" || type === "Comments") {
-      setOptions([
-        { value: "전체 보기" },
-        { value: "최신순" },
-        { value: "인기순" },
-      ]);
-    } else if (type === "Users") {
-      setOptions([{ value: "모든 유저" }, { value: "친구" }]);
-    } else if (type === "MyPosts") {
-      setOptions([{ value: "리뷰" }, { value: "댓글" }]);
-    } else if (type === "Likes") {
-      setOptions([{ value: "영화" }, { value: "리뷰" }]);
-    }
-  }, []);
+export default function FilterDropdown({
+  type,
+  filter,
+  handleChangeFilter,
+}: {
+  type: FilterType;
+  filter?: FilterOption;
+  handleChangeFilter?: (filter: FilterOption) => void;
+}) {
+  const options = FILTER_OPTIONS[type];
+  const [selected, setSelected] = useState<FilterOption>(options[0]);
 
   useEffect(() => {
-    if (options.length > 0) {
-      setSelected(options[0]);
-    }
-  }, [options]);
+    if (filter) setSelected(filter);
+  }, [filter]);
+
+  const onChange = (value: FilterOption) => {
+    setSelected(value);
+    handleChangeFilter?.(value);
+  };
 
   return (
     <div className="w-[200px] border border-main rounded-[10px] z-10">
-      <Listbox value={selected} onChange={setSelected}>
+      <Listbox value={selected} onChange={onChange}>
         <div className="relative mt-1">
           <Listbox.Button className="w-full rounded-[10px] bg-background-main py-2 pl-3 pr-10 text-left focus:outline-none sm:text-sm cursor-pointer text-main">
             {({ open }) => (
@@ -45,15 +38,9 @@ export default function FilterDropdown({ type }: { type: FilterType }) {
                 <span className="block truncate">{selected?.value}</span>
                 <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   {open ? (
-                    <ChevronUpIcon
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
+                    <ChevronUpIcon className="h-5 w-5 text-gray-400" />
                   ) : (
-                    <ChevronDownIcon
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
+                    <ChevronDownIcon className="h-5 w-5 text-gray-400" />
                   )}
                 </span>
               </>
@@ -77,15 +64,13 @@ export default function FilterDropdown({ type }: { type: FilterType }) {
                   value={option}
                 >
                   {({ selected }) => (
-                    <>
-                      <span
-                        className={`block truncate ${
-                          selected ? "font-medium text-main" : "font-normal"
-                        }`}
-                      >
-                        {option.value}
-                      </span>
-                    </>
+                    <span
+                      className={`block truncate ${
+                        selected ? "font-medium text-main" : "font-normal"
+                      }`}
+                    >
+                      {option.value}
+                    </span>
                   )}
                 </Listbox.Option>
               ))}

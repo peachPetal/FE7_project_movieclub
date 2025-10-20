@@ -1,15 +1,24 @@
+import { useState } from "react";
 import FilterDropdown from "../components/common/buttons/FilterDropdown";
 import MoviesList from "../components/movies/MoviesList";
+import type { FilterOption } from "../types/Filter";
 
 export default function MoviesPage() {
+  // ✅ 필터 상태 선언
+  const [filter, setFilter] = useState<FilterOption | undefined>(undefined);
+
   return (
     <div className="w-full h-full flex flex-col justify-start">
       {/* 필터 드롭다운 */}
-      <FilterDropdown type="Movies" />
+      <FilterDropdown
+        type="Movies"
+        filter={filter}
+        handleChangeFilter={setFilter}
+      />
 
       {/* 영화 리스트 */}
       <div className="mt-[25px]">
-        <MoviesList variant="page" />
+        <MoviesList variant="page" filter={filter} />
       </div>
     </div>
   );

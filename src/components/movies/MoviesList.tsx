@@ -1,12 +1,37 @@
-import { getMovies } from "../../api/tmdb/tmdbUtils";
 import MoviesRendering from "./MoviesRendering";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import {
+  getMoviesWithFilters,
+  type MoviesQuery,
+  getMovieGenres,
+} from "../../api/tmdb/tmdbUtils";
+import type { FilterOption } from "../../types/Filter";
 
 type MoviesListProps = {
   variant?: "home" | "page";
+  filter?: FilterOption;
 };
 
-export default function MoviesList({ variant = "page" }: MoviesListProps) {
+// 다양한 meta 형태에서 장르 키 추출
+const pickGenreKey = (meta: any) => {
+  if (!meta) return undefined;
+  if (meta.genreId != null) return meta.genreId;
+  if (meta.genreName != null) return meta.genreName;
+  if (meta.id != null) return meta.id;
+  if (meta.name != null) return meta.name;
+  if (meta.genre != null) return meta.genre;
+  if (Array.isArray(meta.genres) && meta.genres.length) {
+    return meta.genres
+      .map((g: any) => (typeof g === "object" ? g.id ?? g.name : g))
+      .join(",");
+  }
+  return undefined;
+};
+
+export default function MoviesList({
+  variant = "page",
+  filter,
+}: MoviesListProps) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -14,53 +39,95 @@ export default function MoviesList({ variant = "page" }: MoviesListProps) {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const MAX_TMDB_PAGES = 500;
 
-  const MAX_TMDB_PAGES = 500; // TMDB의 공식 최대 페이지
+  // 장르 캐시 웜업 (장르 이름 → ID 대응 빠르게)
+  useEffect(() => {
+    getMovieGenres("ko-KR").catch(() => void 0);
+  }, []);
 
-  /**
-   * 한 페이지를 가져와 movies에 append
-   */
+  /** FilterOption → TMDB 파라미터 매핑 (견고하게) */
+  const queryFromFilter: MoviesQuery = useMemo(() => {
+    const base: MoviesQuery = {
+      sortBy: "primary_release_date.desc",
+      voteAverageGte: 7,
+      voteCountGte: 1000,
+    };
+    if (!filter) return base;
+
+    const v = (filter.value ?? "").toString();
+    const meta: any = (filter as any).meta ?? {};
+
+    // 정렬 라벨 맵핑 (KR/EN 혼용 대비)
+    const sortMap: Record<string, string> = {
+      최신순: "primary_release_date.desc",
+      인기순: "popularity.desc",
+      평점순: "vote_average.desc",
+      release_date: "primary_release_date.desc",
+      popularity: "popularity.desc",
+      rating: "vote_average.desc",
+    };
+
+    if (v in sortMap) {
+      return { ...base, sortBy: sortMap[v] };
+    }
+
+    if (meta.type === "genre") {
+      const genreKey = pickGenreKey(meta);
+      return { ...base, withGenres: genreKey ? String(genreKey) : undefined };
+    }
+
+    if (v === "개봉연도" || v.toLowerCase() === "year") {
+      const yr = typeof meta.year === "number" ? meta.year : Number(meta.year);
+      return {
+        ...base,
+        primaryReleaseYear: Number.isFinite(yr) ? yr : undefined,
+      };
+    }
+
+    return base;
+  }, [filter?.value, JSON.stringify((filter as any)?.meta || {})]);
+
+  /** 한 페이지 로드 */
   const fetchPage = useCallback(
     async (targetPage: number, { replace }: { replace?: boolean } = {}) => {
-      if (variant === "home") return; // home에서는 무한스크롤 비활성화
-
-      // 초기 로딩 vs 추가 로딩 상태 분리
+      if (variant === "home") return;
       if (targetPage === 1) setIsInitialLoading(true);
       else setIsFetchingMore(true);
 
       try {
-        const items = await getMovies(targetPage);
-
+        const items = await getMoviesWithFilters({
+          ...queryFromFilter,
+          page: targetPage,
+        });
         setMovies((prev) => (replace ? items : [...prev, ...items]));
         setPage(targetPage);
 
-        // hasMore 판정: TMDB는 최대 500페이지, 또는 응답이 비었으면 종료
         const reachedEnd = items.length === 0 || targetPage >= MAX_TMDB_PAGES;
         setHasMore(!reachedEnd);
       } catch (e) {
         console.error("[MoviesList] fetchPage error", e);
-        // 오류가 나면 더 이상 무한 스크롤 시도하지 않도록 막아둠
         setHasMore(false);
       } finally {
         if (targetPage === 1) setIsInitialLoading(false);
         else setIsFetchingMore(false);
       }
     },
-    [variant]
+    [variant, queryFromFilter]
   );
 
-  /**
-   * 초기 로드
-   */
+  /** 초기 & 필터 변경 시: 1페이지부터 다시 로드 */
   useEffect(() => {
     let mounted = true;
 
     const init = async () => {
       if (variant === "home") {
-        // 홈에서는 첫 페이지에서 5개만 노출
         setIsInitialLoading(true);
         try {
-          const first = await getMovies(1);
+          const first = await getMoviesWithFilters({
+            ...queryFromFilter,
+            page: 1,
+          });
           const limited = first.slice(0, 5);
           if (!mounted) return;
           setMovies(limited);
@@ -72,7 +139,6 @@ export default function MoviesList({ variant = "page" }: MoviesListProps) {
         return;
       }
 
-      // page 변형: 상태 초기화 후 1페이지부터 시작
       setMovies([]);
       setPage(1);
       setHasMore(true);
@@ -80,17 +146,14 @@ export default function MoviesList({ variant = "page" }: MoviesListProps) {
     };
 
     init();
-
     return () => {
       mounted = false;
     };
-  }, [variant, fetchPage]);
+  }, [variant, fetchPage, queryFromFilter]);
 
-  /**
-   * IntersectionObserver 설정 (무한 스크롤)
-   */
+  /** IntersectionObserver: 끝에 닿으면 다음 페이지 로드 */
   useEffect(() => {
-    if (variant === "home") return; // home에서는 옵저버 사용하지 않음
+    if (variant === "home") return;
     const el = sentinelRef.current;
     if (!el) return;
 
@@ -99,11 +162,10 @@ export default function MoviesList({ variant = "page" }: MoviesListProps) {
         const entry = entries[0];
         if (!entry.isIntersecting) return;
         if (!hasMore) return;
-        if (isInitialLoading || isFetchingMore) return; // 중복 호출 방지
-
+        if (isInitialLoading || isFetchingMore) return;
         fetchPage(page + 1);
       },
-      { root: null, rootMargin: "0px", threshold: 0.2 }
+      { threshold: 0.2 }
     );
 
     observer.observe(el);
@@ -113,23 +175,18 @@ export default function MoviesList({ variant = "page" }: MoviesListProps) {
   return (
     <div className="w-full">
       <MoviesRendering
+        key={JSON.stringify(queryFromFilter)} // 필터 바뀌면 강제 remount
         data={movies}
         variant={variant}
         isLoading={isInitialLoading}
       />
 
-      {/* 무한 스크롤 하단 센티넬 & 상태 표시 (page 전용) */}
       {variant === "page" && (
         <div className="w-full flex flex-col items-center mt-6">
-          {/* sentinel: 뷰포트에 들어오면 다음 페이지 요청 */}
           <div ref={sentinelRef} className="h-6 w-6" aria-hidden />
-
-          {/* 추가 로딩 스피너 */}
           {isFetchingMore && (
             <div className="mt-2 text-sm text-text-sub">불러오는 중...</div>
           )}
-
-          {/* 더 없음 표시 */}
           {!isInitialLoading && !isFetchingMore && !hasMore && (
             <div className="mt-2 text-sm text-text-sub">
               모든 영화를 불러왔습니다.
