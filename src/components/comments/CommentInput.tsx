@@ -2,14 +2,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import DefaultBtn from "../common/buttons/DefaultBtn";
 import { useAuthSession } from "../../hooks/useAuthSession";
 import { useState } from "react";
-import { useUserProfile } from "../../hooks/useUserProfile";
 import { supabase } from "../../utils/supabase";
+import type { UserProfile } from "../../hooks/useUserProfile";
+import useLoginRequiredAlert from "../alert/useLoginRequiredAlert";
 
-export default function CommentInput() {
+export default function CommentInput({
+  profile,
+}: {
+  profile: UserProfile | undefined | null;
+}) {
   const { id: review_id } = useParams();
   const navigate = useNavigate();
   const { session, loading } = useAuthSession();
-  const { profile } = useUserProfile();
+
+  const loginRequiredAlert = useLoginRequiredAlert();
 
   const [content, setContent] = useState("");
 
@@ -44,7 +50,13 @@ export default function CommentInput() {
   };
 
   return (
-    <form className="comment-input_container flex" onSubmit={handleSubmit}>
+    <form
+      className="comment-input_container flex"
+      onClick={() => {
+        if (!session) loginRequiredAlert();
+      }}
+      onSubmit={handleSubmit}
+    >
       {profile?.avatar_url ? (
         <img
           src={profile?.avatar_url}
