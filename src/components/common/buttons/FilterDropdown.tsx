@@ -3,8 +3,8 @@ import { Listbox, Transition } from "@headlessui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 import {
   FILTER_OPTIONS,
-  type FilterOption,
   type FilterType,
+  type FilterOption,
 } from "../../../types/Filter";
 
 export default function FilterDropdown({
@@ -13,14 +13,24 @@ export default function FilterDropdown({
   handleChangeFilter,
 }: {
   type: FilterType;
-  filter: FilterOption;
-  handleChangeFilter: (filter: FilterOption) => void;
+  filter?: FilterOption;
+  handleChangeFilter?: (filter: FilterOption) => void;
 }) {
-  const options = FILTER_OPTIONS[type as keyof typeof FILTER_OPTIONS];
+  const options = FILTER_OPTIONS[type];
+  const [selected, setSelected] = useState<FilterOption>(options[0]);
+
+  useEffect(() => {
+    if (filter) setSelected(filter);
+  }, [filter]);
+
+  const onChange = (value: FilterOption) => {
+    setSelected(value);
+    handleChangeFilter?.(value);
+  };
 
   return (
     <div className="w-[200px] border border-main rounded-[10px] z-10">
-      <Listbox value={filter} onChange={handleChangeFilter}>
+      <Listbox value={selected} onChange={onChange}>
         <div className="relative mt-1">
           <Listbox.Button className="w-full rounded-[10px] bg-background-main py-2 pl-3 pr-10 text-left focus:outline-none sm:text-sm cursor-pointer text-main">
             {({ open }) => (
@@ -28,15 +38,9 @@ export default function FilterDropdown({
                 <span className="block truncate">{filter?.value}</span>
                 <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   {open ? (
-                    <ChevronUpIcon
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
+                    <ChevronUpIcon className="h-5 w-5 text-gray-400" />
                   ) : (
-                    <ChevronDownIcon
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
+                    <ChevronDownIcon className="h-5 w-5 text-gray-400" />
                   )}
                 </span>
               </>
@@ -60,15 +64,13 @@ export default function FilterDropdown({
                   value={option}
                 >
                   {({ selected }) => (
-                    <>
-                      <span
-                        className={`block truncate ${
-                          selected ? "font-medium text-main" : "font-normal"
-                        }`}
-                      >
-                        {option.value}
-                      </span>
-                    </>
+                    <span
+                      className={`block truncate ${
+                        selected ? "font-medium text-main" : "font-normal"
+                      }`}
+                    >
+                      {option.value}
+                    </span>
                   )}
                 </Listbox.Option>
               ))}
