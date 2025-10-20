@@ -20,7 +20,7 @@ export default function HomeContent() {
           이번 주 인기 <span className="text-[var(--color-main)]">#리뷰</span>
         </h2>
         <div className="flex gap-[30px] flex-wrap">
-          <ReviewList variant="home" />
+          <ReviewList variant="home" filter={{ value: "인기순" }} />
         </div>
       </section>
     </div>

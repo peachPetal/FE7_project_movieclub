@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import DefaultBtn from "../common/buttons/DefaultBtn";
 import { supabase } from "../../utils/supabase";
 import type { UserProfile } from "../../hooks/useUserProfile";
@@ -8,10 +8,14 @@ export default function ReplyInput({
   commnetId,
   profile,
   cancleBtnFn,
+  getReplys,
+  setReplyClicked,
 }: {
   commnetId: string;
   profile: UserProfile | null | undefined;
   cancleBtnFn: () => void;
+  getReplys: () => Promise<void>;
+  setReplyClicked: Dispatch<SetStateAction<boolean>>;
 }) {
   const { id } = useParams();
   const [content, setContent] = useState("");
@@ -39,6 +43,12 @@ export default function ReplyInput({
     if (error) throw error;
 
     alert("답글이 등록되었습니다.");
+
+    setContent("");
+    setReplyClicked(false);
+
+    getReplys();
+
     return;
   };
   return (
@@ -48,7 +58,7 @@ export default function ReplyInput({
           <img
             src={profile?.avatar_url}
             alt="my profile image"
-            className="w-[50px] h-[50px] rounded-4xl"
+            className="w-[35px] h-[35px] rounded-4xl"
           />
         ) : (
           <svg
