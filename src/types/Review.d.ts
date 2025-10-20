@@ -2,6 +2,7 @@ import type { Database } from "./database";
 
 type ReviewsListProps = {
   variant?: "home" | "page";
+  filter: FilterOption;
   movie_id?: number;
 };
 
@@ -21,8 +22,7 @@ type ReviewSubset = Pick<
 type ReviewWithDetail = ReviewSubset & {
   likes?: number;
   comments?: number;
-  users?: { name: string }[];
-  user?: { name: string };
+  author_name?: string;
   like_users?: { user_id: string }[];
 };
 

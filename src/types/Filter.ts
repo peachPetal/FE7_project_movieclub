@@ -1,5 +1,3 @@
-// src/types/Filter.ts
-
 export type FilterType = "Movies" | "Reviews" | string;
 
 // 공통 필터 옵션 포맷: value(라벨) + 선택적 meta
@@ -7,7 +5,7 @@ export type FilterOption = {
   value: string;
   // TMDB discover/movie 파라미터로 바로 쓰일 값들
   meta?: {
-    type?: "genre" | "year" | "sort"; // ✅ 필터 종류 구분용
+    type?: "genre" | "year" | "sort"; // 필터 종류 구분용
     genreId?: number; // TMDB 장르 ID
     genreName?: string; // TMDB 장르 영문명 (선택)
     year?: number; // primary_release_year
@@ -18,12 +16,12 @@ export type FilterOption = {
 // 페이지별 프리셋 옵션
 export const FILTER_OPTIONS: Record<FilterType, FilterOption[]> = {
   Movies: [
-    // ✅ 정렬
+    // 정렬
     { value: "최신순", meta: { type: "sort" } },
     { value: "인기순", meta: { type: "sort" } },
     { value: "평점순", meta: { type: "sort" } },
 
-    // ✅ 장르 (TMDB v3 기준)
+    // 장르 (TMDB v3 기준)
     {
       value: "액션",
       meta: { type: "genre", genreId: 28, genreName: "Action" },
@@ -98,7 +96,7 @@ export const FILTER_OPTIONS: Record<FilterType, FilterOption[]> = {
       meta: { type: "genre", genreId: 37, genreName: "Western" },
     },
 
-    // ✅ 연도 (예시)
+    // 연도 (예시)
     { value: "2025", meta: { type: "year", year: 2025 } },
     { value: "2024", meta: { type: "year", year: 2024 } },
     { value: "2023", meta: { type: "year", year: 2023 } },

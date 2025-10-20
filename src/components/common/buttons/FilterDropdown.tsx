@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
 import {
@@ -35,7 +35,7 @@ export default function FilterDropdown({
           <Listbox.Button className="w-full rounded-[10px] bg-background-main py-2 pl-3 pr-10 text-left focus:outline-none sm:text-sm cursor-pointer text-main">
             {({ open }) => (
               <>
-                <span className="block truncate">{selected?.value}</span>
+                <span className="block truncate">{filter?.value}</span>
                 <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   {open ? (
                     <ChevronUpIcon className="h-5 w-5 text-gray-400" />

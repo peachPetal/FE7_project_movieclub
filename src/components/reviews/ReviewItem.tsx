@@ -182,7 +182,7 @@ export default function ReviewItem({
         >
           {hasImage && (
             <img
-              className="review-thumbnail w-full h-[350px] object-cover rounded-t-lg "
+              className="review-thumbnail w-full h-[350px] max-h-[180px] object-cover object-center rounded-t-lg "
               src={
                 review?.thumbnail ||
                 "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg"
@@ -211,7 +211,7 @@ export default function ReviewItem({
                 </span>{" "}
                 by{" "}
                 <span className="review-created-user text-main">
-                  {review?.users?.name}
+                  {review.author_name}
                 </span>
               </p>
               <div className="review-social-buttons flex justify-around items-center text-text-sub">

@@ -4,7 +4,7 @@ import MoviesList from "../components/movies/MoviesList";
 import type { FilterOption } from "../types/Filter";
 
 export default function MoviesPage() {
-  // ✅ 필터 상태 선언
+  // 필터 상태 선언
   const [filter, setFilter] = useState<FilterOption | undefined>(undefined);
 
   return (
