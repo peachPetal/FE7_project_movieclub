@@ -10,7 +10,7 @@ export default function MoviesPage() {
   );
 
   return (
-    <div className="w-full h-full flex flex-col justify-start">
+    <div className="w-full h-full flex flex-col">
       {/* 필터 드롭다운 */}
       <FilterDropdown
         type="Movies"

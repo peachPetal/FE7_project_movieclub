@@ -9,7 +9,7 @@ export default function DefaultLayout() {
       {/* 상단 헤더 */}
       <Header />
 
-      <div className="flex w-full mt-[50px]">
+      <div className="w-5/6 flex m-auto mt-[50px]">
         {/* 사이드바 */}
         <Sidebar />
 

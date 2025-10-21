@@ -21,7 +21,7 @@ const pickGenreKey = (meta: any) => {
   if (meta.genre != null) return meta.genre;
   if (Array.isArray(meta.genres) && meta.genres.length) {
     return meta.genres
-      .map((g: any) => (typeof g === "object" ? g.id ?? g.name : g))
+      .map((g: any) => (typeof g === "object" ? (g.id ?? g.name) : g))
       .join(",");
   }
   return undefined;
@@ -29,7 +29,10 @@ const pickGenreKey = (meta: any) => {
 
 const MIN_LOADING_TIME = 1000; // ✅ 최소 로딩 시간 (1초)
 
-export default function MoviesList({ variant = "page", filter }: MoviesListProps) {
+export default function MoviesList({
+  variant = "page",
+  filter,
+}: MoviesListProps) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -45,7 +48,10 @@ export default function MoviesList({ variant = "page", filter }: MoviesListProps
     if (isInitialLoading) {
       setShowInitialLoading(true);
     } else {
-      const timer = setTimeout(() => setShowInitialLoading(false), MIN_LOADING_TIME);
+      const timer = setTimeout(
+        () => setShowInitialLoading(false),
+        MIN_LOADING_TIME
+      );
       return () => clearTimeout(timer);
     }
   }, [isInitialLoading]);
