@@ -1,7 +1,7 @@
 // 📄 ReviewsDetailSkeleton.tsx
 
 // 1. Comment 컴포넌트 import 제거 (더 이상 사용하지 않음)
-// import Comment from "../comments/Comment"; 
+// import Comment from "../comments/Comment";
 import Skeleton from "react-loading-skeleton";
 import { useState, useEffect } from "react";
 import { isDarkMode } from "../../lib/theme"; // 다크모드 감지 유틸
@@ -19,7 +19,7 @@ export default function ReviewsDetailSkeleton() {
   const skeletonHighlightColor = isDark ? "#6b7280" : "#f5f5f5";
 
   return (
-    <div className="w-[1116px] mr-15">
+    <div className="w-full mr-15">
       {/* --- 상단 리뷰 상세 스켈레톤 (기존과 동일) --- */}
       {/* 제목 */}
       <Skeleton
@@ -51,7 +51,7 @@ export default function ReviewsDetailSkeleton() {
         {/* 텍스트 스켈레톤 */}
         <div className="mr-12 space-y-2">
           <Skeleton
-            width={800}
+            width={600}
             height={325} // 이미지와 같은 높이
             baseColor={skeletonBaseColor}
             highlightColor={skeletonHighlightColor}
