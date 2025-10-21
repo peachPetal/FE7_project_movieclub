@@ -31,6 +31,10 @@ body {
   transform: scale(0.8);
 }
 
+.review-edit-btns button {
+  transform: scale(0.85);
+}
+
 input#thumbnail {
   display: none;
 }
