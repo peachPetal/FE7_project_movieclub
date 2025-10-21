@@ -6,6 +6,7 @@ import {
   getMovieGenres,
 } from "../../api/tmdb/tmdbUtils";
 import type { FilterOption } from "../../types/Filter";
+import { ClipLoader } from "react-spinners";
 
 type MoviesListProps = {
   variant?: "home" | "page";
@@ -29,7 +30,10 @@ const pickGenreKey = (meta: any) => {
 
 const MIN_LOADING_TIME = 1000; // ✅ 최소 로딩 시간 (1초)
 
-export default function MoviesList({ variant = "page", filter }: MoviesListProps) {
+export default function MoviesList({
+  variant = "page",
+  filter,
+}: MoviesListProps) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -45,7 +49,10 @@ export default function MoviesList({ variant = "page", filter }: MoviesListProps
     if (isInitialLoading) {
       setShowInitialLoading(true);
     } else {
-      const timer = setTimeout(() => setShowInitialLoading(false), MIN_LOADING_TIME);
+      const timer = setTimeout(
+        () => setShowInitialLoading(false),
+        MIN_LOADING_TIME
+      );
       return () => clearTimeout(timer);
     }
   }, [isInitialLoading]);
@@ -193,7 +200,9 @@ export default function MoviesList({ variant = "page", filter }: MoviesListProps
         <div className="w-full flex flex-col items-center mt-6">
           <div ref={sentinelRef} className="h-6 w-6" aria-hidden />
           {isFetchingMore && (
-            <div className="mt-2 text-sm text-text-sub">불러오는 중...</div>
+            <div className="mt-4 flex justify-center">
+              <ClipLoader color="var(--color-main)" size={30} />
+            </div>
           )}
           {!isInitialLoading && !isFetchingMore && !hasMore && (
             <div className="mt-2 text-sm text-text-sub">
