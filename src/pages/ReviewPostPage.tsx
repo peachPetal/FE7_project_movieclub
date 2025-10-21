@@ -15,8 +15,6 @@ import clsx from "clsx";
 import { keyForSearch } from "../api/tmdb/tmdb";
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-// !!!!!!!!!!!! 영화 검색 기능 변경 후 주석들 수정하기 !!!!!!!!!!!!!!!!!!
-
 export default function ReviewPostPage() {
   const navigate = useNavigate();
   const userId = useAuthStore((state) => state.user?.id);
@@ -39,8 +37,14 @@ export default function ReviewPostPage() {
   ------------------------ */
   useEffect(() => {
     if (location.state) {
-      setSelected(location.state.state);
-      setSelectMovie(location.state.state);
+      setSelected(location.state);
+      setSelectMovie(location.state);
+
+      if (location.state.review_id) {
+        const { review_title, review_content } = location.state;
+        setTitle(review_title);
+        setContent(review_content);
+      }
     }
     if (!query) {
       setMovies([]);
@@ -101,14 +105,6 @@ export default function ReviewPostPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // let finalThumbnail = thumbnail.trim();
-
-    // if (!finalThumbnail) {
-    //   finalThumbnail =
-    //     backdrop ||
-    //     "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
-    // }
-
     const finalThumbnail =
       thumbnail.trim() ||
       selectMovie?.backdrop ||
@@ -119,24 +115,45 @@ export default function ReviewPostPage() {
       return;
     }
     try {
-      const { data, error } = await supabase
-        .from("reviews")
-        .insert({
-          author_id: userId,
-          title,
-          content,
-          thumbnail: finalThumbnail,
-          movie_id: selectMovie.id,
-          movie_name: selectMovie.title,
-        })
-        .select()
-        .single();
+      if (location.state) {
+        if (location.state.review_id) {
+          const { error } = await supabase
+            .from("reviews")
+            .update({
+              author_id: userId,
+              title,
+              content,
+              thumbnail: finalThumbnail,
+              movie_id: selectMovie.id,
+              movie_name: selectMovie.title,
+            })
+            .eq("id", location.state.review_id);
 
-      if (data) {
-        alert("게시글이 등록되었습니다.");
-        navigate("/reviews");
+          if (error) throw error;
+
+          alert("게시글이 수정되었습니다.");
+          navigate(`/reviews/${location.state.review_id}`);
+        }
+      } else {
+        const { data, error } = await supabase
+          .from("reviews")
+          .insert({
+            author_id: userId,
+            title,
+            content,
+            thumbnail: finalThumbnail,
+            movie_id: selectMovie.id,
+            movie_name: selectMovie.title,
+          })
+          .select()
+          .single();
+
+        if (data) {
+          alert("게시글이 등록되었습니다.");
+          navigate("/reviews");
+        }
+        if (error) throw error;
       }
-      if (error) throw error;
     } catch (err) {
       console.error("Failed to post review:", err);
     }

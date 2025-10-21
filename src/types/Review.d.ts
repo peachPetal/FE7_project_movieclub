@@ -11,6 +11,7 @@ type Review = Database["public"]["Tables"]["reviews"]["Row"];
 type ReviewSubset = Pick<
   Review,
   | "id"
+  | "author_id"
   | "title"
   | "content"
   | "thumbnail"

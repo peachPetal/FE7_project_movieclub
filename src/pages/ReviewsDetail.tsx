@@ -8,6 +8,7 @@ import { supabase } from "../utils/supabase";
 import ReviewsDetailSkeleton from "../components/skeleton/ReviewsDetailSkeleton";
 import { useAuthSession } from "../hooks/useAuthSession"; // <-- 추가
 import { useAuthStore } from "../stores/authStore";
+import DefaultBtn from "../components/common/buttons/DefaultBtn";
 
 export default function ReviewsDetail() {
   const { user } = useAuthSession(); // <-- 로그인 상태
@@ -23,6 +24,7 @@ export default function ReviewsDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
 
   const fetchLiked = async () => {
     try {
@@ -39,7 +41,9 @@ export default function ReviewsDetail() {
           return;
         }
 
-        if (data) setIsLiked(true);
+        if (data) {
+          setIsLiked(true);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -63,6 +67,8 @@ export default function ReviewsDetail() {
         setReview(data);
         setLikeCount(data.likes);
       }
+
+      return data;
     } catch (err) {
       console.log(err);
     }
@@ -74,7 +80,12 @@ export default function ReviewsDetail() {
     const fetchAll = async () => {
       setIsLoading(true);
       try {
-        await Promise.all([fetchLiked(), fetchReview()]);
+        const [_likedData, reviewData] = await Promise.all([
+          fetchLiked(),
+          fetchReview(),
+        ]);
+
+        if (userId === reviewData?.author_id) setIsEditable(true);
       } catch (err) {
         navigate("/error");
       } finally {
@@ -125,6 +136,100 @@ export default function ReviewsDetail() {
     }
   };
 
+  const handleEditBtnClick = () => {
+    navigate("/review/post", {
+      state: {
+        id: review?.movie_id,
+        title: review?.movie_name,
+        backdrop: review?.thumbnail,
+        review_id: review?.id,
+        review_title: review?.title,
+        review_content: review?.content,
+      },
+    });
+  };
+
+  const handleDeleteBtnClick = async () => {
+    if (userId) {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("author_id", userId)
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) {
+        navigate("/error");
+        return;
+      }
+
+      if (data) {
+        if (confirm("정말로 삭제하시겠습니까?")) {
+          const { error: reviewLikesDeleteError } = await supabase
+            .from("review_likes")
+            .delete()
+            .eq("review_id", id);
+
+          if (reviewLikesDeleteError) {
+            alert("삭제할 수 없습니다.");
+            throw reviewLikesDeleteError;
+          }
+
+          const { data: comments, error: commentDeleteError } = await supabase
+            .from("review_comments")
+            .select("*")
+            .eq("review_id", id);
+
+          if (commentDeleteError) {
+            alert("삭제할 수 없습니다.");
+            throw commentDeleteError;
+          }
+
+          if (comments) {
+            // 댓글 좋아요들 삭제
+            comments?.map(async (comment) => {
+              const { error: commentLikesDeleteError } = await supabase
+                .from("review_comment_likes")
+                .delete()
+                .eq("comment_id", comment.id);
+
+              if (commentLikesDeleteError) {
+                throw commentLikesDeleteError;
+              }
+            });
+          }
+
+          const { error: reviewCommentsDeleteError } = await supabase
+            .from("review_comments")
+            .delete()
+            .eq("review_id", id);
+
+          if (reviewCommentsDeleteError) {
+            alert("삭제할 수 없습니다.");
+            throw reviewCommentsDeleteError;
+          }
+
+          const { error } = await supabase
+            .from("reviews")
+            .delete()
+            .eq("id", id);
+
+          if (error) {
+            alert("삭제할 수 없습니다.");
+            throw error;
+          }
+
+          alert("삭제되었습니다.");
+          navigate("/reviews");
+          return;
+        }
+      }
+    } else {
+      alert("삭제할 수 없습니다.");
+      return;
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -165,7 +270,27 @@ export default function ReviewsDetail() {
           <div className="flex justify-center">
             <LikeBtn like={likeCount!} isLiked={isLiked} onClick={handleLike} />
           </div>
-          <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-12 mb-12"></div>
+          {isEditable && (
+            <div className="review-edit-btns flex justify-end">
+              {" "}
+              <DefaultBtn
+                type="reset"
+                size="sm"
+                text="편집"
+                highlight={false}
+                onClickFn={handleEditBtnClick}
+              />
+              <DefaultBtn
+                type="submit"
+                size="sm"
+                text="삭제"
+                highlight={true}
+                onClickFn={handleDeleteBtnClick}
+              />
+            </div>
+          )}
+
+          <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-10 mb-12"></div>
           <section id="comment-section">
             <Comment review_id={id ?? ""} />
           </section>

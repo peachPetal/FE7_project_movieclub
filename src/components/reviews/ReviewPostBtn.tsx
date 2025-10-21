@@ -34,7 +34,7 @@ export default function ReviewPostBtn({
   } else {
     return (
       <>
-        <Link to={`/review/post`} state={{ state }}>
+        <Link to={`/review/post`} state={state}>
           <button
             className={twMerge(
               "flex justify-center items-center w-[50px] h-[50px] rounded-4xl bg-main cursor-pointer hover:bg-main-80 transition-colors",
