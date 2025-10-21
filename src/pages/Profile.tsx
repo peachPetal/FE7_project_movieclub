@@ -160,12 +160,12 @@ export const Profile: React.FC = () => {
               alt="Camera"
               className="absolute bottom-0 right-0 cursor-pointer"
             />
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-[rgba(255,255,255,0.5)] rounded-full">
+                <ClipLoader color="var(--color-main)" size={35} />
+              </div>
+            )}
           </div>
-          {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[rgba(255,255,255,0.5)] rounded-full">
-              <ClipLoader color="var(--color-main)" size={35} />
-            </div>
-          )}
           <button
             className="mt-2 text-[var(--color-alert)] text-sm font-medium hover:underline"
             onClick={handleDelete}
