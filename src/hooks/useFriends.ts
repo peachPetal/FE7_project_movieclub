@@ -1,8 +1,10 @@
 // src/hooks/useFriends.ts
 import { useEffect } from "react";
 import { supabase } from "../utils/supabase";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useAuthSession } from "./useAuthSession";
+import { deleteFriend as deleteFriendApi } from "../api/friend/deleteFriendApi";
+import { toast } from 'react-toastify'; // ✅ 1. toast 임포트
 
 export type FriendStatus = "online" | "offline";
 
@@ -13,7 +15,6 @@ export interface Friend {
   status: FriendStatus;
 }
 
-// ✅ 친구 목록을 가져오는 함수
 async function fetchFriends(userId: string): Promise<Friend[]> {
   const { data: friendships, error: friendshipError } = await supabase
     .from("friendship")
@@ -56,10 +57,25 @@ export function useFriends() {
     staleTime: 1000 * 60 * 5,
   });
 
+  // 친구 삭제 뮤테이션
+  const deleteFriendMutation = useMutation({
+    mutationFn: (friendId: string) => {
+      if (!userId) throw new Error("로그인이 필요합니다.");
+      return deleteFriendApi(userId, friendId); // API 호출
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends", userId] });
+      toast.success("친구를 삭제했습니다."); // ✅ 2. 성공 토스트 추가
+    },
+    onError: (error: Error) => { // error 타입을 명시
+      console.error("Failed to delete friend:", error);
+      toast.error(`친구 삭제 실패: ${error.message}`); // ✅ 3. 실패 토스트 추가
+    },
+  });
+
+  // 실시간 구독 useEffect (변경 없음)
   useEffect(() => {
     if (!userId) return;
-
-    // ✅ 친구 관계 변경 감지
     const friendshipChannel = supabase
       .channel("friendship-changes")
       .on(
@@ -74,7 +90,6 @@ export function useFriends() {
       )
       .subscribe();
 
-    // ✅ 친구의 온라인 상태 변경 감지
     const usersChannel = supabase
       .channel("users-changes")
       .on(
@@ -99,7 +114,12 @@ export function useFriends() {
     };
   }, [userId, queryClient, friends]);
 
-  return { friends, loading: isLoading };
+  return {
+    friends,
+    loading: isLoading,
+    deleteFriend: deleteFriendMutation.mutate, // 삭제 함수
+    isDeletingFriend: deleteFriendMutation.isPending // 삭제 로딩 상태
+  };
 }
 
 /* --------------------------------------------------------------------------
