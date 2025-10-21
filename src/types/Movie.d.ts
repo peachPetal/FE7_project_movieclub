@@ -43,6 +43,7 @@ interface Movie {
   rating: number;
   poster: string;
   backdrop: string;
+  backdrop_path?: string;
   director: string;
   actors: Actor[];
   trailer: string;
