@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabase";
 import { useAuthStore } from "../stores/authStore";
 import ReviewPostBtn from "../components/reviews/ReviewPostBtn";
-
 import {
   Combobox,
   ComboboxInput,
@@ -13,6 +12,8 @@ import {
 import { HashtagIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { keyForSearch } from "../api/tmdb/tmdb";
+import Swal from "sweetalert2";
+
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
 export default function ReviewPostPage() {
@@ -111,9 +112,25 @@ export default function ReviewPostPage() {
       "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
 
     if (!title || !selectMovie || !content) {
-      alert("값을 모두 입력해주세요.");
+      Swal.fire({
+        title: "모든 내용을 입력해주세요",
+        text: "리뷰 할 영화를 선택하고, 제목과 내용을 모두 작성해주세요",
+        icon: "warning",
+        iconColor: "#9858F3",
+        showCancelButton: false,
+        confirmButtonText: "확인",
+        customClass: {
+          popup: "rounded-xl shadow-lg !bg-background-main",
+          title: "!font-semibold !text-text-main",
+          htmlContainer: "!text-s !text-text-sub",
+          confirmButton:
+            "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50",
+        },
+        buttonsStyling: false,
+      });
       return;
     }
+
     try {
       if (location.state) {
         if (location.state.review_id) {
@@ -131,8 +148,56 @@ export default function ReviewPostPage() {
 
           if (error) throw error;
 
-          alert("게시글이 수정되었습니다.");
+          Swal.fire({
+            title: "리뷰가 수정되었습니다.",
+            icon: "success",
+            iconColor: "#9858F3",
+            showCancelButton: false,
+            confirmButtonText: "확인",
+            customClass: {
+              popup: "rounded-xl shadow-lg !bg-background-main",
+              title: "!font-semibold !text-text-main",
+              htmlContainer: "!text-s !text-text-sub",
+              confirmButton:
+                "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
+            },
+            buttonsStyling: false,
+          });
+
           navigate(`/reviews/${location.state.review_id}`);
+        } else {
+          const { data, error } = await supabase
+            .from("reviews")
+            .insert({
+              author_id: userId,
+              title,
+              content,
+              thumbnail: finalThumbnail,
+              movie_id: selectMovie.id,
+              movie_name: selectMovie.title,
+            })
+            .select()
+            .single();
+
+          if (data) {
+            Swal.fire({
+              title: "리뷰가 등록되었습니다.",
+              icon: "success",
+              iconColor: "#9858F3",
+              showCancelButton: false,
+              confirmButtonText: "확인",
+              customClass: {
+                popup: "rounded-xl shadow-lg !bg-background-main",
+                title: "!font-semibold !text-text-main",
+                htmlContainer: "!text-s !text-text-sub",
+                confirmButton:
+                  "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
+              },
+              buttonsStyling: false,
+            });
+            navigate(`/reviews`);
+          }
+          if (error) throw error;
         }
       } else {
         const { data, error } = await supabase
@@ -149,8 +214,22 @@ export default function ReviewPostPage() {
           .single();
 
         if (data) {
-          alert("게시글이 등록되었습니다.");
-          navigate("/reviews");
+          Swal.fire({
+            title: "리뷰가 등록되었습니다.",
+            icon: "success",
+            iconColor: "#9858F3",
+            showCancelButton: false,
+            confirmButtonText: "확인",
+            customClass: {
+              popup: "rounded-xl shadow-lg !bg-background-main",
+              title: "!font-semibold !text-text-main",
+              htmlContainer: "!text-s !text-text-sub",
+              confirmButton:
+                "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
+            },
+            buttonsStyling: false,
+          });
+          navigate(`/reviews`);
         }
         if (error) throw error;
       }
@@ -173,7 +252,6 @@ export default function ReviewPostPage() {
             }
             id="review-title "
             className="text-[28px] pl-3 pb-3 w-full mb-5 outline-0 border-b-1 border-text-light placeholder:text-text-light focus:border-main"
-            required
           />
 
           {/* 영화 검색 영역 */}
@@ -215,7 +293,6 @@ export default function ReviewPostPage() {
                   )}
                   displayValue={(movie: MovieInReview) => movie?.title ?? ""}
                   onChange={(e) => setQuery(e.target.value)}
-                  required
                 />
               </div>
 
@@ -251,7 +328,6 @@ export default function ReviewPostPage() {
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
               setContent(e.target.value)
             }
-            required
           />
           {/* 썸네일 업로드 */}
           <div className="review-post-thumbnail flex mb-5">
