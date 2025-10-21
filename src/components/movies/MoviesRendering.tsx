@@ -9,21 +9,23 @@ export default function MoviesRendering({
   variant: "page" | "home";
   isLoading: boolean;
 }) {
+  const skeletonCount = variant === "home" ? 5 : 20;
+
   const list: (Movie | undefined)[] = isLoading
-    ? Array.from({ length: 5 }).map(() => undefined)
+    ? Array.from({ length: skeletonCount }).map(() => undefined)
     : data;
 
   return (
     <div
       className={
         variant === "home"
-          ? "flex gap-[30px] flex-wrap" // ✅ 오타 수정
+          ? "flex gap-[30px] flex-wrap"
           : "flex flex-wrap gap-5"
       }
     >
       {list.map((movie, idx) => (
         <MovieItem
-          key={(movie && movie.id) ?? `skeleton-${idx}`} // 안전키
+          key={(movie && movie.id) ?? `skeleton-${idx}`}
           movie={movie}
           isLoading={isLoading}
         />

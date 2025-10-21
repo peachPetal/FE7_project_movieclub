@@ -12,7 +12,6 @@ type MoviesListProps = {
   filter?: FilterOption;
 };
 
-// 다양한 meta 형태에서 장르 키 추출
 const pickGenreKey = (meta: any) => {
   if (!meta) return undefined;
   if (meta.genreId != null) return meta.genreId;
@@ -28,25 +27,35 @@ const pickGenreKey = (meta: any) => {
   return undefined;
 };
 
-export default function MoviesList({
-  variant = "page",
-  filter,
-}: MoviesListProps) {
+const MIN_LOADING_TIME = 1000; // ✅ 최소 로딩 시간 (1초)
+
+export default function MoviesList({ variant = "page", filter }: MoviesListProps) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [showInitialLoading, setShowInitialLoading] = useState(true); // ✅ 표시용 로딩 상태
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const MAX_TMDB_PAGES = 500;
 
-  // 장르 캐시 웜업 (장르 이름 → ID 대응 빠르게)
+  // ✅ 최소 로딩시간 로직
+  useEffect(() => {
+    if (isInitialLoading) {
+      setShowInitialLoading(true);
+    } else {
+      const timer = setTimeout(() => setShowInitialLoading(false), MIN_LOADING_TIME);
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialLoading]);
+
+  // 장르 캐시 웜업
   useEffect(() => {
     getMovieGenres("ko-KR").catch(() => void 0);
   }, []);
 
-  /** FilterOption → TMDB 파라미터 매핑 (견고하게) */
+  /** FilterOption → TMDB 파라미터 매핑 */
   const queryFromFilter: MoviesQuery = useMemo(() => {
     const base: MoviesQuery = {
       sortBy: "primary_release_date.desc",
@@ -58,7 +67,6 @@ export default function MoviesList({
     const v = (filter.value ?? "").toString();
     const meta: any = (filter as any).meta ?? {};
 
-    // 정렬 라벨 맵핑 (KR/EN 혼용 대비)
     const sortMap: Record<string, string> = {
       최신순: "primary_release_date.desc",
       인기순: "popularity.desc",
@@ -116,7 +124,7 @@ export default function MoviesList({
     [variant, queryFromFilter]
   );
 
-  /** 초기 & 필터 변경 시: 1페이지부터 다시 로드 */
+  /** 초기 & 필터 변경 시 1페이지부터 다시 로드 */
   useEffect(() => {
     let mounted = true;
 
@@ -178,7 +186,7 @@ export default function MoviesList({
         key={JSON.stringify(queryFromFilter)} // 필터 바뀌면 강제 remount
         data={movies}
         variant={variant}
-        isLoading={isInitialLoading}
+        isLoading={showInitialLoading} // ✅ 최소 1초 유지된 로딩 상태 전달
       />
 
       {variant === "page" && (

@@ -5,26 +5,32 @@ import ReviewsRendering from "./ReviewsRendering";
 
 type Props = {
   authorId: string | null | undefined;
-  variant?: "page" | "home";
+  variant?: "profile";
 };
 
 export default function MyCommentedReviewsList({
   authorId,
-  variant = "page",
+  variant = "profile",
 }: Props) {
   const [reviews, setReviews] = useState<ReviewSubset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchCommentedReviews = async () => {
       if (!authorId) {
-        setReviews([]);
-        setIsLoading(false);
+        if (mounted) {
+          setReviews([]);
+          setIsLoading(false);
+        }
         return;
       }
+
+      setIsLoading(true);
+      const startTime = Date.now();
+
       try {
-        setIsLoading(true);
-        // 1단계에서 만든 RPC 호출
         const { data, error } = await supabase
           .rpc("get_reviews_commented_by_user", {
             p_author_id: authorId,
@@ -32,6 +38,14 @@ export default function MyCommentedReviewsList({
           .returns<ReviewSubset[]>();
 
         if (error) throw error;
+
+        // 최소 로딩 시간 1초 보장
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, 1000 - elapsed);
+        await new Promise((resolve) => setTimeout(resolve, remaining));
+
+        if (!mounted) return;
+
         if (data && Array.isArray(data)) {
           setReviews(data);
         } else {
@@ -39,12 +53,17 @@ export default function MyCommentedReviewsList({
         }
       } catch (e) {
         console.error("내가 댓글 단 리뷰 로딩 실패:", e);
-        setReviews([]);
+        if (mounted) setReviews([]);
       } finally {
-        setIsLoading(false);
+        if (mounted) setIsLoading(false);
       }
     };
+
     fetchCommentedReviews();
+
+    return () => {
+      mounted = false;
+    };
   }, [authorId]);
 
   return (

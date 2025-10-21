@@ -1,5 +1,4 @@
-// src/components/reviews/MyLikedCommentReviewsList.tsx
-
+// src/components/reviews/MyPostedReviewsList.tsx
 import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabase";
 import type { ReviewSubset } from "../../types/Review";
@@ -10,9 +9,9 @@ type Props = {
   variant?: "profile";
 };
 
-const MIN_LOADING_TIME = 1000; // 1초 최소 로딩
+const MIN_LOADING_TIME = 1000; // 최소 로딩 시간 1초
 
-export default function MyLikedCommentReviewsList({
+export default function MyPostedReviewsList({
   authorId,
   variant = "profile",
 }: Props) {
@@ -22,7 +21,7 @@ export default function MyLikedCommentReviewsList({
   useEffect(() => {
     let mounted = true;
 
-    const fetchList = async () => {
+    const fetchPostedReviews = async () => {
       if (!authorId) {
         if (mounted) {
           setReviews([]);
@@ -36,37 +35,30 @@ export default function MyLikedCommentReviewsList({
 
       try {
         const { data, error } = await supabase
-          .rpc("get_reviews_with_liked_comments", {
-            p_user_id: authorId,
+          .rpc("get_reviews_by_user", {
+            p_author_id: authorId,
           })
           .returns<ReviewSubset[]>();
 
         if (error) throw error;
 
-        // 최소 로딩시간 1초 보장
+        // 최소 로딩 시간 1초 보장
         const elapsed = Date.now() - startTime;
         const remaining = Math.max(0, MIN_LOADING_TIME - elapsed);
         await new Promise((resolve) => setTimeout(resolve, remaining));
 
         if (!mounted) return;
 
-        if (data && Array.isArray(data)) {
-          setReviews(data);
-        } else {
-          if (data) {
-            console.error("Supabase RPC type mismatch error:", (data as any).Error);
-          }
-          setReviews([]);
-        }
+        setReviews(Array.isArray(data) ? data : []);
       } catch (e) {
-        console.error("좋아요 한 댓글의 리뷰 로딩 실패:", e);
+        console.error("내가 작성한 리뷰 로딩 실패:", e);
         if (mounted) setReviews([]);
       } finally {
         if (mounted) setIsLoading(false);
       }
     };
 
-    fetchList();
+    fetchPostedReviews();
 
     return () => {
       mounted = false;
@@ -76,8 +68,8 @@ export default function MyLikedCommentReviewsList({
   return (
     <ReviewsRendering
       data={reviews}
-      variant={variant}
-      isLoading={isLoading} // ✅ 최소 1초 동안 true 유지
+      variant={variant} // profile이면 스켈레톤 4개 렌더링
+      isLoading={isLoading}
     />
   );
 }

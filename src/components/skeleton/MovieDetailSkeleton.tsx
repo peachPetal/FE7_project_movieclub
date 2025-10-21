@@ -74,15 +74,23 @@ export default function MovieDetailSkeleton() {
         </div>
       </section>
       <section className="mt-10">
-        <div className="flex items-baseline gap-2 justify-between mb-4">
-          <div className="review-section_title flex ">
-            <Skeleton
-              width={185}
-              height={43}
-              baseColor={skeletonBaseColor}
-              highlightColor={skeletonHighlightColor}
-            />
-          </div>
+        <div className="flex items-center justify-between w-full mb-4">
+          {/* 왼쪽 제목 스켈레톤 */}
+          <Skeleton
+            width={185}
+            height={43}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
+
+          {/* 오른쪽 원형 스켈레톤 */}
+          <Skeleton
+            circle
+            width={50}
+            height={50}
+            baseColor={skeletonBaseColor}
+            highlightColor={skeletonHighlightColor}
+          />
         </div>
       </section>
     </div>

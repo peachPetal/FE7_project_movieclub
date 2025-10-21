@@ -8,6 +8,8 @@ import MovieDetailSkeleton from "../components/skeleton/MovieDetailSkeleton";
 import { useAuthSession } from "../hooks/useAuthSession";
 import ReviewList from "../components/reviews/ReviewList";
 
+const MIN_LOADING_TIME = 1000; // 최소 로딩시간 1초
+
 export default function MoviesDetail() {
   const { id: movie_id } = useParams();
   const location = useLocation();
@@ -23,23 +25,27 @@ export default function MoviesDetail() {
 
   const fetchMovie = async (id: number) => {
     setIsLoading(true);
+    const startTime = Date.now();
+
     try {
       const movieData = await getMovieById(Number(id));
       if (!movieData) navigate("/error");
       else setMovie(movieData);
     } catch (err) {
-      if (err) navigate("/error");
+      console.error(err);
+      navigate("/error");
     } finally {
-      setIsLoading(false);
+      // 최소 로딩시간 1초 보장
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, MIN_LOADING_TIME - elapsed);
+      setTimeout(() => setIsLoading(false), remaining);
     }
   };
 
   useEffect(() => {
-    if (movieState) {
-      setMovie(movieState);
-    }
+    if (movieState) setMovie(movieState);
     fetchMovie(Number(movie_id));
-  }, []);
+  }, [movieState, movie_id]);
 
   const Separator = () => <span className="mx-1.5">{`|`}</span>;
 
@@ -61,113 +67,113 @@ export default function MoviesDetail() {
       navigate("/login");
       return;
     }
-    // 실제 리뷰 작성 로직은 ReviewPostBtn 내부에서 실행됨
   };
 
-  if (isLoading) {
-    return <MovieDetailSkeleton />;
-  } else {
-    return (
-      <div className="w-[90%]">
-        {" "}
-        <section className="box-content movie p-4 flex min-w-4xl h-[500px] mb-10 text-[var(--color-text-main)]">
-          <img
-            src={movie?.poster}
-            alt={`${movie?.title} poster`}
-            className="max-w-[340px] max-h-[500px] object-cover rounded-lg"
-          />
-          <div className="movie-detail-area w-full h-full flex flex-col justify-around ml-9">
-            <div className="movie-info flex items-baseline">
-              <h1 className="text-5xl font-bold mr-4">{movie?.title}</h1>{" "}
-              {movie?.cerfication.length === 2 && (
-                <div className="px-[4px] border border-main text-main mr-2">
-                  <span>{movie?.cerfication}</span>
-                </div>
-              )}
-              <span>{movie?.year}</span>
-              <Separator />
-              <span>{formatRunTime(movie?.runtime ? movie?.runtime : "")}</span>
-              {movie?.genres ? (
-                <>
-                  <Separator />
-                  <span>{formatGenres(movie?.genres)}</span>
-                </>
-              ) : null}
-              <Separator />
-              <span>{movie?.country}</span>
-            </div>
-            <p className="movie-credits leading-relaxed whitespace-pre-line">
-              <span className="font-bold">감독</span>
-              <Separator />
-              <span>{movie?.director}</span>
-              <br />
-              {movie?.actors ? (
-                <>
-                  <span className="font-bold">출연</span>
-                  <Separator />
-                  <span>{formatActors(movie?.actors)}</span>
-                </>
-              ) : null}
-            </p>
-            <div className="mt-2">
-              <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
-                {movie?.overview}
-              </p>
-            </div>
-            <div className="flex items-center gap-6 mt-4">
-              <TrailerBtn src={String(movie?.trailer)} />
-              <div className="flex items-center gap-1.5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-10 h-10 text-yellow-400"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.116 3.986 1.24 5.383c.292 1.265-.956 2.23-2.052 1.612L12 18.226l-4.634 2.757c-1.096.618-2.344-.347-2.052-1.612l1.24-5.383L2.64 10.955c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-4xl font-bold">{movie?.rating}</span>
+  if (isLoading) return <MovieDetailSkeleton />;
+
+  return (
+    <div className="w-[90%]">
+      <section className="box-content movie p-4 flex min-w-4xl h-[500px] mb-10 text-[var(--color-text-main)]">
+        <img
+          src={movie?.poster}
+          alt={`${movie?.title} poster`}
+          className="max-w-[340px] max-h-[500px] object-cover rounded-lg"
+        />
+        <div className="movie-detail-area w-full h-full flex flex-col justify-around ml-9">
+          <div className="movie-info flex items-baseline">
+            <h1 className="text-5xl font-bold mr-4">{movie?.title}</h1>
+            {movie?.cerfication.length === 2 && (
+              <div className="px-[4px] border border-main text-main mr-2">
+                <span>{movie?.cerfication}</span>
               </div>
-            </div>
+            )}
+            <span>{movie?.year}</span>
+            <Separator />
+            <span>{formatRunTime(movie?.runtime ? movie?.runtime : "")}</span>
+            {movie?.genres && (
+              <>
+                <Separator />
+                <span>{formatGenres(movie?.genres)}</span>
+              </>
+            )}
+            <Separator />
+            <span>{movie?.country}</span>
           </div>
-        </section>
-        <section className="mt-10">
-          <div className="flex items-baseline gap-2 justify-between mb-4">
-            <div className="review-section_title flex ">
-              <h2 className="text-2xl font-bold text-[var(--color-text-main)] mr-2">
-                Reviews
-              </h2>
-              <span className="text-2xl text-[var(--color-main)] font-bold">
-                {movie?.reviews?.length}
-              </span>
-            </div>
-            {/* 로그인 상태 체크 후 Review 버튼 클릭 */}
-            <div onClick={handleReviewClick}>
-              <ReviewPostBtn
-                isFloating={false}
-                state={{
-                  id: movie_id,
-                  title: movie?.title,
-                  backdrop: movie?.backdrop,
-                }}
-              />
-            </div>
-          </div>
-          {movie?.reviews?.length ? (
-            <div>
-              {" "}
-              <ReviewList filter={{ value: "인기순" }} movie_id={movie?.id} />
-            </div>
-          ) : (
-            <p className="flex justify-center w-full my-10 text-text-sub">
-              아직 등록된 리뷰가 없습니다.
+
+          <p className="movie-credits leading-relaxed whitespace-pre-line">
+            <span className="font-bold">감독</span>
+            <Separator />
+            <span>{movie?.director}</span>
+            <br />
+            {movie?.actors && (
+              <>
+                <span className="font-bold">출연</span>
+                <Separator />
+                <span>{formatActors(movie?.actors)}</span>
+              </>
+            )}
+          </p>
+
+          <div className="mt-2">
+            <p className="max-w-[900px] leading-relaxed whitespace-pre-line">
+              {movie?.overview}
             </p>
-          )}
-        </section>
-      </div>
-    );
-  }
+          </div>
+
+          <div className="flex items-center gap-6 mt-4">
+            <TrailerBtn src={String(movie?.trailer)} />
+            <div className="flex items-center gap-1.5">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-10 h-10 text-yellow-400"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.116 3.986 1.24 5.383c.292 1.265-.956 2.23-2.052 1.612L12 18.226l-4.634 2.757c-1.096.618-2.344-.347-2.052-1.612l1.24-5.383L2.64 10.955c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-4xl font-bold">{movie?.rating}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <div className="flex items-baseline gap-2 justify-between mb-4">
+          <div className="review-section_title flex ">
+            <h2 className="text-2xl font-bold text-[var(--color-text-main)] mr-2">
+              Reviews
+            </h2>
+            <span className="text-2xl text-[var(--color-main)] font-bold">
+              {movie?.reviews?.length}
+            </span>
+          </div>
+
+          <div onClick={handleReviewClick}>
+            <ReviewPostBtn
+              isFloating={false}
+              state={{
+                id: movie_id,
+                title: movie?.title,
+                backdrop: movie?.backdrop,
+              }}
+            />
+          </div>
+        </div>
+
+        {movie?.reviews?.length ? (
+          <div>
+            <ReviewList filter={{ value: "인기순" }} movie_id={movie?.id} />
+          </div>
+        ) : (
+          <p className="flex justify-center w-full my-10 text-text-sub">
+            아직 등록된 리뷰가 없습니다.
+          </p>
+        )}
+      </section>
+    </div>
+  );
 }
