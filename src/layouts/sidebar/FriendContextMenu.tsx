@@ -7,7 +7,6 @@ import UserMessageReply from "../../components/users/UserMessageReply"; // 4. �
 // Asset Imports
 import friendsIcon from "../../assets/person-circle-black.svg";
 import messageIcon from "../../assets/message.svg";
-import deleteFriendMouseOff from "../../assets/delete-friend-mouse-off.svg";
 import deleteFriendMouseOn from "../../assets/delete-friend-mouse-on.svg";
 
 interface FriendContextMenuProps {
@@ -36,7 +35,13 @@ export const FriendContextMenu: React.FC<FriendContextMenuProps> = ({
   const { sendMessage } = useUserMessages();
 
   // 7. 메시지 전송 핸들러
-  const handleSend = async ({ title, body }: { title: string; body: string }) => {
+  const handleSend = async ({
+    title,
+    body,
+  }: {
+    title: string;
+    body: string;
+  }) => {
     try {
       await sendMessage(friend.id, title, body);
       setIsMessageOpen(false); // 성공 시 닫기
@@ -47,7 +52,6 @@ export const FriendContextMenu: React.FC<FriendContextMenuProps> = ({
       throw error;
     }
   };
-
 
   return (
     // 8. Portal을 형제로 두기 위해 Fragment(<>)로 감싸기
@@ -78,31 +82,23 @@ export const FriendContextMenu: React.FC<FriendContextMenuProps> = ({
           </p>
         </div>
 
+        {/* 친구 삭제 및 메세지 전송 버튼 */}
         <div className="ml-auto flex gap-2">
           <button
-            className={`relative w-8 h-8 group ${
+            className={`relative w-8 h-8 transition-transform hover:opacity-90 active:scale-95 ${
               isDeleting ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={onDelete}
             disabled={isDeleting}
             aria-label="Delete Friend"
           >
-            <img
-              src={deleteFriendMouseOff}
-              alt="delete"
-              className="w-8 h-8 opacity-100 group-hover:opacity-0 transition-opacity duration-200"
-            />
-            <img
-              src={deleteFriendMouseOn}
-              alt="delete hover"
-              className="w-8 h-8 absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-            />
+            <img src={deleteFriendMouseOn} alt="delete" className="w-8 h-8" />
           </button>
 
           <button
-            className="w-8 h-8"
+            className="w-8 h-8 transition-transform hover:opacity-90 active:scale-95"
             aria-label="Send Message"
-            onClick={() => setIsMessageOpen(true)} // 9. 클릭 시 모달 열기
+            onClick={() => setIsMessageOpen(true)}
           >
             <img src={messageIcon} className="w-8 h-8" alt="message" />
           </button>
