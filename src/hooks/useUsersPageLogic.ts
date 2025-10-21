@@ -9,6 +9,7 @@ import type { MessageDetailData } from "../components/users/UserMessageDetail";
 import { getUsers } from "../api/user/userApi";
 import { addFriend } from "../api/friend/addFriendApi";
 import { useAuthSession } from "./useAuthSession";
+import { supabase } from "../utils/supabase";
 
 /**
  * UsersPage의 데이터 조회, 상태, 로직을 모두 관리하는 커스텀 훅.
@@ -120,6 +121,37 @@ export function useUsersPageLogic() {
     };
   }, [selectedId]); // selectedId에만 의존
 
+useEffect(() => {
+  if (!currentUserId) return;
+
+  // 'public:users' 채널 생성
+  const subscription = supabase
+    .channel('public:users') 
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'users',
+      },
+      (payload) => {
+        queryClient.setQueryData(['users'], (oldData: AppUser[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map(user =>
+            user.id === payload.new.id
+              ? { ...user, is_online: payload.new.is_online }
+              : user
+          );
+        });
+      }
+    )
+    .subscribe();
+
+  return () => {
+    subscription.unsubscribe();
+  };
+}, [currentUserId, queryClient]);
+
   // 11. 이벤트 핸들러 함수들
   const handleSelectUser = useCallback((user: AppUser) => {
     setSelectedId((prevId) => {
@@ -141,6 +173,7 @@ export function useUsersPageLogic() {
   const toggleMessage = useCallback(() => setIsMessageOpen((p) => !p), []);
 
   // 14. [수정] openReply, closeReply 제거
+
 
   // 15. 페이지 컴포넌트에 필요한 모든 상태와 함수를 반환
   return {
