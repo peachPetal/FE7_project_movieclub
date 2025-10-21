@@ -46,7 +46,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   return (
     <div
       ref={modalRef}
-      className="absolute w-[290px] h-[320px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 px-4 py-3 overflow-y-auto"
+      className="absolute w-[290px] h-[320px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-60 px-4 py-3 overflow-y-auto"
       style={{ top: position.top, left: position.left + 15 }}
     >
       {isLoading ? (

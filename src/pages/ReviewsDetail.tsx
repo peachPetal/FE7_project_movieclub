@@ -6,12 +6,12 @@ import TimeAgo from "../components/common/time-ago/TimeAgo";
 import type { ReviewWithDetail } from "../types/Review";
 import { supabase } from "../utils/supabase";
 import ReviewsDetailSkeleton from "../components/skeleton/ReviewsDetailSkeleton";
-import { useAuthSession } from "../hooks/useAuthSession"; // <-- 추가
+import { useAuthSession } from "../hooks/useAuthSession";
 import { useAuthStore } from "../stores/authStore";
 import DefaultBtn from "../components/common/buttons/DefaultBtn";
 
 export default function ReviewsDetail() {
-  const { user } = useAuthSession(); // <-- 로그인 상태
+  const { user } = useAuthSession(); 
   const userId = useAuthStore((state) => state.user?.id);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -79,6 +79,8 @@ export default function ReviewsDetail() {
 
     const fetchAll = async () => {
       setIsLoading(true);
+      const startTime = Date.now(); // 시작 시간 기록
+
       try {
         const [_likedData, reviewData] = await Promise.all([
           fetchLiked(),
@@ -89,7 +91,13 @@ export default function ReviewsDetail() {
       } catch (err) {
         navigate("/error");
       } finally {
-        setIsLoading(false);
+        const elapsed = Date.now() - startTime;
+        const minLoadingTime = 1000; // 최소 1초
+        if (elapsed < minLoadingTime) {
+          setTimeout(() => setIsLoading(false), minLoadingTime - elapsed);
+        } else {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -98,7 +106,7 @@ export default function ReviewsDetail() {
 
   const handleLike = async () => {
     if (!user) {
-      navigate("/login"); // <-- 로그인 체크 후 이동
+      navigate("/login");
       return;
     }
 

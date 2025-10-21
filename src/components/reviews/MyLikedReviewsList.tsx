@@ -5,26 +5,34 @@ import ReviewsRendering from "./ReviewsRendering";
 
 type Props = {
   authorId: string | null | undefined;
-  variant?: "page" | "home";
+  variant?: "profile";
 };
+
+const MIN_LOADING_TIME = 1000; // 최소 로딩시간 1초
 
 export default function MyLikedReviewsList({
   authorId,
-  variant = "page",
+  variant = "profile",
 }: Props) {
   const [reviews, setReviews] = useState<ReviewSubset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchLikedReviews = async () => {
       if (!authorId) {
-        setReviews([]);
-        setIsLoading(false);
+        if (mounted) {
+          setReviews([]);
+          setIsLoading(false);
+        }
         return;
       }
+
+      setIsLoading(true);
+      const startTime = Date.now();
+
       try {
-        setIsLoading(true);
-        // 1단계에서 만든 RPC 호출
         const { data, error } = await supabase
           .rpc("get_liked_reviews", {
             p_user_id: authorId,
@@ -32,6 +40,14 @@ export default function MyLikedReviewsList({
           .returns<ReviewSubset[]>();
 
         if (error) throw error;
+
+        // 최소 로딩시간 1초 보장
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, MIN_LOADING_TIME - elapsed);
+        await new Promise((resolve) => setTimeout(resolve, remaining));
+
+        if (!mounted) return;
+
         if (data && Array.isArray(data)) {
           setReviews(data);
         } else {
@@ -39,19 +55,24 @@ export default function MyLikedReviewsList({
         }
       } catch (e) {
         console.error("좋아요 한 리뷰 로딩 실패:", e);
-        setReviews([]);
+        if (mounted) setReviews([]);
       } finally {
-        setIsLoading(false);
+        if (mounted) setIsLoading(false);
       }
     };
+
     fetchLikedReviews();
+
+    return () => {
+      mounted = false;
+    };
   }, [authorId]);
 
   return (
     <ReviewsRendering
       data={reviews}
       variant={variant}
-      isLoading={isLoading}
+      isLoading={isLoading} // 최소 1초 동안 true 유지
     />
   );
 }

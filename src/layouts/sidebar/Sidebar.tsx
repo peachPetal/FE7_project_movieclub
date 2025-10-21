@@ -208,7 +208,6 @@ export default function Sidebar() {
           position={notificationPosition}
           modalRef={modalNotificationRef}
           userId={userId}
-          // ✅ 5. fetch한 데이터와 로딩 상태를 prop으로 전달합니다.
           data={notifications}
           isLoading={isNotificationsLoading}
         />

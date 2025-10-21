@@ -8,12 +8,10 @@ import { useUserProfile } from "../hooks/useUserProfile";
 import { FILTER_OPTIONS, type FilterOption } from "../types/Filter";
 
 // ✅ 1. 필요한 모든 목록 컴포넌트 import (MyLikedCommentReviewsList 추가)
-import ReviewList from "../components/reviews/ReviewList";
 import MyCommentedReviewsList from "../components/reviews/MyCommentedReviewsList";
+import MyPostedReviewsList from "../components/reviews/MyPostedReviewsList";
 import MyLikedReviewsList from "../components/reviews/MyLikedReviewsList";
 import MyLikedCommentReviewsList from "../components/reviews/MyLikedCommentReviewsList"; // ✅ 새로 추가
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css"; // Skeleton CSS
 
 /* -----------------------------------------------
   Helper Functions (변경 없음)
@@ -43,7 +41,7 @@ async function uploadAvatar(userId: string, file: File): Promise<string> {
 // 아바타 삭제
 async function deleteAvatar(
   userId: string,
-  currentUrl: string | null | undefined,
+  currentUrl: string | null | undefined
 ): Promise<void> {
   if (!currentUrl) return;
   const urlWithoutQuery = currentUrl.split("?")[0];
@@ -119,10 +117,10 @@ export const Profile: React.FC = () => {
 
   // ✅ 2. 'likesFilter' state 및 핸들러 복원
   const [myPostsFilter, setMyPostsFilter] = useState<FilterOption>(
-    FILTER_OPTIONS.MyPosts[0],
+    FILTER_OPTIONS.MyPosts[0]
   );
   const [likesFilter, setLikesFilter] = useState<FilterOption>(
-    FILTER_OPTIONS.Likes[0], // (가정: FILTER_OPTIONS.Likes[0]는 '리뷰')
+    FILTER_OPTIONS.Likes[0] // (가정: FILTER_OPTIONS.Likes[0]는 '리뷰')
   );
 
   const handleChangeFilter1 = (filter: FilterOption) => {
@@ -206,19 +204,12 @@ export const Profile: React.FC = () => {
           />
         </div>
         <div className="mt-4 w-full">
-          {isProfileLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Skeleton height={230} />
-              <Skeleton height={230} />
-              <Skeleton height={230} />
-            </div>
-          ) : myPostsFilter.value === "댓글" ? (
-            <MyCommentedReviewsList authorId={userId} variant="page" />
+          {myPostsFilter.value === "댓글" ? (
+            <MyCommentedReviewsList authorId={userId} variant="profile" />
           ) : (
-            <ReviewList
-              filter={myPostsFilter}
+            <MyPostedReviewsList
               authorId={userId}
-              variant="page"
+              variant="profile"
             />
           )}
         </div>
@@ -229,30 +220,22 @@ export const Profile: React.FC = () => {
         <h1 className="text-[32px] font-bold text-[var(--color-text-main)] mb-2">
           좋아요
         </h1>
-        
-        {/* ✅ 3. "좋아요" 섹션에 FilterDropdown 복원 */}
+
+        {/* ✅ FilterDropdown 유지 */}
         <div className="z-50 w-[200px] h-[40px]">
           <FilterDropdown
-            type="Likes" // (가정: FILTER_OPTIONS에 "Likes" 타입이 정의되어 있음)
+            type="Likes"
             filter={likesFilter}
             handleChangeFilter={handleChangeFilter2}
           />
         </div>
-        
-        {/* ✅ 4. "좋아요" 조건부 렌더링 섹션 수정 */}
+
+        {/* ✅ 내부 스켈레톤 제거, ReviewList 내부의 스켈레톤만 사용 */}
         <div className="mt-4 w-full">
-          {isProfileLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Skeleton height={230} />
-              <Skeleton height={230} />
-              <Skeleton height={230} />
-            </div>
-          ) : likesFilter.value === "댓글" ? (
-             // (가정: 'Likes' 필터 옵션에 '댓글'이라는 value가 있음)
-            <MyLikedCommentReviewsList authorId={userId} variant="page" />
+          {likesFilter.value === "댓글" ? (
+            <MyLikedCommentReviewsList authorId={userId} variant="profile" />
           ) : (
-            // (기본값: "리뷰")
-            <MyLikedReviewsList authorId={userId} variant="page" />
+            <MyLikedReviewsList authorId={userId} variant="profile" />
           )}
         </div>
       </div>
