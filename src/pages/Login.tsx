@@ -1,11 +1,7 @@
-import { useEffect } from "react";
 import SocialBtn from "../components/common/buttons/SocialBtn";
 import { supabase } from "../utils/supabase";
-import { useAuthStore } from "../stores/authStore";
 
 export default function LoginPage() {
-  const user = useAuthStore((state) => state.user);
-
   // 구글 로그인
   const handleGoogleLogin = async () => {
     try {
@@ -50,11 +46,6 @@ export default function LoginPage() {
       console.log(e);
     }
   };
-
-  // user 상태 디버깅
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
 
   return (
     <div className="w-full h-full flex ml-[340px] mt-[50px]">
