@@ -7,7 +7,7 @@ import type { FilterOption } from "../../types/Filter";
 type Props = {
   variant?: "page" | "home";
   filter?: FilterOption;
-  movie_id?: string | null;
+  movie_id?: number | null;
   authorId?: string | null;
 };
 

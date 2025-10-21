@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { AppUser } from "../../types/appUser";
-import { FILTER_OPTIONS, type FilterOption } from "../../types/Filter";
+import { FILTER_OPTIONS } from "../../types/Filter";
 import FilterDropdown from "../common/buttons/FilterDropdown";
 import UserRendering from "./UserRendering";
 
