@@ -1,12 +1,11 @@
-// src/components/layouts/sidebar/NotificationModal.tsx (수정된 코드)
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../../utils/supabase";
 
 interface NotificationModalProps {
   position: { top: number; left: number };
   modalRef: React.RefObject<HTMLDivElement | null>;
-  userId: string | undefined; // ✅ 로그인한 사용자의 ID
+  userId: string | undefined;
   data: Message[];
   isLoading: boolean;
 }
@@ -15,32 +14,40 @@ export interface Message {
   id: number;
   title: string;
   created_at: string;
-  sender_id: string; // 메시지를 보낸 사람의 ID
+  sender_id: string;
   receiver_id: string;
   text: string;
+  read?: boolean;
 }
 
 export const NotificationModal: React.FC<NotificationModalProps> = ({
   position,
   modalRef,
-  userId, // 로그인한 사용자 ID
+  userId,
   data: messages,
   isLoading,
 }) => {
   const navigate = useNavigate();
 
-  // 클릭 시 로그인한 사용자 페이지로 이동 + 보낸 사람 ID 전달
-  const handleMessageClick = (senderId: string) => {
-    // userId가 없으면 (로그아웃 상태 등) 아무것도 하지 않음
+  const handleMessageClick = async (msg: Message) => {
     if (!userId) return;
 
-    navigate("/users", {
-      state: {
-        selectedUserId: userId, // 로그인한 사용자 ID를 선택하도록 설정
-        senderIdToShow: senderId, // UsersPage가 이 sender의 메시지를 보여주도록 전달
-        openMessages: true, // 메시지 패널을 열도록 지시
-      },
-    });
+    try {
+      await supabase
+        .from("friends_messages")
+        .update({ read: true })
+        .eq("id", msg.id);
+
+      navigate("/users", {
+        state: {
+          selectedUserId: userId,
+          senderIdToShow: msg.sender_id,
+          openMessages: true,
+        },
+      });
+    } catch (error) {
+      console.error("메시지 읽음 처리 중 오류:", error);
+    }
   };
 
   return (
@@ -62,7 +69,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           <button
             type="button"
             key={msg.id}
-            onClick={() => handleMessageClick(msg.sender_id)}
+            onClick={() => handleMessageClick(msg)} // ✅ msg 객체 전체 전달
             className="
               w-full
               text-[var(--color-text-main)]
@@ -85,6 +92,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     </div>
   );
 };
+
 // // src/components/layouts/sidebar/NotificationModal.tsx
 // import React, { useEffect, useState } from "react";
 // // 1. useNavigate 훅 임포트

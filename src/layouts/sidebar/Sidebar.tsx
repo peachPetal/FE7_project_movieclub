@@ -31,8 +31,9 @@ export default function Sidebar() {
         if (!userId) return [];
         const { data, error } = await supabase
           .from("friends_messages")
-          .select("id, title, created_at, sender_id, receiver_id, text")
+          .select("id, title, created_at, sender_id, receiver_id, text, read")
           .eq("receiver_id", userId)
+          .eq("read", false)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
