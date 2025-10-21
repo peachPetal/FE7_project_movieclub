@@ -33,7 +33,7 @@ const MessageListItem: React.FC<MessageListItemProps> = ({
       )}
     >
       <span className="truncate">{message.title}</span>
-      {message.unread && (
+      {!message.read && (
         <span
           className="ml-3 inline-block h-2 w-2 shrink-0 rounded-full bg-[var(--color-alert)]"
           aria-label="읽지 않음"
