@@ -3,12 +3,9 @@ import { Outlet } from "react-router-dom";
 import Header from "./header/Header";
 import Sidebar from "./sidebar/Sidebar";
 
-import { Toaster } from "react-hot-toast";
-
 export default function DefaultLayout() {
   return (
     <div className="w-full flex flex-col bg-[var(--color-background-main)]">
-      <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
       {/* 상단 헤더 */}
       <Header />
 

@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 interface LikeBtn {
   like: number;
   isLiked: boolean;

@@ -65,7 +65,7 @@ export default function ReviewPostPage() {
           ({ id, title, backdrop_path }) => ({
             id,
             title,
-            backdrop: `${IMAGE_BASE_URL}${backdrop_path}`,
+            backdrop_path: `${IMAGE_BASE_URL}${backdrop_path}`,
           })
         );
 
@@ -108,7 +108,7 @@ export default function ReviewPostPage() {
 
     const finalThumbnail =
       thumbnail.trim() ||
-      selectMovie?.backdrop ||
+      selectMovie?.backdrop_path ||
       "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
 
     if (!title || !selectMovie || !content) {
@@ -265,7 +265,7 @@ export default function ReviewPostPage() {
                 setSelectMovie({
                   id: value.id,
                   title: value.title,
-                  backdrop: value.backdrop,
+                  backdrop_path: value.backdrop_path,
                 });
               }}
               onClose={() => setQuery("")}

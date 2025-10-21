@@ -1,46 +1,63 @@
-// src/components/layouts/sidebar/NotificationModal.tsx (수정된 코드)
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../../utils/supabase";
+import { QueryClient } from "@tanstack/react-query";
 
 interface NotificationModalProps {
   position: { top: number; left: number };
   modalRef: React.RefObject<HTMLDivElement | null>;
-  userId: string | undefined; // ✅ 로그인한 사용자의 ID
+  userId: string | undefined;
   data: Message[];
   isLoading: boolean;
+  queryClient: QueryClient;
 }
 
 export interface Message {
   id: number;
   title: string;
   created_at: string;
-  sender_id: string; // 메시지를 보낸 사람의 ID
+  sender_id: string;
   receiver_id: string;
   text: string;
+  read?: boolean;
 }
 
 export const NotificationModal: React.FC<NotificationModalProps> = ({
   position,
   modalRef,
-  userId, // 로그인한 사용자 ID
+  userId,
   data: messages,
   isLoading,
+  queryClient,
 }) => {
   const navigate = useNavigate();
 
-  // 클릭 시 로그인한 사용자 페이지로 이동 + 보낸 사람 ID 전달
-  const handleMessageClick = (senderId: string) => {
-    // userId가 없으면 (로그아웃 상태 등) 아무것도 하지 않음
+  const handleMessageClick = async (msg: Message) => {
     if (!userId) return;
 
-    navigate("/users", {
-      state: {
-        selectedUserId: userId, // 로그인한 사용자 ID를 선택하도록 설정
-        senderIdToShow: senderId, // UsersPage가 이 sender의 메시지를 보여주도록 전달
-        openMessages: true, // 메시지 패널을 열도록 지시
-      },
-    });
+    try {
+      // ✅ Supabase에서 read 상태 업데이트
+      const { error } = await supabase
+        .from("friends_messages")
+        .update({ read: true })
+        .eq("id", msg.id);
+
+      if (error) throw error;
+
+      // ✅ React Query 캐시 무효화 → Sidebar의 알림 자동 갱신
+      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+
+      // ✅ 메시지 클릭 시 이동
+      navigate("/users", {
+        state: {
+          selectedUserId: userId,
+          senderIdToShow: msg.sender_id,
+          openMessages: true,
+        },
+      });
+    } catch (error) {
+      console.error("메시지 읽음 처리 중 오류:", error);
+    }
   };
 
   return (
@@ -60,9 +77,9 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
       ) : (
         messages.map((msg) => (
           <button
-            type="button"
             key={msg.id}
-            onClick={() => handleMessageClick(msg.sender_id)}
+            type="button"
+            onClick={() => handleMessageClick(msg)}
             className="
               w-full
               text-[var(--color-text-main)]
@@ -85,6 +102,8 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     </div>
   );
 };
+
+
 // // src/components/layouts/sidebar/NotificationModal.tsx
 // import React, { useEffect, useState } from "react";
 // // 1. useNavigate 훅 임포트
