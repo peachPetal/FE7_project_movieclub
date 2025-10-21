@@ -206,12 +206,13 @@ export default function Sidebar() {
 
       {modalNotificationOpen && (
         <NotificationModal
-          position={notificationPosition}
-          modalRef={modalNotificationRef}
-          userId={userId}
-          data={notifications}
-          isLoading={isNotificationsLoading}
-        />
+            position={notificationPosition}
+            modalRef={modalNotificationRef}
+            userId={userId}
+            data={notifications}
+            isLoading={isNotificationsLoading}
+            queryClient={queryClient}
+          />
       )}
     </>
   );
