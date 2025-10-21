@@ -10,7 +10,6 @@ const updateUserOnlineStatus = async (user: User, isOnline: boolean) => {
     .from("users")
     .update({ 
       is_online: isOnline, 
-      last_seen: new Date().toISOString() // 상태 변경 시 last_seen도 업데이트
     })
     .eq("id", user.id);
 
@@ -44,7 +43,6 @@ export function useAuthSession() {
       setUser(currentUser);
       setLoading(false);
 
-      // ✅ [유지] 세션 로드 시 (새로고침 포함) true로 설정
       if (currentUser) updateStatus({ user: currentUser, isOnline: true });
     });
 
@@ -58,34 +56,17 @@ export function useAuthSession() {
         setUser(currentUser);
         setLoading(false);
 
-        // ✅ [유지] 로그인 시 true로 설정
         if (event === "SIGNED_IN" && currentUser)
           updateStatus({ user: currentUser, isOnline: true });
         
-        // ✅ [유지] 로그아웃 시 (Sidebar 버튼 클릭) false로 설정
-        // supabase.auth.signOut()이 호출되면 이 이벤트가 발생합니다.
         if (event === "SIGNED_OUT" && previousUser)
           updateStatus({ user: previousUser, isOnline: false });
       }
     );
 
-    // ❌ [제거] 창 닫힘 감지 (beforeunload) 로직 전체 제거
-    // const handleBeforeUnload = () => {
-    //   const currentUser = userRef.current;
-    //   if (currentUser)
-    //     updateStatus({ user: currentUser, isOnline: false });
-    // };
-    // window.addEventListener("beforeunload", handleBeforeUnload);
-
     // 클린업
     return () => {
       listener.subscription.unsubscribe();
-      // ❌ [제거] beforeunload 리스너 제거 로직 삭제
-      // window.removeEventListener("beforeunload", handleBeforeUnload);
-
-      // ❌ [제거] 컴포넌트 언마운트(페이지 이동 등) 시 false로 설정하는 로직 삭제
-      // const currentUser = userRef.current;
-      // if (currentUser) updateStatus({ user: currentUser, isOnline: false });
     };
   }, [updateStatus]); // 의존성 배열에서 updateStatus만 남김
 
