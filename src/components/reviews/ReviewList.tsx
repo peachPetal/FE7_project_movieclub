@@ -7,7 +7,7 @@ import type { FilterOption } from "../../types/Filter";
 type Props = {
   variant?: "page" | "home" | "profile";
   filter?: FilterOption;
-  movie_id?: string | null;
+  movie_id?: number | null; // movie_id 타입 에러 수정
   authorId?: string | null;
 };
 

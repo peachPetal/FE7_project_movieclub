@@ -43,6 +43,7 @@ interface Movie {
   rating: number;
   poster: string;
   backdrop: string;
+  backdrop_path?: string;
   director: string;
   actors: Actor[];
   trailer: string;
@@ -52,5 +53,5 @@ interface Movie {
 interface MovieInReview {
   id: number;
   title: string;
-  backdrop: string;
+  backdrop_path: string;
 }
