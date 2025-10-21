@@ -35,6 +35,7 @@ function Error() {
       {/* 홈으로 돌아가기 버튼 */}
       <div className="mt-4">
         <DefaultBtn
+          type="reset"
           size="lg"
           text="홈으로 돌아가기"
           highlight={false}
