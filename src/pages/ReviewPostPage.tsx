@@ -80,10 +80,6 @@ export default function ReviewPostPage() {
     fetchMoviesFromTMDB();
   }, [query]);
 
-  /* ------------------------
-      Thumbnail Upload / Remove
-  ------------------------ */
-
   const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
     if (file) {
@@ -98,10 +94,6 @@ export default function ReviewPostPage() {
   const removeThumbanil = () => {
     setThumbnail("");
   };
-
-  /* ------------------------
-      Form Submit
-  ------------------------ */
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

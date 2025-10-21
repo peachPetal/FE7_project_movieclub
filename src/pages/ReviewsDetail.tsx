@@ -10,6 +10,7 @@ import { useAuthSession } from "../hooks/useAuthSession";
 import { useAuthStore } from "../stores/authStore";
 import DefaultBtn from "../components/common/buttons/DefaultBtn";
 import Swal from "sweetalert2";
+import useLoginRequiredAlert from "../components/alert/useLoginRequiredAlert";
 
 export default function ReviewsDetail() {
   const { user } = useAuthSession();
@@ -26,6 +27,8 @@ export default function ReviewsDetail() {
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
+
+  const loginRequiredAlert = useLoginRequiredAlert();
 
   const fetchLiked = async () => {
     try {
@@ -107,7 +110,7 @@ export default function ReviewsDetail() {
 
   const handleLike = async () => {
     if (!user) {
-      navigate("/login");
+      loginRequiredAlert();
       return;
     }
 

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { supabase } from "../../utils/supabase";
 import type { UserProfile } from "../../hooks/useUserProfile";
 import useLoginRequiredAlert from "../alert/useLoginRequiredAlert";
+import Swal from "sweetalert2";
 
 export default function CommentInput({
   profile,
@@ -33,7 +34,21 @@ export default function CommentInput({
     }
 
     if (!content) {
-      alert("댓글 내용을 입력해주세요.");
+      Swal.fire({
+        title: "댓글 내용을 입력해주세요.",
+        icon: "warning",
+        iconColor: "#9858F3",
+        showCancelButton: false,
+        confirmButtonText: "확인",
+        customClass: {
+          popup: "rounded-xl shadow-lg !bg-background-main",
+          title: "!font-semibold !text-text-main",
+          htmlContainer: "!text-s !text-text-sub",
+          confirmButton:
+            "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50",
+        },
+        buttonsStyling: false,
+      });
       return;
     }
 
@@ -45,8 +60,21 @@ export default function CommentInput({
       .select();
 
     if (error) throw error;
-
-    alert("댓글이 등록되었습니다.");
+    Swal.fire({
+      title: "댓글이 등록되었습니다.",
+      icon: "success",
+      iconColor: "#9858F3",
+      showCancelButton: false,
+      confirmButtonText: "확인",
+      customClass: {
+        popup: "rounded-xl shadow-lg !bg-background-main",
+        title: "!font-semibold !text-text-main",
+        htmlContainer: "!text-s !text-text-sub",
+        confirmButton:
+          "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50",
+      },
+      buttonsStyling: false,
+    });
     getComments();
 
     setContent("");
@@ -103,7 +131,6 @@ export default function CommentInput({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setContent(e.target.value);
           }}
-          required
         />
         <div className="flex justify-end">
           <DefaultBtn size="sm" text="등록" highlight={true} type="submit" />
