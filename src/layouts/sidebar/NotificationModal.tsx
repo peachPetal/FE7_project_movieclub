@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../utils/supabase";
+import { QueryClient } from "@tanstack/react-query";
 
 interface NotificationModalProps {
   position: { top: number; left: number };
@@ -8,6 +9,7 @@ interface NotificationModalProps {
   userId: string | undefined;
   data: Message[];
   isLoading: boolean;
+  queryClient: QueryClient;
 }
 
 export interface Message {
@@ -26,6 +28,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   userId,
   data: messages,
   isLoading,
+  queryClient,
 }) => {
   const navigate = useNavigate();
 
@@ -33,11 +36,18 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     if (!userId) return;
 
     try {
-      await supabase
+      // ✅ Supabase에서 read 상태 업데이트
+      const { error } = await supabase
         .from("friends_messages")
         .update({ read: true })
         .eq("id", msg.id);
 
+      if (error) throw error;
+
+      // ✅ React Query 캐시 무효화 → Sidebar의 알림 자동 갱신
+      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+
+      // ✅ 메시지 클릭 시 이동
       navigate("/users", {
         state: {
           selectedUserId: userId,
@@ -67,9 +77,9 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
       ) : (
         messages.map((msg) => (
           <button
-            type="button"
             key={msg.id}
-            onClick={() => handleMessageClick(msg)} // ✅ msg 객체 전체 전달
+            type="button"
+            onClick={() => handleMessageClick(msg)}
             className="
               w-full
               text-[var(--color-text-main)]
@@ -92,6 +102,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     </div>
   );
 };
+
 
 // // src/components/layouts/sidebar/NotificationModal.tsx
 // import React, { useEffect, useState } from "react";
