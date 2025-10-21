@@ -53,5 +53,5 @@ interface Movie {
 interface MovieInReview {
   id: number;
   title: string;
-  backdrop: string;
+  backdrop_path: string;
 }
