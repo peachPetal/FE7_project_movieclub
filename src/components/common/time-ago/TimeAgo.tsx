@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 interface TimeAgoProps {
-  dateString: string;
+  dateString: string | undefined;
 }
 
 const formatTimeAgo = (dateString: string) => {
@@ -33,11 +33,11 @@ const formatTimeAgo = (dateString: string) => {
 };
 
 const TimeAgo: React.FC<TimeAgoProps> = ({ dateString }) => {
-  const [timeAgo, setTimeAgo] = useState(formatTimeAgo(dateString));
+  const [timeAgo, setTimeAgo] = useState(formatTimeAgo(dateString!));
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setTimeAgo(formatTimeAgo(dateString));
+      setTimeAgo(formatTimeAgo(dateString!));
     }, 60000);
     return () => clearInterval(intervalId);
   }, [dateString]);

@@ -1,5 +1,4 @@
-// src/hooks/useUserMessages.ts
-import { useEffect, useMemo, useCallback } from "react"; // useCallback 추가
+import { useEffect, useMemo, useCallback } from "react";
 import { supabase } from "../utils/supabase";
 import type { MessageDetailData } from "../components/users/UserMessageDetail";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
@@ -11,6 +10,7 @@ export type MessageItem = MessageDetailData & {
   createdAt?: string;
   senderId?: string;
   receiverId?: string;
+  senderName?: string; // ✅ 추가
 };
 
 type FriendsMessageRow = {
@@ -21,6 +21,7 @@ type FriendsMessageRow = {
   text: string;
   created_at: string;
   read: boolean;
+  sender_name: string ; // users 테이블 join 결과
 };
 
 type UseUserMessagesOptions = {
@@ -28,12 +29,17 @@ type UseUserMessagesOptions = {
 };
 
 async function fetchMessages(userId: string): Promise<MessageItem[]> {
-  const { data, error: msgErr } = await supabase
-    .from("friends_messages")
-    .select("id, sender_id, receiver_id, title, text, created_at, read")
+  // const { data, error: msgErr } = await supabase
+  //   .from("friends_messages")
+  //   .select("id, sender_id, receiver_id, title, text, created_at, read")
+  //   .eq("receiver_id", userId)
+  //   .order("created_at", { ascending: false })
+  //   .returns<FriendsMessageRow[]>();
+const { data, error: msgErr } = await supabase
+    .from("messages_with_sender")
+    .select("*")
     .eq("receiver_id", userId)
-    .order("created_at", { ascending: false })
-    .returns<FriendsMessageRow[]>();
+    .order("created_at", { ascending: false });
 
   if (msgErr) throw msgErr;
 
@@ -43,9 +49,10 @@ async function fetchMessages(userId: string): Promise<MessageItem[]> {
     bodyMine: "",
     bodyFriend: row.text ?? "",
     read: row.read ?? false,
-    createdAt: row.created_at,
+    createdAt: row.created_at!,          // timestamptz → string
     senderId: row.sender_id,
     receiverId: row.receiver_id,
+    senderName: row.sender_name ?? "Unknown", // ✅ 안전하게 senderName
   }));
 }
 
@@ -62,30 +69,31 @@ export function useUserMessages(
   const { data: messages = [], isLoading, error } = useQuery({
     queryKey: queryKey,
     queryFn: () => fetchMessages(userId!),
-    enabled: !!userId, // 로그인했을 때만 실행
+    enabled: !!userId,
   });
 
   useEffect(() => {
     if (!userId) return;
 
     const channelName = `my_inbox_${userId}`;
-    // ✅ [수정] 'subscription' 변수 선언 제거 (직접 .subscribe() 호출)
-    const channel = supabase.channel(channelName) // 변수 이름 변경 (선택사항)
+    const channel = supabase.channel(channelName)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'friends_messages', filter: `receiver_id=eq.${userId}` },
         (payload) => {
           const newMessageRow = payload.new as FriendsMessageRow;
-          const newMessage: MessageItem = {
-            id: newMessageRow.id,
-            title: newMessageRow.title ?? "",
-            bodyMine: "",
-            bodyFriend: newMessageRow.text ?? "",
-            read: newMessageRow.read ?? false,
-            createdAt: newMessageRow.created_at,
-            senderId: newMessageRow.sender_id,
-            receiverId: newMessageRow.receiver_id,
-          };
+      const newMessage: MessageItem = {
+        id: newMessageRow.id,
+        title: newMessageRow.title ?? "",
+        bodyMine: "",
+        bodyFriend: newMessageRow.text ?? "",
+        read: newMessageRow.read ?? false,
+        createdAt: newMessageRow.created_at,
+        senderId: newMessageRow.sender_id,
+        receiverId: newMessageRow.receiver_id,
+        senderName: newMessageRow.sender_name ?? "Unknown", // view에서 바로 가져오기
+      };
+
           queryClient.setQueryData(queryKey, (oldData: MessageItem[] | undefined) => {
             return oldData ? [newMessage, ...oldData] : [newMessage];
           });
@@ -104,17 +112,30 @@ export function useUserMessages(
           });
         }
       )
-      .subscribe(); // ✅ .subscribe() 직접 호출
+.on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'friends_messages', filter: `receiver_id=eq.${userId}` },
+        (payload) => {
+          // payload.old에서 삭제된 메시지 ID를 가져옵니다.
+          const deletedMessageId = payload.old.id;
+          if (deletedMessageId) {
+            // 캐시(queryData)에서 해당 메시지를 즉시 제거합니다.
+            queryClient.setQueryData(queryKey, (oldData: MessageItem[] | undefined) => {
+              if (!oldData) return [];
+              return oldData.filter((msg) => msg.id !== deletedMessageId);
+            });
+          }
+        }
+      )
+      .subscribe();
 
     return () => {
-      // supabase.removeChannel(channel); // 채널 제거 안 함
-      // ✅ 만약 채널 객체가 필요하다면 위에서 channel 변수를 사용하고 여기서 removeChannel 호출
-      supabase.removeChannel(channel); // 예시: 필요 시 주석 해제
+      supabase.removeChannel(channel);
     };
   }, [userId, queryClient, queryKey]);
 
 
-  const { mutateAsync: markAsReadMutation } = useMutation({ // 변수명 변경
+  const { mutateAsync: markAsReadMutation } = useMutation({
     mutationFn: async (messageId: string) => {
       const { error } = await supabase
         .from("friends_messages")
@@ -123,21 +144,18 @@ export function useUserMessages(
       if (error) throw error;
     },
     onSuccess: () => {
-      // 성공 토스트 없음
     },
-    onError: (error: Error) => { // error 타입을 명시
+    onError: (error: Error) => {
       console.error("markAsRead DB update error:", error);
       toast.error(`읽음 처리 실패: ${error.message}`);
     },
   });
 
-  // markAsRead 래핑 (기존 mutateAsync 호출만 유지)
   const markAsRead = useCallback(
     async (messageId: string) => {
       try {
         await markAsReadMutation(messageId);
       } catch (e) {
-        // onError에서 이미 처리
       }
     },
     [markAsReadMutation]
@@ -155,25 +173,58 @@ export function useUserMessages(
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("메세지 전송을 성공했습니다."); // ✅ 성공 토스트 유지
+      toast.success("메세지 전송을 성공했습니다.");
     },
-    onError: (error: Error) => { // error 타입을 명시
+    onError: (error: Error) => {
       console.error("sendMessage error:", error);
-      toast.error(`메세지 전송 실패: ${error.message}`); // ✅ 실패 토스트 유지
+      toast.error(`메세지 전송 실패: ${error.message}`);
     }
   });
 
-  // sendMessage 래핑 (단순 호출만 수행)
   const sendMessage = useCallback(
     async (peerId: string, title: string, text: string) => {
       try {
         await sendMessageMutation({ peerId, title, text });
-        // onSuccess에서 토스트 호출하므로 여기서는 제거
       } catch (e) {
-        // onError에서 이미 처리
       }
     },
     [sendMessageMutation]
+  );
+  
+// ✅ 2. deleteMessage 뮤테이션 추가
+  const { mutateAsync: deleteMessageMutation } = useMutation({
+    mutationFn: async (messageId: string) => {
+      if (!userId) throw new Error("로그인이 필요합니다.");
+
+      // 받은 메시지만 삭제할 수 있도록 receiver_id 조건 추가
+      const { error } = await supabase
+        .from("friends_messages")
+        .delete()
+        .eq("id", messageId)
+        .eq("receiver_id", userId); // ⬅️ 중요
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("메세지를 삭제했습니다.");
+      // 화면 업데이트는 useEffect의 'DELETE' 구독이 처리합니다.
+    },
+    onError: (error: Error) => {
+      console.error("deleteMessage error:", error);
+      toast.error(`메세지 삭제 실패: ${error.message}`);
+    }
+  });
+
+  // ✅ 3. deleteMessage 콜백 함수 추가
+  const deleteMessage = useCallback(
+    async (messageId: string) => {
+      try {
+        await deleteMessageMutation(messageId);
+      } catch (e) {
+        // onError가 이미 토스트를 처리하므로 여긴 비워둬도 됩니다.
+      }
+    },
+    [deleteMessageMutation]
   );
 
   const filteredMessages = useMemo(() => {
@@ -187,8 +238,9 @@ export function useUserMessages(
     messages: filteredMessages,
     isLoading,
     error: error as string | null,
-    markAsRead, // 수정된 래핑 함수
+    markAsRead,
     refetch: () => queryClient.invalidateQueries({ queryKey: queryKey }),
-    sendMessage // 수정된 래핑 함수
+    sendMessage,
+    deleteMessage,
   };
 }
