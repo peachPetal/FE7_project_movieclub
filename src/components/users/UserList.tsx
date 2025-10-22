@@ -5,7 +5,8 @@ import UserRendering from "./UserRendering";
 export type UserListProps = {
   users: AppUser[];
   selectedId: string | null;
-  onSelectUser: (user: AppUser) => void;
+  // onSelectUser: (user: AppUser) => void;
+  onSelectUser: (user: AppUser, anchorEl: HTMLElement) => void;
   isLoading: boolean;
   error: Error | null;
 };

@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../utils/supabase";
 import { useUserProfile } from "../hooks/useUserProfile";
 import { FILTER_OPTIONS, type FilterOption } from "../types/Filter";
+import { ClipLoader } from "react-spinners";
 
 // ✅ 1. 필요한 모든 목록 컴포넌트 import (MyLikedCommentReviewsList 추가)
 import MyCommentedReviewsList from "../components/reviews/MyCommentedReviewsList";
@@ -159,6 +160,11 @@ export const Profile: React.FC = () => {
               alt="Camera"
               className="absolute bottom-0 right-0 cursor-pointer"
             />
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-[rgba(255,255,255,0.5)] rounded-full">
+                <ClipLoader color="var(--color-main)" size={35} />
+              </div>
+            )}
           </div>
           <button
             className="mt-2 text-[var(--color-alert)] text-sm font-medium hover:underline"
@@ -207,10 +213,7 @@ export const Profile: React.FC = () => {
           {myPostsFilter.value === "댓글" ? (
             <MyCommentedReviewsList authorId={userId} variant="profile" />
           ) : (
-            <MyPostedReviewsList
-              authorId={userId}
-              variant="profile"
-            />
+            <MyPostedReviewsList authorId={userId} variant="profile" />
           )}
         </div>
       </div>

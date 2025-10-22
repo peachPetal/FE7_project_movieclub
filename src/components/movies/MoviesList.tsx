@@ -6,6 +6,7 @@ import {
   getMovieGenres,
 } from "../../api/tmdb/tmdbUtils";
 import type { FilterOption } from "../../types/Filter";
+import { ClipLoader } from "react-spinners";
 
 type MoviesListProps = {
   variant?: "home" | "page";
@@ -199,7 +200,9 @@ export default function MoviesList({
         <div className="w-full flex flex-col items-center mt-6">
           <div ref={sentinelRef} className="h-6 w-6" aria-hidden />
           {isFetchingMore && (
-            <div className="mt-2 text-sm text-text-sub">불러오는 중...</div>
+            <div className="mt-4 flex justify-center">
+              <ClipLoader color="var(--color-main)" size={30} />
+            </div>
           )}
           {!isInitialLoading && !isFetchingMore && !hasMore && (
             <div className="mt-2 text-sm text-text-sub">

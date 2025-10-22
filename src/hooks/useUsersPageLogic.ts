@@ -2,37 +2,49 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-// 1. react-router-dom에서 useLocation 임포트
 import { useLocation } from "react-router-dom";
 import type { AppUser } from "../types/appUser";
 import type { MessageDetailData } from "../components/users/UserMessageDetail";
 import { getUsers } from "../api/user/userApi";
 import { addFriend } from "../api/friend/addFriendApi";
+import { deleteFriend } from "../api/friend/deleteFriendApi"; // ✅ [추가] 1. 친구 삭제 API 임포트
 import { useAuthSession } from "./useAuthSession";
 import { supabase } from "../utils/supabase";
+import { toast } from 'react-toastify';
 
 /**
  * UsersPage의 데이터 조회, 상태, 로직을 모두 관리하는 커스텀 훅.
+ * @param externalUsers - (선택) 외부에서 주입할 사용자 목록.
+ * 이 값이 제공되면, 훅 내부의 'users' 쿼리는 비활성화됩니다.
  */
-export function useUsersPageLogic() {
+export function useUsersPageLogic(externalUsers?: AppUser[]) {
   const queryClient = useQueryClient();
   const { user: sessionUser } = useAuthSession();
   const currentUserId = sessionUser?.id;
 
-  // 2. useLocation 훅을 사용하여 location 객체 가져오기
   const location = useLocation();
-  // location.state 타입 정의
   const initialState = location.state as
     | { selectedUserId?: string; openMessages?: boolean }
     | undefined;
 
-  // 3. TanStack Query로 사용자 목록 조회
-  const { data: users = [], isLoading, isError, error } = useQuery({
+  // ... (useQuery 'users' 로직 - 기존과 동일)
+  const {
+    data: internalUsers = [],
+    isLoading: isInternalLoading,
+    isError: isInternalError,
+    error: internalError,
+  } = useQuery({
     queryKey: ["users"],
     queryFn: getUsers,
+    enabled: !externalUsers,
   });
 
-  // 4. TanStack Query로 친구 추가 기능 구현
+  const users = externalUsers || internalUsers;
+  const isLoading = externalUsers ? false : isInternalLoading;
+  const isError = externalUsers ? false : isInternalError;
+  const error = externalUsers ? null : internalError;
+
+  // 4. TanStack Query로 친구 추가 기능 구현 (기존과 동일)
   const addFriendMutation = useMutation({
     mutationFn: (friendId: string) => {
       if (!currentUserId) throw new Error("로그인이 필요합니다.");
@@ -40,25 +52,41 @@ export function useUsersPageLogic() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["friends"] });
-      // toast.success("친구 추가에 성공했습니다!");
+      toast.success("친구를 추가했습니다");
     },
     onError: (error: Error) => {
-      console.error(error);
-      // toast.error(error.message);
+      toast.error(`친구 추가 실패: ${error.message}`);
     },
   });
 
-  // 5. UI 상호작용과 관련된 상태
+  // ✅ [추가] 2. TanStack Query로 친구 삭제 기능 구현
+  const deleteFriendMutation = useMutation({
+    mutationFn: (friendId: string) => {
+      if (!currentUserId) throw new Error("로그인이 필요합니다.");
+      // deleteFriendApi.ts의 deleteFriend 함수 사용
+      return deleteFriend(currentUserId, friendId);
+    },
+    onSuccess: () => {
+      // 친구 추가와 동일하게 'friends' 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+      toast.success("친구를 삭제했습니다.");
+    },
+    onError: (error: Error) => {
+      console.error("Failed to delete friend:", error);
+      toast.error(`친구 삭제 실패: ${error.message}`);
+    },
+  });
+
+
+  // 5. UI 상호작용과 관련된 상태 (기존과 동일)
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pickedMessage, setPickedMessage] = useState<MessageDetailData | null>(
-    null
+    null,
   );
-  // 6. [수정] isMessageOpen 상태를 UserDetailPanel에서 여기로 이동
   const [isMessageOpen, setIsMessageOpen] = useState(false);
-  // 7. [수정] isReplyOpen 상태 제거 (UsersPage.tsx에서 사용 안 함)
   const userDetailsRef = useRef<HTMLDivElement>(null);
 
-  // 8. 가져온 데이터를 UI에 맞게 가공 (기존과 동일)
+  // ... (processedUsers, selectedUser, useEffects ... - 기존과 동일)
   const processedUsers = useMemo(() => {
     // ... (기존 코드)
     const formattedUsers = users.map((user) => ({
@@ -77,40 +105,42 @@ export function useUsersPageLogic() {
 
   const selectedUser = useMemo(
     () => processedUsers.find((u) => u.id === selectedId) ?? null,
-    [processedUsers, selectedId]
+    [processedUsers, selectedId],
   );
 
-  // 9. [추가] NotificationModal에서 이동 시 사용자 선택 및 패널 열기
   useEffect(() => {
-    // 사용자가 로드되었고, location.state에 selectedUserId가 있는지 확인
     if (initialState?.selectedUserId && users.length > 0) {
       const userExists = users.some(
-        (u) => u.id === initialState.selectedUserId
+        (u) => u.id === initialState.selectedUserId,
       );
       if (userExists) {
-        // 사용자 선택
         setSelectedId(initialState.selectedUserId);
-        // 메시지 패널 열기
         if (initialState.openMessages) {
           setIsMessageOpen(true);
         }
-        // 1회성 동작이므로 state를 비워줍니다.
         window.history.replaceState({}, document.title);
       }
     }
-    // users가 로드되거나 location state가 변경될 때 실행
   }, [users, initialState?.selectedUserId, initialState?.openMessages]);
 
-  // 10. [유지] 외부 클릭 시 선택 해제하는 로직 (pickedMessage도 닫도록 수정)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      // ✅ [추가] 클릭된 요소 또는 그 부모 중에 data-ignore-outside-click 속성이 있는지 확인
+      if ((target as Element).closest('[data-ignore-outside-click="true"]')) {
+        // 만약 NotificationModal 내부(또는 data- 속성을 가진 다른 요소)를 클릭했다면,
+        // 패널을 닫지 않고 함수를 종료합니다.
+        return;
+      }
+
       if (
         userDetailsRef.current &&
         !userDetailsRef.current.contains(event.target as Node)
       ) {
         setSelectedId(null);
         setPickedMessage(null);
-        setIsMessageOpen(false); // 외부 클릭 시 메시지 패널도 닫기
+        setIsMessageOpen(false);
       }
     };
     if (selectedId) {
@@ -119,46 +149,51 @@ export function useUsersPageLogic() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [selectedId]); // selectedId에만 의존
+  }, [selectedId]);
 
-useEffect(() => {
-  if (!currentUserId) return;
-
-  // 'public:users' 채널 생성
-  const subscription = supabase
-    .channel('public:users') 
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'users',
-      },
-      (payload) => {
-        queryClient.setQueryData(['users'], (oldData: AppUser[] | undefined) => {
-          if (!oldData) return [];
-          return oldData.map(user =>
-            user.id === payload.new.id
-              ? { ...user, is_online: payload.new.is_online }
-              : user
+  useEffect(() => {
+    if (externalUsers || !currentUserId) return;
+    // ... (기존 Realtime 구독 코드)
+    const subscription = supabase
+      .channel("public:users")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "users" },
+        (payload) => {
+          queryClient.setQueryData(
+            ["users"],
+            (oldData: AppUser[] | undefined) => {
+              if (!oldData) return [];
+              return oldData.map((user) =>
+                user.id === payload.new.id
+                  ? { ...user, is_online: payload.new.is_online }
+                  : user,
+              );
+            },
           );
-        });
-      }
-    )
-    .subscribe();
+        },
+      )
+      .subscribe();
 
-  return () => {
-    subscription.unsubscribe();
-  };
-}, [currentUserId, queryClient]);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [currentUserId, queryClient, externalUsers]);
+
 
   // 11. 이벤트 핸들러 함수들
-  const handleSelectUser = useCallback((user: AppUser) => {
+  const handleSelectUser = useCallback((user: AppUser | null) => {
+    // ... (기존 코드)
     setSelectedId((prevId) => {
+      if (user === null) {
+        setPickedMessage(null);
+        setIsMessageOpen(false);
+        return null;
+      }
       const newId = prevId === user.id ? null : user.id;
       if (prevId !== newId) {
         setPickedMessage(null);
-        setIsMessageOpen(false); // 12. [수정] isReplyOpen -> isMessageOpen
+        setIsMessageOpen(false);
       }
       return newId;
     });
@@ -169,11 +204,14 @@ useEffect(() => {
     addFriendMutation.mutate(selectedUser.id);
   }, [selectedUser, addFriendMutation]);
 
-  // 13. [추가] 메시지 패널 토글 핸들러
+  // ✅ [추가] 3. 친구 삭제 핸들러 함수
+  const handleDeleteFriend = useCallback(() => {
+    if (!selectedUser) return;
+    deleteFriendMutation.mutate(selectedUser.id);
+  }, [selectedUser, deleteFriendMutation]);
+
+
   const toggleMessage = useCallback(() => setIsMessageOpen((p) => !p), []);
-
-  // 14. [수정] openReply, closeReply 제거
-
 
   // 15. 페이지 컴포넌트에 필요한 모든 상태와 함수를 반환
   return {
@@ -185,139 +223,15 @@ useEffect(() => {
     selectedId,
     selectedUser,
     pickedMessage,
-    isMessageOpen, // [추가]
+    isMessageOpen,
     isAddingFriend: addFriendMutation.isPending,
     handleSelectUser,
     setPickedMessage,
     handleAddFriend,
-    toggleMessage, // [추가]
+    toggleMessage,
     userDetailsRef,
-    // [제거] isReplyOpen, openReply, closeReply
+    // ✅ [추가] 4. 삭제 관련 핸들러 및 상태 반환
+    handleDeleteFriend,
+    isDeletingFriend: deleteFriendMutation.isPending,
   };
 }
-// // hooks/useUsersPageLogic.ts
-
-// import { useState, useMemo, useCallback, useRef, useEffect } from "react";
-// import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; // useQueryClient 추가
-// import type { AppUser } from "../types/appUser";
-// import type { MessageDetailData } from "../components/users/UserMessageDetail";
-// import { getUsers } from "../api/user/userApi";
-// import { addFriend } from "../api/friend/addFriendApi";
-// import { useAuthSession } from "./useAuthSession";
-// // import { toast } from "react-hot-toast"; // 사용자 피드백 라이브러리 예시
-
-// /**
-//  * UsersPage의 데이터 조회, 상태, 로직을 모두 관리하는 커스텀 훅.
-//  */
-// export function useUsersPageLogic() {
-//   // 0. QueryClient 인스턴스 가져오기 (데이터 동기화를 위해)
-//   const queryClient = useQueryClient();
-
-//   // 1. 현재 로그인한 사용자 정보 가져오기
-//   const { user: sessionUser } = useAuthSession();
-//   const currentUserId = sessionUser?.id;
-
-//   // 2. TanStack Query로 사용자 목록 조회
-//   const { data: users = [], isLoading, isError, error } = useQuery({
-//     queryKey: ["users"],
-//     queryFn: getUsers,
-//   });
-
-//   // 3. TanStack Query로 친구 추가 기능 구현
-//   const addFriendMutation = useMutation({
-//     mutationFn: (friendId: string) => {
-//       if (!currentUserId) throw new Error("로그인이 필요합니다.");
-//       return addFriend(currentUserId, friendId);
-//     },
-//     onSuccess: () => {
-//       // ✅ [개선] 친구 추가 성공 시, 관련 쿼리를 무효화하여 최신 데이터로 업데이트
-//       // 예를 들어 'friends'라는 쿼리 키를 사용하는 친구 목록이 있다면 아래와 같이 처리
-//       queryClient.invalidateQueries({ queryKey: ["friends"] });
-//       // toast.success("친구 추가에 성공했습니다!"); // ✅ [개선] 사용자에게 성공 피드백
-//     },
-//     onError: (error: Error) => {
-//       console.error(error); // 에러 로깅
-//       // toast.error(error.message); // ✅ [개선] 사용자에게 에러 피드백
-//     },
-//   });
-
-//   // 4. UI 상호작용과 관련된 상태
-//   const [selectedId, setSelectedId] = useState<string | null>(null);
-//   const [pickedMessage, setPickedMessage] = useState<MessageDetailData | null>(null);
-//   const [isReplyOpen, setIsReplyOpen] = useState(false);
-//   const userDetailsRef = useRef<HTMLDivElement>(null); // ✅ [추가] 외부 클릭 감지용 ref
-
-//   // 5. 가져온 데이터를 UI에 맞게 가공
-//   // (기존 코드와 동일, 매우 잘 작성됨)
-//   const processedUsers = useMemo(() => {
-//     const formattedUsers = users.map((user) => ({
-//       ...user,
-//       joinedAt: user.created_at ? new Date(user.created_at).toLocaleDateString("ko-KR") : "정보 없음",
-//     }));
-//     if (!currentUserId) return formattedUsers;
-//     return formattedUsers.sort((a, b) => {
-//       if (a.id === currentUserId) return -1;
-//       if (b.id === currentUserId) return 1;
-//       return a.name.localeCompare(b.name);
-//     });
-//   }, [users, currentUserId]);
-
-//   const selectedUser = useMemo(() => processedUsers.find((u) => u.id === selectedId) ?? null, [processedUsers, selectedId]);
-
-//   // ✅ [추가] 외부 클릭 시 선택 해제하는 로직
-//   useEffect(() => {
-//     const handleClickOutside = (event: MouseEvent) => {
-//       if (userDetailsRef.current && !userDetailsRef.current.contains(event.target as Node)) {
-//         setSelectedId(null);
-//         setPickedMessage(null);
-//       }
-//     };
-//     if (selectedId) {
-//       document.addEventListener("mousedown", handleClickOutside);
-//     }
-//     return () => {
-//       document.removeEventListener("mousedown", handleClickOutside);
-//     };
-//   }, [selectedId]);
-
-
-//   // 6. 이벤트 핸들러 함수들 (기존 코드와 동일, 최적화 잘 되어있음)
-//   const handleSelectUser = useCallback((user: AppUser) => {
-//     setSelectedId((prevId) => {
-//       const newId = prevId === user.id ? null : user.id;
-//       if (prevId !== newId) {
-//         setPickedMessage(null);
-//         setIsReplyOpen(false);
-//       }
-//       return newId;
-//     });
-//   }, []);
-
-//   const handleAddFriend = useCallback(() => {
-//     if (!selectedUser) return;
-//     addFriendMutation.mutate(selectedUser.id);
-//   }, [selectedUser, addFriendMutation]);
-
-//   const openReply = useCallback(() => setIsReplyOpen(true), []);
-//   const closeReply = useCallback(() => setIsReplyOpen(false), []);
-
-//   // 7. 페이지 컴포넌트에 필요한 모든 상태와 함수를 반환
-//   return {
-//     users: processedUsers,
-//     isLoading,
-//     isError,
-//     error,
-//     currentUserId,
-//     selectedId,
-//     selectedUser,
-//     pickedMessage,
-//     isReplyOpen,
-//     isAddingFriend: addFriendMutation.isPending,
-//     handleSelectUser,
-//     setPickedMessage,
-//     handleAddFriend,
-//     openReply,
-//     closeReply,
-//     userDetailsRef, // ✅ [추가] ref 반환
-//   };
-// }
