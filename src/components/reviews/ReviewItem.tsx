@@ -26,8 +26,12 @@ export default function ReviewItem({
   const userId = useAuthStore((state) => state.user?.id);
 
   const isDark = isDarkMode();
-  const skeletonBaseColor = isDark ? "#3c3c3c" : "#ebebeb";
-  const skeletonHighlightColor = isDark ? "#6b7280" : "#f5f5f5";
+  const skeletonBaseColor = isDark
+    ? "var(--color-background-sub)"
+    : "var(--color-background-sub)";
+  const skeletonHighlightColor = isDark
+    ? "var(--color-text-light)"
+    : "var(--color-background-sub)";
 
   const [likeCount, setLikeCount] = useState(0);
   const [commentCount, setCommentCount] = useState(0);
