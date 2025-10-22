@@ -116,9 +116,10 @@ export default function ReviewPostPage() {
     e.preventDefault();
 
     const finalThumbnail =
-      thumbnail.trim() ||
-      selectMovie?.backdrop_path ||
-      "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
+      !thumbnail || thumbnail.trim() === "" || thumbnail.includes("null")
+        ? selectMovie?.backdrop_path ||
+          "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg"
+        : thumbnail.trim();
 
     if (!title || !selectMovie || !content) {
       Swal.fire({
@@ -254,6 +255,7 @@ export default function ReviewPostPage() {
           <input
             type="text"
             placeholder="제목을 입력하세요"
+            autoComplete="off"
             value={title}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setTitle(e.target.value)
