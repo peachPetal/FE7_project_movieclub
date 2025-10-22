@@ -108,6 +108,28 @@ export default function ReviewItem({
     }
   };
 
+  // =========================
+  // 내부 태그 클릭: 영화 / 작성자 이동 (부모 Link 차단)
+  // =========================
+  const handleMovieTagClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (review?.movie_id) {
+      navigate(`/movies/${review.movie_id}`);
+    }
+  };
+
+  const handleAuthorClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (review?.author_id) {
+      // Users 페이지로 이동하면서 해당 작성자를 선택 상태로 전달
+      navigate("/users", {
+        state: { selectedUserId: review.author_id },
+      });
+    }
+  };
+
   if (isLoading || dataIsLoading || !review) {
     return (
       <div
@@ -202,15 +224,28 @@ export default function ReviewItem({
             </div>
             <div>
               <p className="review-movie text-main text-xs mb-2">
-                {" "}
-                #{review?.movie_name}
+                <span
+                  role="link"
+                  tabIndex={0}
+                  onClick={handleMovieTagClick}
+                  className="cursor-pointer hover:underline"
+                  aria-label={`${review?.movie_name} 영화 페이지로 이동`}
+                >
+                  #{review?.movie_name}
+                </span>
               </p>
               <p className="review-created-info text-xs text-text-sub mb-3">
                 <span className="text-[var(--color-text-sub)]">
                   <TimeAgo dateString={review?.created_at} />
                 </span>{" "}
                 by{" "}
-                <span className="review-created-user text-main">
+                <span
+                  role="link"
+                  tabIndex={0}
+                  onClick={handleAuthorClick}
+                  className="review-created-user text-main cursor-pointer hover:underline"
+                  aria-label={`${review?.author_name} 사용자 페이지로 이동`}
+                >
                   {review.author_name}
                 </span>
               </p>
