@@ -58,8 +58,8 @@ const UserDetails = ({
   if (!selectedUser) {
     return (
       <div className="flex h-full w-full items-center justify-center text-[var(--color-text-sub)]">
-        {" "}
-        사용자를 선택하여 상세 정보를 확인하세요.{" "}
+        {/* {" "}
+        사용자를 선택하여 상세 정보를 확인하세요.{" "} */}
       </div>
     );
   }
@@ -83,8 +83,10 @@ const UserDetails = ({
       {pickedMessage && (
         <div className="w-full md:w-[450px] md:min-w-[450px]">
           <UserMessageDetail
+          key={pickedMessage.id}
             message={pickedMessage}
             onReplySent={onReplySent}
+            onMessageDeleted={pickedMessage.onMessageDeleted}
           />
         </div>
       )}

@@ -21,6 +21,7 @@ type UserDetailsProps = {
   refreshKey?: number;
   onMessageSent?: () => void;
   onReplySent?: () => void;
+  onMessageDeleted?: () => void;
   isMessageOpen: boolean;
   onToggleMessage: () => void;
 };
@@ -38,6 +39,7 @@ const UserDetails = ({
   refreshKey,
   onMessageSent,
   onReplySent,
+  onMessageDeleted,
   isMessageOpen,
   onToggleMessage,
 }: UserDetailsProps) => {
@@ -72,8 +74,10 @@ const UserDetails = ({
       {pickedMessage && (
         <div className="w-full md:w-[450px] md:min-w-[450px]">
           <UserMessageDetail
+          key={pickedMessage.id}
             message={pickedMessage}
             onReplySent={onReplySent}
+            onMessageDeleted={onMessageDeleted}
           />
         </div>
       )}
@@ -108,6 +112,12 @@ export default function UsersPage() {
     setMessagesRefreshKey((k) => k + 1);
   };
 
+// ✅ 4. 삭제 완료 핸들러 정의
+  const handleMessageDeleted = () => {
+    setPickedMessage(null); // 👈 디테일 뷰 닫기
+    handleRefreshMessages(); // 👈 리스트 새로고침
+  };
+
   return (
     <div className="ml-[50px] flex h-full w-full gap-6">
       <UserList
@@ -130,6 +140,7 @@ export default function UsersPage() {
           refreshKey={messagesRefreshKey}
           onMessageSent={handleRefreshMessages}
           onReplySent={handleRefreshMessages}
+          onMessageDeleted={handleMessageDeleted}
           isMessageOpen={isMessageOpen}
           onToggleMessage={toggleMessage}
         />

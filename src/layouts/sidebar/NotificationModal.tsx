@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { QueryClient } from "@tanstack/react-query";
 import { useUserMessages, type MessageItem } from "../../hooks/useUserMessages";
+import TimeAgo from "../../components/common/time-ago/TimeAgo"; // 추가
 
 interface NotificationModalProps {
   position: { top: number; left: number };
@@ -21,14 +22,27 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     messages: unreadMessages,
     isLoading,
     markAsRead,
-  } = useUserMessages({ filter: 'unread' });
+  } = useUserMessages({ filter: "unread" });
 
-  const handleMessageClick = async (msg: MessageItem) => { 
+  const handleMessageClick = async (msg: MessageItem) => {
     if (!userId) return;
 
     try {
+      // 1. UI에서 바로 제거/읽음 처리
+      queryClient.setQueryData(
+        ["messages", userId],
+        (oldData: MessageItem[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.map((m) =>
+            m.id === msg.id ? { ...m, read: true } : m
+          );
+        }
+      );
+
+      // 2. DB 업데이트
       await markAsRead(msg.id);
 
+      // 3. 알림 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
 
       navigate("/users", {
@@ -46,8 +60,23 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     <div
       ref={modalRef}
       data-ignore-outside-click="true"
-      className="absolute w-[290px] h-[320px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-60 px-4 py-3 overflow-y-auto"
-      style={{ top: position.top, left: position.left + 15 }}
+      style={{
+        top: position.top,
+        left: position.left + 15,
+      }}
+      className="
+    absolute
+    w-[290px]
+    min-h-[82px]      /* 최소 높이 */
+    max-h-[500px]     /* 최대 높이 */
+    bg-[var(--color-background-sub)]
+    rounded-lg
+    shadow-md
+    z-60
+    px-4
+    py-3
+    overflow-y-auto
+  "
     >
       {isLoading ? (
         <p className="text-[var(--color-text-main)] text-center">
@@ -78,7 +107,15 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
             "
             title={msg.title}
           >
-            {msg.title}
+            {/* {msg.title} */}
+            <div className="flex flex-col">
+              <div className="font-medium text-[var(--color-text-main)] truncate">
+                {msg.title}
+              </div>
+              <div className="text-sm text-gray-400">
+                <TimeAgo dateString={msg.createdAt} /> by {msg.senderName}
+              </div>
+            </div>
           </button>
         ))
       )}

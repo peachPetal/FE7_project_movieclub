@@ -7,7 +7,8 @@ type UserRenderingProps = {
   data?: AppUser;
   isLoading: boolean;
   selectedId: string | null;
-  onSelectUser: (user: AppUser) => void;
+  // onSelectUser: (user: AppUser) => void;
+  onSelectUser: (user: AppUser, anchorEl: HTMLElement) => void;
 };
 
 export default function UserRendering({
