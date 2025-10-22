@@ -38,11 +38,14 @@ export default function ReviewPostPage() {
       setSelected(location.state);
       setSelectMovie(location.state);
 
+      console.log(location.state.backdrop);
+
       if (
         location.state.backdrop !== null &&
         location.state.backdrop !== undefined &&
         location.state.backdrop.trim() !== ""
       ) {
+        console.log(location.state.backdrop);
         setThumbnail(location.state.backdrop);
       }
 
@@ -116,10 +119,8 @@ export default function ReviewPostPage() {
     e.preventDefault();
 
     const finalThumbnail =
-      !thumbnail || thumbnail.trim() === "" || thumbnail.includes("null")
-        ? selectMovie?.backdrop_path ||
-          "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg"
-        : thumbnail.trim();
+      (thumbnail.trim() && selectMovie?.backdrop_path) ||
+      "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
 
     if (!title || !selectMovie || !content) {
       Swal.fire({
