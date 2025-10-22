@@ -11,9 +11,11 @@ import CommentItemSkeleton from "../skeleton/CommentItemSkeleton";
 export default function CommentItem({
   profile,
   comment,
+  handleCommentCountAdd,
 }: {
   profile: UserProfile | undefined | null;
   comment: ReviewComment;
+  handleCommentCountAdd: () => void;
 }) {
   const navigate = useNavigate();
   const loginRequiredAlert = useLoginRequiredAlert();
@@ -114,6 +116,7 @@ export default function CommentItem({
         await Promise.all([getReplys(), fetchLiked()]);
       } catch (err) {
         navigate("/error");
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -256,6 +259,7 @@ export default function CommentItem({
                 cancleBtnFn={onReplyBtnClick}
                 getReplys={getReplys}
                 setReplyClicked={setReplyClicked}
+                handleCommentCountAdd={handleCommentCountAdd}
               />
             ) : null}
             {replyData?.length ? (
