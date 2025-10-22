@@ -83,7 +83,7 @@ const UserDetails = ({
       {pickedMessage && (
         <div className="w-full md:w-[450px] md:min-w-[450px]">
           <UserMessageDetail
-          key={pickedMessage.id}
+            key={pickedMessage.id}
             message={pickedMessage}
             onReplySent={onReplySent}
           />
@@ -226,6 +226,7 @@ const SearchResultPage = () => {
               data={movies}
               isLoading={isLoading}
               variant="page"
+              skeletonCount={20}
             />
             <br />
             {/* 리뷰 검색 결과 */}
