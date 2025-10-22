@@ -275,6 +275,7 @@ export default function ReviewsDetail() {
     }
   };
 
+  console.log(review);
   return (
     <>
       {isLoading ? (
