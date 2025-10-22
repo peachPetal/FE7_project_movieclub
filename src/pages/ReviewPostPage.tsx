@@ -37,7 +37,10 @@ export default function ReviewPostPage() {
     if (location.state) {
       setSelected(location.state);
       setSelectMovie(location.state);
-      setThumbnail(location.state.backdrop);
+
+      if (location.state.backdrop) {
+        setThumbnail(location.state.backdrop);
+      }
 
       if (location.state.review_id) {
         const getPrevData = async () => {
@@ -239,7 +242,6 @@ export default function ReviewPostPage() {
       console.error("Failed to post review:", err);
     }
   };
-
   return (
     <>
       <div className="review-post text-text-main">
