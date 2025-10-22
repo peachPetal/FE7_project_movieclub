@@ -22,13 +22,16 @@ const pickGenreKey = (meta: any) => {
   if (meta.genre != null) return meta.genre;
   if (Array.isArray(meta.genres) && meta.genres.length) {
     return meta.genres
-      .map((g: any) => (typeof g === "object" ? (g.id ?? g.name) : g))
+      .map((g: any) => (typeof g === "object" ? g.id ?? g.name : g))
       .join(",");
   }
   return undefined;
 };
 
-const MIN_LOADING_TIME = 1000; // ✅ 최소 로딩 시간 (1초)
+const MIN_LOADING_TIME = 1000; // 최소 로딩 시간 (1초)
+const PAGE_SIZW_HOME = 4; // 홈 화면에서 표시할 아이템 수
+const SKELETON_HOME_COUNT = 4; // 홈 화면에서 스켈레톤 개수
+const SKELETON_PAGE_COUNT = 20; // Movies 페이지 스켈레톤 개수 추가
 
 export default function MoviesList({
   variant = "page",
@@ -143,7 +146,7 @@ export default function MoviesList({
             ...queryFromFilter,
             page: 1,
           });
-          const limited = first.slice(0, 5);
+          const limited = first.slice(0, PAGE_SIZW_HOME);
           if (!mounted) return;
           setMovies(limited);
         } catch (e) {
@@ -193,7 +196,10 @@ export default function MoviesList({
         key={JSON.stringify(queryFromFilter)} // 필터 바뀌면 강제 remount
         data={movies}
         variant={variant}
-        isLoading={showInitialLoading} // ✅ 최소 1초 유지된 로딩 상태 전달
+        isLoading={showInitialLoading} // 최소 1초 유지된 로딩 상태 전달
+        skeletonCount={
+          variant === "home" ? SKELETON_HOME_COUNT : SKELETON_PAGE_COUNT
+        }
       />
 
       {variant === "page" && (

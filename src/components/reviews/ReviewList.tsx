@@ -16,9 +16,12 @@ const DEFAULT_FILTER: FilterOption = {
   value: "최신순",
 };
 
-const MIN_LOADING_TIME = 2000; // 최소 로딩시간 (1초)
-const PAGE_SIZE_PAGE = 20; // 페이지 화면에서 한 번에 가져올 개수
-const PAGE_SIZE_HOME = 4; // 홈/프로필에서 보여줄 개수
+// 상단 상수 구역
+const MIN_LOADING_TIME = 2000; // 최소 로딩시간 (2초)
+const PAGE_SIZE_PAGE = 15; // ✅ Reviews 페이지 실제 데이터 15개
+const PAGE_SIZE_HOME = 3; // 홈/프로필에서 보여줄 개수
+const SKELETON_HOME_COUNT = 3; // 홈/프로필 스켈레톤 갯수(리뷰)
+const SKELETON_PAGE_COUNT = 15; // ✅ Reviews 페이지 스켈레톤 갯수
 
 export default function ReviewList({
   variant = "page",
@@ -170,7 +173,16 @@ export default function ReviewList({
 
   return (
     <div className="w-full">
-      <ReviewsRendering data={data} variant={variant} isLoading={showLoading} />
+      <ReviewsRendering
+        data={data}
+        variant={variant}
+        isLoading={showLoading}
+        skeletonCount={
+          variant === "home" || variant === "profile"
+            ? SKELETON_HOME_COUNT
+            : SKELETON_PAGE_COUNT
+        }
+      />
 
       {variant === "page" && (
         <div className="w-full flex flex-col items-center mt-6">

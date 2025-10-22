@@ -4,13 +4,13 @@ export default function MoviesRendering({
   data,
   variant = "page",
   isLoading,
+  skeletonCount,
 }: {
   data: Movie[];
   variant: "page" | "home";
   isLoading: boolean;
+  skeletonCount: number;
 }) {
-  const skeletonCount = variant === "home" ? 5 : 20;
-
   const list: (Movie | undefined)[] = isLoading
     ? Array.from({ length: skeletonCount }).map(() => undefined)
     : data;

@@ -28,7 +28,8 @@ type ReviewWithDetail = ReviewSubset & {
 };
 
 interface ReviewRenderProps {
-  data: Review[] | ReviewSubset[];
-  variant?: "home" | "page" | "profile";
-  isLoading: boolean;
+  data: ReviewSubset[];
+  variant?: "page" | "home" | "profile";
+  isLoading?: boolean;
+  skeletonCount?: number;
 }
