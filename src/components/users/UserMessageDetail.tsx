@@ -4,8 +4,6 @@ import { createPortal } from "react-dom";
 import { supabase } from "../../utils/supabase";
 import { useUserMessages } from "../../hooks/useUserMessages";
 import UserMessageReply from "./UserMessageReply";
-import Swal from "sweetalert2";
-import { confirmAlert } from "../alert/confirmAlert";
 
 // --- 타입 정의 ---
 export type MessageDetailData = {
