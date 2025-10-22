@@ -51,7 +51,7 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
       return addFriend(currentUserId, friendId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["friends", currentUserId] });
       toast.success("친구를 추가했습니다");
     },
     onError: (error: Error) => {
@@ -68,7 +68,7 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
     },
     onSuccess: () => {
       // 친구 추가와 동일하게 'friends' 쿼리 무효화
-      queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["friends", currentUserId] });
       toast.success("친구를 삭제했습니다.");
     },
     onError: (error: Error) => {
