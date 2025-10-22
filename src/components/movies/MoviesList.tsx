@@ -22,7 +22,7 @@ const pickGenreKey = (meta: any) => {
   if (meta.genre != null) return meta.genre;
   if (Array.isArray(meta.genres) && meta.genres.length) {
     return meta.genres
-      .map((g: any) => (typeof g === "object" ? g.id ?? g.name : g))
+      .map((g: any) => (typeof g === "object" ? (g.id ?? g.name) : g))
       .join(",");
   }
   return undefined;

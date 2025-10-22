@@ -33,18 +33,28 @@ export default function ReviewPostPage() {
   const [selected, setSelected] = useState<MovieInReview | null>(null);
   const [isInputFocus, setIsInputFocus] = useState(true);
 
-  /* ------------------------
-      Fetch Movies from TMDB
-  ------------------------ */
   useEffect(() => {
     if (location.state) {
       setSelected(location.state);
       setSelectMovie(location.state);
+      setThumbnail(location.state.backdrop);
 
       if (location.state.review_id) {
-        const { review_title, review_content } = location.state;
-        setTitle(review_title);
-        setContent(review_content);
+        const getPrevData = async () => {
+          const { data: prevData, error: prevDataError } = await supabase
+            .from("reviews")
+            .select("*")
+            .eq("id", location.state.review_id)
+            .maybeSingle();
+
+          if (prevDataError) throw prevDataError;
+
+          setTitle(prevData.title);
+          setContent(prevData.content);
+          setThumbnail(prevData.thumbnail);
+        };
+
+        getPrevData();
       }
     }
     if (!query) {
