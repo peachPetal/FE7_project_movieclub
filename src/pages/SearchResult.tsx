@@ -86,7 +86,6 @@ const UserDetails = ({
           key={pickedMessage.id}
             message={pickedMessage}
             onReplySent={onReplySent}
-            onMessageDeleted={pickedMessage.onMessageDeleted}
           />
         </div>
       )}
