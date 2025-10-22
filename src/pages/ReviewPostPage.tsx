@@ -38,7 +38,11 @@ export default function ReviewPostPage() {
       setSelected(location.state);
       setSelectMovie(location.state);
 
-      if (location.state.backdrop) {
+      if (
+        location.state.backdrop !== null &&
+        location.state.backdrop !== undefined &&
+        location.state.backdrop.trim() !== ""
+      ) {
         setThumbnail(location.state.backdrop);
       }
 
