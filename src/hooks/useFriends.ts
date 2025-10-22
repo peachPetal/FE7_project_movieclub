@@ -1,21 +1,20 @@
-// src/hooks/useFriends.ts (View를 사용하도록 수정한 최종본)
+// src/hooks/useFriends.ts
 import { useEffect } from "react";
 import { supabase } from "../utils/supabase";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useAuthSession } from "./useAuthSession";
 import { deleteFriend as deleteFriendApi } from "../api/friend/deleteFriendApi";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 export type FriendStatus = "online" | "offline";
 
 export interface Friend {
-  id: string; // 친구의 ID
+  id: string;
   name: string;
   avatarUrl?: string;
   status: FriendStatus;
 }
 
-// ✅ View에서 가져올 행의 타입 정의
 type FriendDetailRow = {
   viewer_id: string;
   friend_id: string;
@@ -24,17 +23,15 @@ type FriendDetailRow = {
   friend_is_online: boolean;
 };
 
-// --- ✅ 1. fetchFriends 함수 수정 ---
-// View를 조회하도록 변경
+// View에서 친구 목록 가져오기
 async function fetchFriends(userId: string): Promise<Friend[]> {
   const { data, error } = await supabase
-    .from("user_friends_details") // ⬅️ View 이름
+    .from("user_friends_details")
     .select("*")
-    .eq("viewer_id", userId); // ⬅️ RLS가 있어도 필터링은 필요
+    .eq("viewer_id", userId);
 
   if (error) throw error;
 
-  // View의 데이터를 Friend 타입으로 매핑
   return (data || []).map((row: FriendDetailRow) => ({
     id: row.friend_id,
     name: row.friend_name,
@@ -47,97 +44,102 @@ export function useFriends() {
   const queryClient = useQueryClient();
   const { user } = useAuthSession();
   const userId = user?.id;
-
-  const queryKey = ["friends", userId]; // 쿼리 키
+  const queryKey = ["friends", userId];
 
   const { data: friends = [], isLoading } = useQuery<Friend[], Error>({
-    queryKey: queryKey,
+    queryKey,
     queryFn: () => fetchFriends(userId!),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5,
   });
-  // 친구 삭제 뮤테이션
+
   const deleteFriendMutation = useMutation({
     mutationFn: (friendId: string) => {
       if (!userId) throw new Error("로그인이 필요합니다.");
-      return deleteFriendApi(userId, friendId); // API 호출
+      return deleteFriendApi(userId, friendId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["friends", userId] });
-      toast.success("친구를 삭제했습니다."); // ✅ 2. 성공 토스트 추가
+      queryClient.invalidateQueries({ queryKey });
+      toast.success("친구를 삭제했습니다.");
     },
-    onError: (error: Error) => { // error 타입을 명시
+    onError: (error: Error) => {
       console.error("Failed to delete friend:", error);
-      toast.error(`친구 삭제 실패: ${error.message}`); // ✅ 3. 실패 토스트 추가
+      toast.error(`친구 삭제 실패: ${error.message}`);
     },
   });
-useEffect(() => {
+
+  // --- 공통 처리 함수 ---
+  const mapRowToFriend = (row: FriendDetailRow): Friend => ({
+    id: row.friend_id,
+    name: row.friend_name,
+    avatarUrl: row.friend_avatar ?? undefined,
+    status: row.friend_is_online ? "online" : "offline",
+  });
+
+  const handleFriendChange = (payload: any) => {
     if (!userId) return;
 
-    // View의 Row를 Friend 타입으로 변환하는 헬퍼 함수
-    const mapRowToFriend = (row: FriendDetailRow): Friend => ({
-      id: row.friend_id,
-      name: row.friend_name,
-      avatarUrl: row.friend_avatar ?? undefined,
-      status: row.friend_is_online ? "online" : "offline",
-    });
+    if (payload.eventType === "INSERT") {
+      const newFriend = mapRowToFriend(payload.new as FriendDetailRow);
+      queryClient.setQueryData<Friend[]>(queryKey, (oldData) => {
+        if (!oldData) return [newFriend];
+        if (oldData.some((f) => f.id === newFriend.id)) return oldData;
+        return [newFriend, ...oldData];
+      });
+    } else if (payload.eventType === "UPDATE") {
+      const updatedFriend = mapRowToFriend(payload.new as FriendDetailRow);
+      queryClient.setQueryData<Friend[]>(queryKey, (oldData) =>
+        oldData ? oldData.map((f) => (f.id === updatedFriend.id ? updatedFriend : f)) : []
+      );
+    } else if (payload.eventType === "DELETE") {
+      const deletedFriendId = (payload.old as FriendDetailRow).friend_id;
+      if (deletedFriendId) {
+        queryClient.setQueryData<Friend[]>(queryKey, (oldData) =>
+          oldData ? oldData.filter((f) => f.id !== deletedFriendId) : []
+        );
+      }
+    }
+  };
 
-    const channel = supabase
-      .channel("user-friends-details-changes")
+  // --- 실시간 구독 ---
+  useEffect(() => {
+    if (!userId) return;
+
+    // 1️⃣ viewer_id = userId 구독
+    const viewerChannel = supabase
+      .channel("user-friends-viewer-changes")
       .on(
         "postgres_changes",
         {
-          event: "*", // INSERT, UPDATE, DELETE 모두 감지
+          event: "*",
           schema: "public",
-          table: "user_friends_details", // ⬅️ View 구독
-          filter: `viewer_id=eq.${userId}`, // ⬅️ "나"의 목록만
+          table: "user_friends_details",
+          filter: `viewer_id=eq.${userId}`,
         },
-        (payload) => {
+        handleFriendChange
+      )
+      .subscribe();
 
-          if (payload.eventType === 'INSERT') {
-            // --- 친구 추가 (INSERT) ---
-            // payload.new에 이름, 아바타, 상태가 모두 포함되어 있음!
-            const newFriend = mapRowToFriend(payload.new as FriendDetailRow);
-            queryClient.setQueryData(
-              queryKey,
-              (oldData: Friend[] | undefined) => {
-                if (!oldData) return [newFriend];
-                // 중복 추가 방지
-                if (oldData.some(f => f.id === newFriend.id)) return oldData;
-                return [newFriend, ...oldData];
-              }
-            );
-          } 
-          
-          else if (payload.eventType === 'UPDATE') {
-            // --- 친구 정보 변경 (UPDATE: 온라인 상태, 이름 변경 등) ---
-            const updatedFriend = mapRowToFriend(payload.new as FriendDetailRow);
-            queryClient.setQueryData(
-              queryKey,
-              (oldData: Friend[] | undefined) => 
-                oldData ? oldData.map(f => f.id === updatedFriend.id ? updatedFriend : f) : []
-            );
-          } 
-          
-          else if (payload.eventType === 'DELETE') {
-            // --- 친구 삭제 (DELETE) ---
-            const deletedFriendId = (payload.old as FriendDetailRow).friend_id;
-            if (deletedFriendId) {
-              queryClient.setQueryData(
-                queryKey,
-                (oldData: Friend[] | undefined) =>
-                  oldData ? oldData.filter(f => f.id !== deletedFriendId) : []
-              );
-            }
-          }
-        }
+    // 2️⃣ friend_id = userId 구독
+    const friendChannel = supabase
+      .channel("user-friends-friend-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_friends_details",
+          filter: `friend_id=eq.${userId}`,
+        },
+        handleFriendChange
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(viewerChannel);
+      supabase.removeChannel(friendChannel);
     };
-  }, [userId, queryClient, queryKey]); // queryKey 의존성 추가
+  }, [userId, queryClient]);
 
   return {
     friends,
@@ -146,6 +148,7 @@ useEffect(() => {
     isDeletingFriend: deleteFriendMutation.isPending,
   };
 }
+
   // 실시간 구독 useEffect (변경 없음)
 //   useEffect(() => {
 //     if (!userId) return;
