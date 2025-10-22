@@ -14,7 +14,8 @@ export default function ReviewsRendering({
     : data;
 
   // profile은 home과 같이 이미지 포함
-  const hasImage = variant === "page" ? true : variant === "profile" ? true : false;
+  const hasImage =
+    variant === "page" ? true : variant === "profile" ? true : false;
 
   return (
     <div

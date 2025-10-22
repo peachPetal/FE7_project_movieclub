@@ -4,11 +4,11 @@ import Swal from "sweetalert2";
 export default function useLoginRequiredAlert() {
   const navigate = useNavigate();
 
-  const loginRequiredAlert = () => {
-    Swal.fire({
+  const loginRequiredAlert = async () => {
+    const result = await Swal.fire({
       title: "로그인이 필요한 기능입니다.",
       icon: "warning",
-      iconColor: "#9858F3",
+      iconColor: "#F65050",
       showCancelButton: false,
       confirmButtonText: "확인",
       customClass: {
@@ -19,7 +19,9 @@ export default function useLoginRequiredAlert() {
           "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50",
       },
       buttonsStyling: false,
-    }).then(() => navigate("/login"));
+    });
+
+    if (result.isConfirmed) navigate("/login");
   };
   return loginRequiredAlert;
 }

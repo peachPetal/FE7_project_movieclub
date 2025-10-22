@@ -11,6 +11,8 @@ import { useAuthStore } from "../stores/authStore";
 import DefaultBtn from "../components/common/buttons/DefaultBtn";
 import Swal from "sweetalert2";
 import useLoginRequiredAlert from "../components/alert/useLoginRequiredAlert";
+import { confirmAlert } from "../components/alert/confirmAlert";
+import { alertError } from "../components/alert/alertError";
 
 export default function ReviewsDetail() {
   const { user } = useAuthSession();
@@ -176,24 +178,9 @@ export default function ReviewsDetail() {
       }
 
       if (data) {
-        const result = await Swal.fire({
+        const result = await confirmAlert({
           title: "정말로 삭제하시겠습니까?",
           text: "삭제한 데이터는 복구가 불가능합니다",
-          icon: "warning",
-          iconColor: "#9858F3",
-          showCancelButton: true,
-          confirmButtonText: "삭제",
-          cancelButtonText: "취소",
-          customClass: {
-            popup: "rounded-xl shadow-lg !bg-background-main",
-            title: "!font-semibold !text-text-main",
-            htmlContainer: "!text-s !text-text-sub",
-            confirmButton:
-              "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
-            cancelButton:
-              "bg-background-main text-text-main border-1 border-main font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-10",
-          },
-          buttonsStyling: false,
         });
 
         if (result.isConfirmed) {
@@ -203,22 +190,7 @@ export default function ReviewsDetail() {
             .eq("review_id", id);
 
           if (reviewLikesDeleteError) {
-            Swal.fire({
-              title: "Error",
-              text: "삭제할 수 없습니다",
-              icon: "warning",
-              iconColor: "#F65050",
-              showCancelButton: false,
-              confirmButtonText: "확인",
-              customClass: {
-                popup: "rounded-xl shadow-lg !bg-background-main",
-                title: "!font-semibold !text-text-main",
-                htmlContainer: "!text-s !text-text-sub",
-                confirmButton:
-                  "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
-              },
-              buttonsStyling: false,
-            });
+            alertError("삭제할 수 없습니다");
             throw reviewLikesDeleteError;
           }
 
@@ -228,22 +200,7 @@ export default function ReviewsDetail() {
             .eq("review_id", id);
 
           if (commentDeleteError) {
-            Swal.fire({
-              title: "Error",
-              text: "삭제할 수 없습니다",
-              icon: "warning",
-              iconColor: "#F65050",
-              showCancelButton: false,
-              confirmButtonText: "확인",
-              customClass: {
-                popup: "rounded-xl shadow-lg !bg-background-main",
-                title: "!font-semibold !text-text-main",
-                htmlContainer: "!text-s !text-text-sub",
-                confirmButton:
-                  "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
-              },
-              buttonsStyling: false,
-            });
+            alertError("삭제할 수 없습니다");
             throw commentDeleteError;
           }
 
@@ -267,22 +224,7 @@ export default function ReviewsDetail() {
             .eq("review_id", id);
 
           if (reviewCommentsDeleteError) {
-            Swal.fire({
-              title: "Error",
-              text: "삭제할 수 없습니다",
-              icon: "warning",
-              iconColor: "#F65050",
-              showCancelButton: false,
-              confirmButtonText: "확인",
-              customClass: {
-                popup: "rounded-xl shadow-lg !bg-background-main",
-                title: "!font-semibold !text-text-main",
-                htmlContainer: "!text-s !text-text-sub",
-                confirmButton:
-                  "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
-              },
-              buttonsStyling: false,
-            });
+            alertError("삭제할 수 없습니다");
             throw reviewCommentsDeleteError;
           }
 
@@ -292,22 +234,7 @@ export default function ReviewsDetail() {
             .eq("id", id);
 
           if (error) {
-            Swal.fire({
-              title: "Error",
-              text: "삭제할 수 없습니다",
-              icon: "warning",
-              iconColor: "#F65050",
-              showCancelButton: false,
-              confirmButtonText: "확인",
-              customClass: {
-                popup: "rounded-xl shadow-lg !bg-background-main",
-                title: "!font-semibold !text-text-main",
-                htmlContainer: "!text-s !text-text-sub",
-                confirmButton:
-                  "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
-              },
-              buttonsStyling: false,
-            });
+            alertError("삭제할 수 없습니다");
             throw error;
           }
 
@@ -331,22 +258,7 @@ export default function ReviewsDetail() {
         }
       }
     } else {
-      Swal.fire({
-        title: "Error",
-        text: "삭제할 수 없습니다",
-        icon: "warning",
-        iconColor: "#F65050",
-        showCancelButton: false,
-        confirmButtonText: "확인",
-        customClass: {
-          popup: "rounded-xl shadow-lg !bg-background-main",
-          title: "!font-semibold !text-text-main",
-          htmlContainer: "!text-s !text-text-sub",
-          confirmButton:
-            "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
-        },
-        buttonsStyling: false,
-      });
+      alertError("삭제할 수 없습니다");
       return;
     }
   };

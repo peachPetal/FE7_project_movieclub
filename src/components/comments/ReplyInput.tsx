@@ -3,6 +3,8 @@ import DefaultBtn from "../common/buttons/DefaultBtn";
 import { supabase } from "../../utils/supabase";
 import type { UserProfile } from "../../hooks/useUserProfile";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 export default function ReplyInput({
   commnetId,
@@ -23,7 +25,21 @@ export default function ReplyInput({
     e.preventDefault();
 
     if (!content || content === "") {
-      alert("답글 내용을 입력해주세요.");
+      Swal.fire({
+        title: "답글 내용을 입력해주세요.",
+        icon: "warning",
+        iconColor: "#9858F3",
+        showCancelButton: false,
+        confirmButtonText: "확인",
+        customClass: {
+          popup: "rounded-xl shadow-lg !bg-background-main",
+          title: "!font-semibold !text-text-main",
+          htmlContainer: "!text-s !text-text-sub",
+          confirmButton:
+            "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50",
+        },
+        buttonsStyling: false,
+      });
       return;
     }
 
@@ -42,7 +58,7 @@ export default function ReplyInput({
 
     if (error) throw error;
 
-    alert("답글이 등록되었습니다.");
+    toast.success("답글이 등록되었습니다.");
 
     setContent("");
     setReplyClicked(false);
@@ -97,7 +113,6 @@ export default function ReplyInput({
               setContent(e.target.value);
             }}
             className="pl-1 pb-1 mt-3 mb-3 border-b border-text-light  placeholder:text-text-gborder-text-light focus:border-main-80 outline-0"
-            required
           />
           <div className="reply-btns flex justify-end">
             {" "}
