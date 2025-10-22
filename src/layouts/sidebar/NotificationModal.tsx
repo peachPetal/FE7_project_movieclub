@@ -30,7 +30,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     try {
       // 1. UI에서 바로 제거/읽음 처리
       queryClient.setQueryData(
-        ["messages", userId],
+        ["messages", userId, 'unread'],
         (oldData: MessageItem[] | undefined) => {
           if (!oldData) return [];
           return oldData.map((m) =>
@@ -43,7 +43,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
       await markAsRead(msg.id);
 
       // 3. 알림 쿼리 무효화
-      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+     queryClient.invalidateQueries({ queryKey: ['messages', userId, 'unread'] });
 
       navigate("/users", {
         state: {

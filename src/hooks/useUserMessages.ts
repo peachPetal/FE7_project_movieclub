@@ -10,7 +10,7 @@ export type MessageItem = MessageDetailData & {
   createdAt?: string;
   senderId?: string;
   receiverId?: string;
-  senderName?: string; // ✅ 추가
+  senderName?: string;
 };
 
 type FriendsMessageRow = {
@@ -21,40 +21,80 @@ type FriendsMessageRow = {
   text: string;
   created_at: string;
   read: boolean;
-  sender_name: string ; // users 테이블 join 결과
+  sender_name: string ;
 };
 
 type UseUserMessagesOptions = {
   filter?: 'all' | 'unread';
 };
 
+
 async function fetchMessages(userId: string): Promise<MessageItem[]> {
-  // const { data, error: msgErr } = await supabase
-  //   .from("friends_messages")
-  //   .select("id, sender_id, receiver_id, title, text, created_at, read")
-  //   .eq("receiver_id", userId)
-  //   .order("created_at", { ascending: false })
-  //   .returns<FriendsMessageRow[]>();
-const { data, error: msgErr } = await supabase
-    .from("messages_with_sender")
+  const { data: messagesData, error: messagesError } = await supabase
+    .from("friends_messages")
     .select("*")
     .eq("receiver_id", userId)
     .order("created_at", { ascending: false });
 
-  if (msgErr) throw msgErr;
+  if (messagesError) throw messagesError;
 
-  return (data || []).map((row) => ({
-    id: row.id,
-    title: row.title ?? "",
+  const senderIds = messagesData.map((msg) => msg.sender_id);
+
+  const { data: usersData, error: usersError } = await supabase
+    .from("users")
+    .select("id, name")
+    .in("id", senderIds);
+
+  if (usersError) throw usersError;
+
+  const userMap = new Map(usersData.map((u) => [u.id, u.name]));
+
+  return messagesData.map((msg) => ({
+    id: msg.id,
+    title: msg.title ?? "",
     bodyMine: "",
-    bodyFriend: row.text ?? "",
-    read: row.read ?? false,
-    createdAt: row.created_at!,          // timestamptz → string
-    senderId: row.sender_id,
-    receiverId: row.receiver_id,
-    senderName: row.sender_name ?? "Unknown", // ✅ 안전하게 senderName
+    bodyFriend: msg.text ?? "",
+    read: msg.read ?? false,
+    createdAt: msg.created_at!,
+    senderId: msg.sender_id,
+    receiverId: msg.receiver_id,
+    senderName: userMap.get(msg.sender_id) ?? "Unknown",
   }));
 }
+
+// async function fetchMessages(userId: string): Promise<MessageItem[]> {
+
+// const { data, error } = await supabase
+//   .from("friends_messages")
+//   .select(`
+//     id,
+//     title,
+//     text,
+//     created_at,
+//     read,
+//     sender_id,
+//     receiver_id,
+//     sender:users (
+//       name
+//     )
+//   `)
+//   .eq("receiver_id", userId)
+//   .order("created_at", { ascending: false });
+
+//   if (error) throw error;
+
+//   return (data || []).map((row) => ({
+//     id: row.id,
+//     title: row.title ?? "",
+//     bodyMine: "",
+//     bodyFriend: row.text ?? "",
+//     read: row.read ?? false,
+//     createdAt: row.created_at!,
+//     senderId: row.sender_id,
+//     receiverId: row.receiver_id,
+//     senderName: row.sender?.name ?? "Unknown",
+//   }));
+// }
 
 export function useUserMessages(
   options: UseUserMessagesOptions = { filter: 'all' }
@@ -64,7 +104,7 @@ export function useUserMessages(
   const { user } = useAuthSession();
   const userId = user?.id;
 
-  const queryKey = ['messages', userId];
+  const queryKey = ['messages', userId, filter];
 
   const { data: messages = [], isLoading, error } = useQuery({
     queryKey: queryKey,

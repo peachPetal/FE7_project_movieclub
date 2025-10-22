@@ -4,13 +4,18 @@ import ReviewItem from "./ReviewItem";
 export default function ReviewsRendering({
   data,
   variant = "page",
-  isLoading,
+  isLoading = false,
+  skeletonCount,
 }: ReviewRenderProps) {
-  // profile도 home처럼 4개 스켈레톤
-  const skeletonCount = variant === "home" || variant === "profile" ? 4 : 16;
+  const effectiveSkeleton =
+    typeof skeletonCount === "number"
+      ? skeletonCount
+      : variant === "home" || variant === "profile"
+      ? 3
+      : 15;
 
   const list: (ReviewSubset | undefined)[] = isLoading
-    ? Array.from({ length: skeletonCount }).map(() => undefined)
+    ? Array.from({ length: effectiveSkeleton }).map(() => undefined)
     : data;
 
   // profile은 home과 같이 이미지 포함

@@ -150,6 +150,17 @@ export default function ReviewsDetail() {
     }
   };
 
+  const handleAuthorClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (review?.author_id) {
+      // Users 페이지로 이동하면서 해당 작성자를 선택 상태로 전달
+      navigate("/users", {
+        state: { selectedUserId: review.author_id },
+      });
+    }
+  };
+
   const handleEditBtnClick = () => {
     navigate("/review/post", {
       state: {
@@ -272,8 +283,8 @@ export default function ReviewsDetail() {
           <h1 className="text-4xl font-semibold mb-2.5 text-text-main dark:text-text-main-dark">
             {review?.title}
             <Link to={`/movies/${review?.movie_id}`}>
-              <span className="text-main dark:text-main-dark">
-                {" "}
+              <span className="text-text-sub dark:text-main-dark"> </span>
+              <span className="text-main dark:text-main-dark cursor-pointer hover:underline">
                 #{review?.movie_name}
               </span>
             </Link>
@@ -283,7 +294,13 @@ export default function ReviewsDetail() {
               <TimeAgo dateString={review?.created_at ?? ""} />
             </span>
             {" by "}
-            <span className="review-created-user text-main">
+            <span
+              role="link"
+              tabIndex={0}
+              onClick={handleAuthorClick}
+              className="review-created-user text-main cursor-pointer hover:underline"
+              aria-label={`${review?.author_name} 사용자 페이지로 이동`}
+            >
               {review?.author_name}
             </span>
           </p>
