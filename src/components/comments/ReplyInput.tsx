@@ -12,12 +12,14 @@ export default function ReplyInput({
   cancleBtnFn,
   getReplys,
   setReplyClicked,
+  handleCommentCountAdd,
 }: {
   commnetId: string;
   profile: UserProfile | null | undefined;
   cancleBtnFn: () => void;
   getReplys: () => Promise<void>;
   setReplyClicked: Dispatch<SetStateAction<boolean>>;
+  handleCommentCountAdd: () => void;
 }) {
   const { id } = useParams();
   const [content, setContent] = useState("");
@@ -60,6 +62,7 @@ export default function ReplyInput({
 
     toast.success("답글이 등록되었습니다.");
 
+    handleCommentCountAdd();
     setContent("");
     setReplyClicked(false);
 

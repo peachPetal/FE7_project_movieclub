@@ -55,6 +55,10 @@ export default function Comment({ review_id }: { review_id: string }) {
     setIsLoading(false);
   };
 
+  const handleCommentCountAdd = () => {
+    setCommentCount((prev) => prev + 1);
+  };
+
   useEffect(() => {
     getComments();
   }, []);
@@ -76,7 +80,11 @@ export default function Comment({ review_id }: { review_id: string }) {
           </div>
           <CommentInput profile={profile} getComments={getComments} />
           {comment?.length ? (
-            <CommentList profile={profile} comments={comment} />
+            <CommentList
+              profile={profile}
+              comments={comment}
+              handleCommentCountAdd={handleCommentCountAdd}
+            />
           ) : (
             <p className="flex justify-center w-full my-10 text-text-sub">
               아직 등록된 댓글이 없습니다.

@@ -96,6 +96,7 @@ export default function ReviewsDetail() {
         if (userId === reviewData?.author_id) setIsEditable(true);
       } catch (err) {
         navigate("/error");
+        throw err;
       } finally {
         const elapsed = Date.now() - startTime;
         const minLoadingTime = 1000; // 최소 1초
@@ -339,7 +340,6 @@ export default function ReviewsDetail() {
               />
             </div>
           )}
-
           <div className="w-full border-t border-gray-300 dark:border-gray-700 mt-10 mb-12"></div>
           <section id="comment-section">
             <Comment review_id={id ?? ""} />
