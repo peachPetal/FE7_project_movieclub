@@ -6,6 +6,7 @@ import { supabase } from "../../utils/supabase";
 import type { UserProfile } from "../../hooks/useUserProfile";
 import useLoginRequiredAlert from "../alert/useLoginRequiredAlert";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 export default function CommentInput({
   profile,
@@ -60,21 +61,8 @@ export default function CommentInput({
       .select();
 
     if (error) throw error;
-    Swal.fire({
-      title: "댓글이 등록되었습니다.",
-      icon: "success",
-      iconColor: "#9858F3",
-      showCancelButton: false,
-      confirmButtonText: "확인",
-      customClass: {
-        popup: "rounded-xl shadow-lg !bg-background-main",
-        title: "!font-semibold !text-text-main",
-        htmlContainer: "!text-s !text-text-sub",
-        confirmButton:
-          "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50",
-      },
-      buttonsStyling: false,
-    });
+
+    toast.success("댓글이 등록되었습니다.");
     getComments();
 
     setContent("");

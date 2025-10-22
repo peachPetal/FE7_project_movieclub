@@ -68,7 +68,7 @@ export default function Comment({ review_id }: { review_id: string }) {
   } else {
     return (
       <>
-        <div className="comment-area text-text-main mr-40">
+        <div className="comment-area text-text-main">
           <div className="comment-title flex mb-5">
             <h1 className="text-3xl font-bold mr-3.5">
               Comments <span className="text-main">{commentCount}</span>
