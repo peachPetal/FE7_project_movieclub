@@ -17,55 +17,50 @@ export default function Comment({ review_id }: { review_id: string }) {
   );
   const handleChangeFilter = (filter: FilterOption) => {
     setFilter(filter);
+    if (filter.value === "인기순") {
+      setComment(comment?.sort((a, b) => b.likes - a.likes));
+    } else if (filter.value === "최신순") {
+      setComment(
+        comment?.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
+      );
+    }
   };
 
   const getComments = async () => {
     setIsLoading(true);
     if (review_id) {
-      if (filter.value === "최신순") {
-        const { data, error } = await supabase
-          .from("comment_detail")
-          .select("*")
-          .eq("review_id", Number(review_id))
-          .eq("depth", 0)
-          .order("created_at", { ascending: false });
-
-        if (error) throw error;
-
-        setComment(data);
-      } else if (filter.value === "인기순") {
-        const { data, error } = await supabase
-          .from("comment_detail")
-          .select("*")
-          .eq("review_id", Number(review_id))
-          .eq("depth", 0)
-          .order("likes", { ascending: false });
-
-        if (error) throw error;
-
-        setComment(data);
-        setCommentCount(data?.length ?? 0);
-      }
       const { data, error } = await supabase
+        .from("comment_detail")
+        .select("*")
+        .eq("review_id", Number(review_id))
+        .eq("depth", 0)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setComment(data);
+
+      const { data: commentData, error: commentDataError } = await supabase
         .from("comment_detail")
         .select("*")
         .eq("review_id", Number(review_id));
 
-      if (error) throw error;
+      if (commentDataError) throw commentDataError;
 
-      setCommentCount(data?.length ?? 0);
+      setCommentCount(commentData?.length ?? 0);
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
     getComments();
-  }, [filter]);
+  }, []);
 
-  if (isLoading) {
-    // 스켈레톤으로 바꾸기
-    return <CommentItemSkeleton />;
-  } else {
+  if (isLoading) <CommentItemSkeleton />;
+  else {
     return (
       <>
         <div className="comment-area text-text-main">
