@@ -6,6 +6,7 @@ import type { UserProfile } from "../../hooks/useUserProfile";
 import useLoginRequiredAlert from "../alert/useLoginRequiredAlert";
 import { supabase } from "../../utils/supabase";
 import { useNavigate } from "react-router-dom";
+import CommentItemSkeleton from "../skeleton/CommentItemSkeleton";
 
 export default function CommentItem({
   profile,
@@ -130,8 +131,7 @@ export default function CommentItem({
     setReplyListClicked((prev) => !prev);
   };
 
-  // 스켈레톤으로 바꿀 것
-  if (isLoading) return <p>로딩중...</p>;
+  if (isLoading) return <CommentItemSkeleton />;
   else {
     return (
       <>
