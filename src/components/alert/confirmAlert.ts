@@ -1,3 +1,5 @@
+// src/utils/confirmAlert.ts
+
 import Swal from "sweetalert2";
 
 export const confirmAlert = async ({
@@ -20,10 +22,26 @@ export const confirmAlert = async ({
       title: "!font-semibold !text-text-main",
       htmlContainer: "!text-s !text-text-sub",
       confirmButton:
-        "bg-main text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-50 mr-2",
+        "bg-[red] text-white font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:opacity-90 mr-2",
       cancelButton:
-        "bg-background-main text-text-main border-1 border-main font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-main-10",
+        "bg-[var(--color-background-main)] text-[var(--color-text-main)] border border-[var(--color-text-placeholder)] font-medium px-4 py-2 rounded-lg cursor-pointer transition hover:bg-[var(--color-main-10)]",
     },
     buttonsStyling: false,
+
+    allowOutsideClick: false, 
+    allowEscapeKey: false,    
+    
+    didOpen: () => {
+        const swalContainer = document.querySelector('.swal2-container');
+        if (swalContainer) {
+            swalContainer.setAttribute('data-ignore-outside-click', 'true');
+        }
+    },
+    didClose: () => {
+        const swalContainer = document.querySelector('.swal2-container');
+        if (swalContainer) {
+            swalContainer.removeAttribute('data-ignore-outside-click');
+        }
+    }
   });
 };

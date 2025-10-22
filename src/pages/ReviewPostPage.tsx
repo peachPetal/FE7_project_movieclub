@@ -256,6 +256,7 @@ export default function ReviewPostPage() {
           <input
             type="text"
             placeholder="제목을 입력하세요"
+            autoComplete="off"
             value={title}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setTitle(e.target.value)

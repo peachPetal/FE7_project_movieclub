@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { supabase } from "../../utils/supabase";
 import { useUserMessages } from "../../hooks/useUserMessages";
 import UserMessageReply from "./UserMessageReply";
+import { confirmAlert } from "../alert/confirmAlert";
 
 // --- 타입 정의 ---
 export type MessageDetailData = {
@@ -99,24 +100,20 @@ const UserMessageDetail: FC<Props> = ({
       throw err;
     }
   };
+const handleDelete = async () => {
+    const result = await confirmAlert({
+      title: "메시지 삭제 확인",
+      text: "이 메시지를 정말로 삭제하시겠습니까?\n받은 편지함에서 영구적으로 제거됩니다.",
+    });
 
-  const handleDelete = async () => {
-    // 사용자에게 삭제 확인
-    if (
-      !window.confirm(
-        "이 메시지를 정말로 삭제하시겠습니까?\n받은 편지함에서 영구적으로 제거됩니다."
-      )
-    ) {
+    // 취소 시 함수 종료
+    if (!result.isConfirmed) {
       return;
     }
 
     try {
       // 훅의 deleteMessage 함수 호출
       await deleteMessage(message.id);
-      // 훅의 onSuccess가 토스트를 띄울 것입니다.
-
-      // ✅ 부모 컴포넌트에게 메시지가 삭제되었음을 알림
-      // (부모가 이 상세 뷰를 닫도록 처리)
       onMessageDeleted?.();
     } catch (err) {
       // 훅의 onError가 이미 토스트로 실패를 알림
