@@ -42,6 +42,7 @@ export default function Sidebar() {
   const notificationButtonRef = useRef<HTMLButtonElement>(null);
   const modalFriendRef = useRef<HTMLDivElement>(null);
   const modalNotificationRef = useRef<HTMLDivElement>(null);
+  const lastClickedFriendRef = useRef<HTMLElement | null>(null);
 
   const handleToggleCollapse = useCallback(
     () => setIsCollapsed((prev) => !prev),
@@ -51,9 +52,11 @@ export default function Sidebar() {
   const handleFriendClick = useCallback(
     (friend: Friend, e: React.MouseEvent<HTMLDivElement>) => {
       if (modalNotificationOpen) setModalNotificationOpen(false);
+      lastClickedFriendRef.current = e.currentTarget;
       const rect = e.currentTarget.getBoundingClientRect();
       setModalPosition({
-        top: rect.top + window.scrollY,
+        // top: rect.top + window.scrollY,
+        top: rect.top, // rect.top + window.scrollY 에서 window.scrollY 제거
         left: rect.right + 10,
       });
       setModalFriend(friend);
@@ -88,7 +91,9 @@ export default function Sidebar() {
       if (!prev && notificationButtonRef.current) {
         const rect = notificationButtonRef.current.getBoundingClientRect();
         setNotificationPosition({
-          top: rect.top + window.scrollY,
+          // top: rect.top + window.scrollY,
+          // ✅ [수정] window.scrollY 제거: 뷰포트 상대 좌표 (fixed에 적합)
+          top: rect.top, // rect.top + window.scrollY 에서 window.scrollY 제거
           left: rect.right + 10,
         });
       }
@@ -100,6 +105,36 @@ export default function Sidebar() {
     setModalFriend(null);
     setModalNotificationOpen(false);
   }, []);
+
+useEffect(() => {
+    const handleScroll = () => {
+      // 1. 친구 컨텍스트 메뉴 위치 업데이트
+      if (modalFriend && lastClickedFriendRef.current) {
+        const rect = lastClickedFriendRef.current.getBoundingClientRect();
+        setModalPosition({
+          top: rect.top,
+          left: rect.right + 10,
+        });
+      }
+
+      // 2. 알림 모달 위치 업데이트
+      if (modalNotificationOpen && notificationButtonRef.current) {
+        const rect = notificationButtonRef.current.getBoundingClientRect();
+        setNotificationPosition({
+          top: rect.top,
+          left: rect.right + 10,
+        });
+      }
+    };
+
+    if (modalFriend || modalNotificationOpen) {
+        window.addEventListener("scroll", handleScroll);
+    }
+    
+    return () => {
+        window.removeEventListener("scroll", handleScroll);
+    };
+  }, [modalFriend, modalNotificationOpen]);
 
   useEffect(() => {
     // (외부 클릭 감지 로직 - 동일)
