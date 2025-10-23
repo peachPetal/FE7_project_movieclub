@@ -151,24 +151,60 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
     };
   }, [selectedId]);
 
-  useEffect(() => {
+useEffect(() => {
     if (externalUsers || !currentUserId) return;
-    // ... (기존 Realtime 구독 코드)
+    
+    // useQuery에서 사용하는 동일한 쿼리 키를 사용합니다.
+    const usersQueryKey = ["users"];
+
     const subscription = supabase
-      .channel("public:users")
+      .channel("public:users_changes") 
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "users" },
+        (payload) => {
+          const newUser = payload.new as AppUser;
+          // 새 사용자를 목록 맨 앞에 추가
+          queryClient.setQueryData(
+            usersQueryKey,
+            (oldData: AppUser[] | undefined) => {
+              if (!oldData) return [newUser];
+              // 배열 맨 앞에 추가하여 실시간으로 반영
+              return [newUser, ...oldData]; 
+            },
+          );
+        },
+      )
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "users" },
         (payload) => {
+          const updatedUser = payload.new as AppUser;
+          // 업데이트된 데이터를 기존 목록에 병합 (is_online, avatar_url, name 등 모두 반영)
           queryClient.setQueryData(
-            ["users"],
+            usersQueryKey,
             (oldData: AppUser[] | undefined) => {
               if (!oldData) return [];
               return oldData.map((user) =>
-                user.id === payload.new.id
-                  ? { ...user, is_online: payload.new.is_online }
+                user.id === updatedUser.id
+                  ? { ...user, ...updatedUser } // 모든 변경된 필드를 기존 객체에 덮어씁니다.
                   : user,
               );
+            },
+          );
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "users" },
+        (payload) => {
+          // 삭제된 사용자 ID를 기반으로 목록에서 제거
+          const deletedUserId = payload.old.id; 
+          queryClient.setQueryData(
+            usersQueryKey,
+            (oldData: AppUser[] | undefined) => {
+              if (!oldData) return [];
+              return oldData.filter((user) => user.id !== deletedUserId);
             },
           );
         },
