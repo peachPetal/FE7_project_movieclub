@@ -58,7 +58,8 @@ export const FriendContextMenu: React.FC<FriendContextMenuProps> = ({
     <>
       <div
         ref={modalRef}
-        className="absolute w-[320px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 flex items-center px-4"
+        // className="absolute w-[320px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-50 flex items-center px-4"
+        className="fixed w-[320px] h-[82px] bg-[var(--color-background-sub)] rounded-lg shadow-md z-1000 flex items-center px-4"
         style={{ top: position.top, left: position.left + 15 }}
       >
         <div className="relative w-12 h-12">
