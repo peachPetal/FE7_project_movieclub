@@ -152,7 +152,7 @@ const handleDelete = async () => {
           <div className="mt-4 flex gap-2 justify-end">
             <button
               type="button"
-              className="rounded-md px-4 py-2 text-white bg-[red] hover:opacity-90 transition-colors"
+              className="rounded-md px-4 py-2 text-white bg-[red] hover:opacity-90 transition-colors cursor-pointer"
               onClick={handleDelete}
             >
               삭제
@@ -160,7 +160,7 @@ const handleDelete = async () => {
 
             <button
               type="button"
-              className="rounded-md px-4 py-2 text-white bg-[var(--color-main)] hover:opacity-90 transition-colors"
+              className="rounded-md px-4 py-2 text-white bg-[var(--color-main)] hover:opacity-90 transition-colors cursor-pointer"
               onClick={() => setIsReplyOpen(true)}
             >
               답장

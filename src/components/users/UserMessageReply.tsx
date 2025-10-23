@@ -82,7 +82,7 @@ const UserMessageReply: FC<Props> = ({
           <>
             <button
               type="button"
-              className="rounded-md px-4 py-2 border border-[var(--color-text-placeholder)] text-[var(--color-text-main)] dark:border-[var(--color-text-light)]"
+              className="rounded-md px-4 py-2 border border-[var(--color-text-placeholder)] text-[var(--color-text-main)] dark:border-[var(--color-text-light)] cursor-pointer"
               onClick={onClose}
               disabled={isSending}
             >
@@ -91,7 +91,7 @@ const UserMessageReply: FC<Props> = ({
             <button
               type="submit"
               form="reply-form"
-              className="rounded-md bg-[var(--color-main)] px-4 py-2 text-white hover:opacity-90 disabled:opacity-60"
+              className="rounded-md bg-[var(--color-main)] px-4 py-2 text-white hover:opacity-90 disabled:opacity-60 cursor-pointer"
               disabled={isSending}
               aria-busy={isSending}
             >
