@@ -183,7 +183,8 @@ const SearchResultPage = () => {
             </h2>
 
             <div className="flex h-full w-full gap-6">
-              <div className="w-[300px] min-w-[300px]">
+              {/* <div className="w-[300px] min-w-[300px]"> */}
+              <div className="w-[300px] min-w-[300px] sticky top-6 self-start overflow-y-auto max-h-[calc(100vh-6rem)]">
                 <UserList
                   users={processedUsers}
                   isLoading={isLoading}
@@ -193,7 +194,8 @@ const SearchResultPage = () => {
                 />
               </div>
 
-              <div ref={userDetailsRef} className="flex flex-1 gap-6">
+              {/* <div ref={userDetailsRef} className="flex flex-1 gap-6"> */}
+              <div ref={userDetailsRef} className="flex flex-1 gap-6 sticky top-6 self-start">
                 <UserDetails
                   selectedUser={selectedUser}
                   pickedMessage={pickedMessage}

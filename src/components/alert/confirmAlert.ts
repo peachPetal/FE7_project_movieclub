@@ -9,9 +9,11 @@ export const confirmAlert = async ({
   title: string;
   text: string;
 }) => {
+  const convertedText = text.replace(/\n/g, "<br>");
   return await Swal.fire({
     title: title,
-    text: text,
+    // text: text,
+    html: convertedText,
     icon: "warning",
     iconColor: "#F65050",
     showCancelButton: true,

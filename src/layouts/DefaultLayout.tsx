@@ -9,9 +9,14 @@ export default function DefaultLayout() {
       {/* 상단 헤더 */}
       <Header />
 
+      {/* <div className="w-5/6 flex m-auto mt-[50px]"> */}
+      {/* 사이드바 */}
+      {/* <Sidebar /> */}
       <div className="w-5/6 flex m-auto mt-[50px]">
-        {/* 사이드바 */}
-        <Sidebar />
+        {/* 사이드바 Wrapper: sticky, top-6, self-start, ml-[50px] 적용 */}
+        <div className="ml-[50px] sticky top-6 self-start">
+          <Sidebar />
+        </div>
 
         {/* 메인 콘텐츠 영역 */}
         <div className="flex-1 ml-[46px] mb-36 justify-center items-center min-h-[80vh] w-full">
