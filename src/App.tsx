@@ -19,13 +19,15 @@ import SearchResultPage from "./pages/SearchResult";
 import Error from "./pages/Error";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 
-// ✅ 1. react-toastify 관련 임포트 추가
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import { AppErrorBoundary } from './components/error/ErrorBoundary';
 
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <AppErrorBoundary>
       <Routes>
         {/* Layout 적용 영역 */}
         <Route element={<DefaultLayout />}>
@@ -63,8 +65,9 @@ export default function App() {
         <Route path="/error" element={<Error />} />
         <Route path="*" element={<Navigate to="/error" replace />} />
       </Routes>
+      </AppErrorBoundary>
 
-      {/* ✅ 2. ToastContainer 컴포넌트 추가 */}
+      {/* ToastContainer 컴포넌트 추가 */}
       <ToastContainer
         position="bottom-right" // 우측 하단
         autoClose={3000} // 3초 후 자동 닫힘
@@ -75,41 +78,8 @@ export default function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="colored" // 'light', 'dark', 'colored' 중 선택
+        theme="colored"
       />
     </QueryClientProvider>
   );
 }
-
-/*
-주석 설명:
-
-1. QueryClientProvider
-   - react-query 클라이언트를 전체 앱에 제공
-   - 상태 캐싱, 쿼리 관리 등
-
-2. DefaultLayout Route
-   - 공통 레이아웃(Header, Sidebar 등)을 적용
-   - 내부 Route들은 모두 DefaultLayout 안에서 렌더링됨
-
-3. PublicOnlyRoute
-   - 로그인하지 않은 사용자만 접근 가능
-   - 로그인 페이지에 적용
-
-4. ProtectedRoute
-   - 로그인한 사용자만 접근 가능
-   - 프로필, 리뷰 작성, 사용자 페이지 등에 적용
-
-5. ToastContainer
-   - react-toastify 알림 메시지를 표시할 컨테이너
-   - 앱 전체에서 사용 가능하도록 Provider 외부에 배치
-
-6. 페이지 카테고리
-   - 리뷰 관련: /review/post, /reviews, /reviews/:id
-   - 영화 관련: /movies, /movies/:id
-   - 사용자 관련: /profile, /users
-   - 기타: /search/:query
-
-7. 독립 페이지
-   - /error : 레이아웃 없이 독립적으로 렌더링
-*/
