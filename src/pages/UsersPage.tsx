@@ -1,5 +1,5 @@
 // src/pages/UsersPage.tsx
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUsersPageLogic } from "../hooks/useUsersPageLogic";
 import UserList from "../components/users/UserList";
 import UserDetailPanel from "../components/users/UserDetailPanel";

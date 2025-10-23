@@ -14,12 +14,12 @@ export default function DefaultLayout() {
       {/* <Sidebar /> */}
       <div className="w-5/6 flex m-auto mt-[50px]">
         {/* 사이드바 Wrapper: sticky, top-6, self-start, ml-[50px] 적용 */}
-        <div className="ml-[50px] sticky top-6 self-start">
+        <div className="ml-[50px] sticky top-6 self-start z-[50]">
           <Sidebar />
         </div>
 
         {/* 메인 콘텐츠 영역 */}
-        <div className="flex-1 ml-[46px] mb-36 justify-center items-center min-h-[80vh] w-full">
+        <div className="flex-1 ml-[46px] mb-36 justify-center items-center min-h-[80vh] w-full z-0">
           {/* 라우팅된 페이지 컴포넌트가 렌더링되는 Outlet */}
           <Outlet />
         </div>

@@ -30,7 +30,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
     try {
       // 1. UI에서 바로 제거/읽음 처리
       queryClient.setQueryData(
-        ["messages", userId, 'unread'],
+        ["messages", userId, "unread"],
         (oldData: MessageItem[] | undefined) => {
           if (!oldData) return [];
           return oldData.map((m) =>
@@ -43,7 +43,9 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
       await markAsRead(msg.id);
 
       // 3. 알림 쿼리 무효화
-     queryClient.invalidateQueries({ queryKey: ['messages', userId, 'unread'] });
+      queryClient.invalidateQueries({
+        queryKey: ["messages", userId, "unread"],
+      });
 
       navigate("/users", {
         state: {
@@ -64,15 +66,29 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
         top: position.top,
         left: position.left + 15,
       }}
+      //     className="
+      //   absolute
+      //   w-[290px]
+      //   min-h-[82px]      /* 최소 높이 */
+      //   max-h-[500px]     /* 최대 높이 */
+      //   bg-[var(--color-background-sub)]
+      //   rounded-lg
+      //   shadow-md
+      //   z-60
+      //   px-4
+      //   py-3
+      //   overflow-y-auto
+      // "
+      //   >
       className="
-    absolute
+    fixed
     w-[290px]
     min-h-[82px]      /* 최소 높이 */
     max-h-[500px]     /* 최대 높이 */
     bg-[var(--color-background-sub)]
     rounded-lg
     shadow-md
-    z-60
+    z-1000
     px-4
     py-3
     overflow-y-auto
