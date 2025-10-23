@@ -29,8 +29,7 @@ export default function CommentInput({
     if (loading) return; // 아직 로딩 중이면 아무것도 안 함
 
     if (!session) {
-      // 로그인하지 않은 경우 /login으로 이동
-      navigate("/login");
+      loginRequiredAlert();
       return;
     }
 

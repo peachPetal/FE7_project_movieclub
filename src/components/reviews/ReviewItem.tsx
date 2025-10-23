@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabase";
 import { useAuthStore } from "../../stores/authStore";
 import { twMerge } from "tailwind-merge";
+import useLoginRequiredAlert from "../alert/useLoginRequiredAlert";
 
 interface ReviewItemProps {
   review?: ReviewWithDetail;
@@ -38,6 +39,8 @@ export default function ReviewItem({
   const [isLiked, setIsLiked] = useState(false);
   const [dataIsLoading, setDataIsLoading] = useState(true);
   const [showCopyPopup, setShowCopyPopup] = useState(false);
+
+  const loginRequiredAlert = useLoginRequiredAlert();
 
   const fetchLiked = async () => {
     try {
@@ -74,7 +77,7 @@ export default function ReviewItem({
     e.preventDefault(); // Link 이동 방지
 
     if (!user) {
-      navigate("/login");
+      loginRequiredAlert();
       return;
     }
     // 실제 좋아요 로직 수행
