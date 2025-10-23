@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import DefaultBtn from "../common/buttons/DefaultBtn";
 import { useAuthSession } from "../../hooks/useAuthSession";
 import { useState } from "react";
@@ -16,7 +16,6 @@ export default function CommentInput({
   getComments: () => Promise<void>;
 }) {
   const { id: review_id } = useParams();
-  const navigate = useNavigate();
   const { session, loading } = useAuthSession();
 
   const loginRequiredAlert = useLoginRequiredAlert();
