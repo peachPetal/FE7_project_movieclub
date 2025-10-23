@@ -7,16 +7,20 @@ import type { AppUser } from "../types/appUser";
 import type { MessageDetailData } from "../components/users/UserMessageDetail";
 import { getUsers } from "../api/user/userApi";
 import { addFriend } from "../api/friend/addFriendApi";
-import { deleteFriend } from "../api/friend/deleteFriendApi"; // ✅ [추가] 1. 친구 삭제 API 임포트
+import { deleteFriend } from "../api/friend/deleteFriendApi";
 import { useAuthSession } from "./useAuthSession";
 import { supabase } from "../utils/supabase";
 import { toast } from 'react-toastify';
+import { useFriends } from "./useFriends";
+
+const MAX_FRIENDS_COUNT = 9;
 
 /**
  * UsersPage의 데이터 조회, 상태, 로직을 모두 관리하는 커스텀 훅.
  * @param externalUsers - (선택) 외부에서 주입할 사용자 목록.
  * 이 값이 제공되면, 훅 내부의 'users' 쿼리는 비활성화됩니다.
  */
+
 export function useUsersPageLogic(externalUsers?: AppUser[]) {
   const queryClient = useQueryClient();
   const { user: sessionUser } = useAuthSession();
@@ -27,7 +31,8 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
     | { selectedUserId?: string; openMessages?: boolean }
     | undefined;
 
-  // ... (useQuery 'users' 로직 - 기존과 동일)
+  const { friendsCount } = useFriends();
+
   const {
     data: internalUsers = [],
     isLoading: isInternalLoading,
@@ -44,10 +49,14 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
   const isError = externalUsers ? false : isInternalError;
   const error = externalUsers ? null : internalError;
 
-  // 4. TanStack Query로 친구 추가 기능 구현 (기존과 동일)
   const addFriendMutation = useMutation({
     mutationFn: (friendId: string) => {
       if (!currentUserId) throw new Error("로그인이 필요합니다.");
+      
+      if (friendsCount >= MAX_FRIENDS_COUNT) {
+        throw new Error(`친구는 최대 ${MAX_FRIENDS_COUNT}명까지만 추가할 수 있습니다.`);
+      }
+      
       return addFriend(currentUserId, friendId);
     },
     onSuccess: () => {
@@ -59,15 +68,12 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
     },
   });
 
-  // ✅ [추가] 2. TanStack Query로 친구 삭제 기능 구현
   const deleteFriendMutation = useMutation({
     mutationFn: (friendId: string) => {
       if (!currentUserId) throw new Error("로그인이 필요합니다.");
-      // deleteFriendApi.ts의 deleteFriend 함수 사용
       return deleteFriend(currentUserId, friendId);
     },
     onSuccess: () => {
-      // 친구 추가와 동일하게 'friends' 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ["friends", currentUserId] });
       toast.success("친구를 삭제했습니다.");
     },
@@ -78,7 +84,6 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
   });
 
 
-  // 5. UI 상호작용과 관련된 상태 (기존과 동일)
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pickedMessage, setPickedMessage] = useState<MessageDetailData | null>(
     null,
@@ -86,9 +91,7 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
   const [isMessageOpen, setIsMessageOpen] = useState(false);
   const userDetailsRef = useRef<HTMLDivElement>(null);
 
-  // ... (processedUsers, selectedUser, useEffects ... - 기존과 동일)
   const processedUsers = useMemo(() => {
-    // ... (기존 코드)
     const formattedUsers = users.map((user) => ({
       ...user,
       joinedAt: user.created_at
@@ -127,10 +130,7 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
 
-      // ✅ [추가] 클릭된 요소 또는 그 부모 중에 data-ignore-outside-click 속성이 있는지 확인
       if ((target as Element).closest('[data-ignore-outside-click="true"]')) {
-        // 만약 NotificationModal 내부(또는 data- 속성을 가진 다른 요소)를 클릭했다면,
-        // 패널을 닫지 않고 함수를 종료합니다.
         return;
       }
 
@@ -181,9 +181,7 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
   }, [currentUserId, queryClient, externalUsers]);
 
 
-  // 11. 이벤트 핸들러 함수들
   const handleSelectUser = useCallback((user: AppUser | null) => {
-    // ... (기존 코드)
     setSelectedId((prevId) => {
       if (user === null) {
         setPickedMessage(null);
@@ -204,7 +202,6 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
     addFriendMutation.mutate(selectedUser.id);
   }, [selectedUser, addFriendMutation]);
 
-  // ✅ [추가] 3. 친구 삭제 핸들러 함수
   const handleDeleteFriend = useCallback(() => {
     if (!selectedUser) return;
     deleteFriendMutation.mutate(selectedUser.id);
@@ -213,7 +210,6 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
 
   const toggleMessage = useCallback(() => setIsMessageOpen((p) => !p), []);
 
-  // 15. 페이지 컴포넌트에 필요한 모든 상태와 함수를 반환
   return {
     users: processedUsers,
     isLoading,
@@ -230,7 +226,6 @@ export function useUsersPageLogic(externalUsers?: AppUser[]) {
     handleAddFriend,
     toggleMessage,
     userDetailsRef,
-    // ✅ [추가] 4. 삭제 관련 핸들러 및 상태 반환
     handleDeleteFriend,
     isDeletingFriend: deleteFriendMutation.isPending,
   };

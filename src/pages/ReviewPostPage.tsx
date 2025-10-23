@@ -119,7 +119,10 @@ export default function ReviewPostPage() {
     e.preventDefault();
 
     const finalThumbnail =
-      (thumbnail.trim() && selectMovie?.backdrop_path) ||
+      thumbnail.trim() ||
+      thumbnail === undefined ||
+      thumbnail === null ||
+      selectMovie?.backdrop_path ||
       "https://mrwvwylqxypdithozmgm.supabase.co/storage/v1/object/public/img/movie_no_image.jpg";
 
     if (!title || !selectMovie || !content) {
@@ -412,4 +415,4 @@ export default function ReviewPostPage() {
     </>
   );
 }
-// }
+

@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import DefaultBtn from "../common/buttons/DefaultBtn";
 import { useAuthSession } from "../../hooks/useAuthSession";
 import { useState } from "react";
@@ -16,7 +16,6 @@ export default function CommentInput({
   getComments: () => Promise<void>;
 }) {
   const { id: review_id } = useParams();
-  const navigate = useNavigate();
   const { session, loading } = useAuthSession();
 
   const loginRequiredAlert = useLoginRequiredAlert();
@@ -29,8 +28,7 @@ export default function CommentInput({
     if (loading) return; // 아직 로딩 중이면 아무것도 안 함
 
     if (!session) {
-      // 로그인하지 않은 경우 /login으로 이동
-      navigate("/login");
+      loginRequiredAlert();
       return;
     }
 

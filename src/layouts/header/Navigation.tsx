@@ -45,7 +45,7 @@ export default function Navigation() {
   }, [location.pathname]);
 
   return (
-    <div className="flex items-center space-x-[121px]">
+    <div className="flex items-center space-x-[108px]">
       {/* Logo */}
       <button onClick={() => navigate("/")} className="flex-shrink-0">
         <img src={logo} alt="MOVIECLUB Logo" className="w-[165px] h-[32px]" />

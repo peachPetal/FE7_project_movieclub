@@ -1,3 +1,5 @@
+// UserItem.tsx
+
 import clsx from "clsx";
 import { useTheme } from "../../hooks/useTheme";
 import type { AppUser } from "../../types/appUser";
@@ -11,7 +13,12 @@ type Props = {
   className?: string;
 };
 
-export default function UserItem({ user, selected, onClick, className }: Props) {
+export default function UserItem({
+  user,
+  selected,
+  onClick,
+  className,
+}: Props) {
   const { name, is_online, avatar_url } = user;
   const { isDark } = useTheme();
 
@@ -22,22 +29,21 @@ export default function UserItem({ user, selected, onClick, className }: Props) 
       type="button"
       onClick={() => onClick?.(user)}
       className={clsx(
-        // 기본 스타일
         "flex w-full cursor-pointer items-center gap-4 rounded-lg p-4 text-left transition",
-        // 포커스 스타일
+
         "focus:outline-none focus:ring-2 focus:ring-[var(--color-main-20)]",
-        
-        // ✅ 다크 모드 스타일 추가
-        // 그림자와 미세한 테두리를 추가하여 입체감을 줍니다.
+
+        // ⭐️ [수정] 다크 모드 스타일은 dark: 접두사를 유지합니다.
         "dark:shadow-lg dark:shadow-black/20 dark:border dark:border-neutral-800",
 
-        // 선택 상태에 따른 배경색 변경
         {
-          "bg-[var(--color-main-10)]": selected,
-          "bg-[var(--color-background-main)] hover:bg-[var(--color-main-10)] dark:bg-neutral-900 dark:hover:bg-neutral-800":
+          "bg-[var(--color-main-10)] shadow-md": selected, // ⭐️ 선택된 항목은 라이트 모드에서도 그림자를 추가하여 강조
+          
+          // ⭐️ [추가/수정] 라이트 모드일 때 테두리(border)와 작은 그림자를 추가하여 구분합니다.
+          "bg-[var(--color-background-main)] hover:bg-[var(--color-main-10)] border border-neutral-200 shadow-sm hover:shadow-md dark:bg-neutral-900 dark:hover:bg-neutral-800":
             !selected,
         },
-        className,
+        className
       )}
       aria-pressed={selected}
     >

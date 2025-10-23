@@ -42,8 +42,6 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />
             <Route path="/review/post" element={<ReviewPostPage />} />
-            {/* UsersPage도 ProtectedRoute 내부로 이동하는 것이 적절해 보입니다. */}
-            <Route path="/users" element={<UsersPage />} />
           </Route>
 
           {/* 리뷰 관련 페이지 (로그인 필요 없음) */}
@@ -55,7 +53,7 @@ export default function App() {
           <Route path="/movies/:id" element={<MoviesDetail />} />
 
           {/* 사용자 관련 페이지 (ProtectedRoute로 이동) */}
-          {/* <Route path="/users" element={<UsersPage />} /> */}
+          <Route path="/users" element={<UsersPage />} />
 
           {/* 기타 페이지 */}
           <Route path="/search/:query" element={<SearchResultPage />} />
@@ -69,8 +67,8 @@ export default function App() {
 
       {/* ToastContainer 컴포넌트 추가 */}
       <ToastContainer
-        position="bottom-right" // 우측 하단
-        autoClose={3000} // 3초 후 자동 닫힘
+        position="bottom-right"
+        autoClose={1000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick

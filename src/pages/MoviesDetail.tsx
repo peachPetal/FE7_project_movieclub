@@ -64,7 +64,6 @@ export default function MoviesDetail() {
   const handleReviewClick = () => {
     if (loading) return;
     if (!session) {
-      navigate("/login");
       return;
     }
   };
