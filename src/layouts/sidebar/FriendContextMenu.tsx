@@ -86,7 +86,7 @@ export const FriendContextMenu: React.FC<FriendContextMenuProps> = ({
         {/* 친구 삭제 및 메세지 전송 버튼 */}
         <div className="ml-auto flex gap-2">
           <button
-            className={`relative w-8 h-8 transition-transform hover:opacity-90 active:scale-95 ${
+            className={`relative w-8 h-8 transition-transform hover:opacity-90 active:scale-95 cursor-pointer${
               isDeleting ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={onDelete}
@@ -97,7 +97,7 @@ export const FriendContextMenu: React.FC<FriendContextMenuProps> = ({
           </button>
 
           <button
-            className="w-8 h-8 transition-transform hover:opacity-90 active:scale-95"
+            className="w-8 h-8 transition-transform hover:opacity-90 active:scale-95 cursor-pointer"
             aria-label="Send Message"
             onClick={() => setIsMessageOpen(true)}
           >

@@ -53,7 +53,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
           <button
             ref={notificationButtonRef}
             onClick={onNotificationClick}
-            className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+            className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)] cursor-pointer"
           >
             <img
               src={notificationIconToUse}
@@ -73,7 +73,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
           <button
             type="button"
             onClick={() => setIsFriendsMenuOpen((prev) => !prev)}
-            className="flex w-full items-center p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+            className="flex w-full items-center p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)] cursor-pointer"
             aria-expanded={isFriendsMenuOpen}
           >
             <img src={friendsIcon} alt="Friends" className="w-6 h-6 mr-3" />
@@ -137,7 +137,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
         <ul className="space-y-1">
           <li>
             <button
-              className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+              className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)] cursor-pointer"
               onClick={onProfileClick}
             >
               <img src={profileIcon} alt="Profile" className="w-6 h-6 mr-3" />
@@ -146,7 +146,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
           </li>
           <li>
             <button
-              className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+              className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)] cursor-pointer"
               onClick={handleThemeChange}
             >
               <img
@@ -159,7 +159,7 @@ export const LoggedInContent: React.FC<LoggedInContentProps> = ({
           </li>
           <li>
             <button
-              className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)]"
+              className="flex items-center w-full p-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-main-10)] cursor-pointer"
               onClick={onLogout}
             >
               <img src={logoutIcon} alt="Logout" className="w-6 h-6 mr-3" />

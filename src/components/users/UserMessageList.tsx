@@ -24,7 +24,7 @@ const MessageListItem: React.FC<MessageListItemProps> = ({
       onClick={() => onClick(message.id)}
       aria-current={isActive}
       className={clsx(
-        "flex w-full items-center justify-between rounded-md px-4 py-3 text-left transition-colors",
+        "flex w-full items-center justify-between rounded-md px-4 py-3 text-left transition-colors cursor-pointer",
         {
           "bg-[var(--color-main-10)] ring-1 ring-[var(--color-main)]": isActive,
           "bg-[var(--color-background-sub)] hover:bg-[var(--color-main-10)]":
@@ -68,12 +68,11 @@ export default function UserMessageList({
   const [isComposeOpen, setIsComposeOpen] = useState(!isOwnProfile);
 
   useEffect(() => {
-    // 내 프로필을 볼 때만 받은 편지함을 refetch
     if (isOwnProfile && typeof refetch === "function") {
       refetch();
     }
     setSelectedId(null);
-  }, [user.id, refreshKey, refetch, isOwnProfile]); // ✅ isOwnProfile 의존성 추가
+  }, [user.id, refreshKey, refetch, isOwnProfile]); 
 
   const handleSelect = useCallback(
     (id: string) => {

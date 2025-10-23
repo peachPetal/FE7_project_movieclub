@@ -47,7 +47,7 @@ export default function Navigation() {
   return (
     <div className="flex items-center space-x-[108px]">
       {/* Logo */}
-      <button onClick={() => navigate("/")} className="flex-shrink-0">
+      <button onClick={() => navigate("/")} className="flex-shrink-0 cursor-pointer">
         <img src={logo} alt="MOVIECLUB Logo" className="w-[165px] h-[32px]" />
       </button>
 
@@ -64,7 +64,7 @@ export default function Navigation() {
               <button
                 onClick={() => navigate(item.path)}
                 className={`w-[120px] h-[65px] flex items-center justify-center
-                  text-[20px] font-medium tracking-wider transition-colors duration-300
+                  text-[20px] font-medium tracking-wider transition-colors duration-300 cursor-pointer
                   ${
                     location.pathname === item.path
                       ? "text-[var(--color-main)]"
