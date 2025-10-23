@@ -82,7 +82,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
       //   >
       className="
     fixed
-    w-[290px]
+    w-[330px]
     min-h-[82px]      /* 최소 높이 */
     max-h-[500px]     /* 최대 높이 */
     bg-[var(--color-background-sub)]
