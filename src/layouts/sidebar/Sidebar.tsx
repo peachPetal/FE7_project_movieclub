@@ -106,7 +106,7 @@ export default function Sidebar() {
     setModalNotificationOpen(false);
   }, []);
 
-useEffect(() => {
+  useEffect(() => {
     const handleScroll = () => {
       // 1. 친구 컨텍스트 메뉴 위치 업데이트
       if (modalFriend && lastClickedFriendRef.current) {
@@ -128,11 +128,11 @@ useEffect(() => {
     };
 
     if (modalFriend || modalNotificationOpen) {
-        window.addEventListener("scroll", handleScroll);
+      window.addEventListener("scroll", handleScroll);
     }
-    
+
     return () => {
-        window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [modalFriend, modalNotificationOpen]);
 
@@ -165,11 +165,10 @@ useEffect(() => {
       > */}
       <aside
         className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ${
-          // <- 여기서 ml-[50px]를 제거
           !loading && isLoggedIn
             ? isCollapsed
               ? "h-[110px]"
-              : "h-[852px]"
+              : "max-h-[852px]" // ⭐️ 수정: max-h-[852px]만 남겨 유동적 높이 유지 (overflow-y-auto 제거)
             : "h-[255px]"
         }`}
       >
