@@ -154,21 +154,12 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* <aside
-        className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ml-[50px] ${
-          !loading && isLoggedIn
-            ? isCollapsed
-              ? "h-[110px]"
-              : "h-[852px]"
-            : "h-[255px]"
-        }`}
-      > */}
       <aside
         className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ${
           !loading && isLoggedIn
             ? isCollapsed
               ? "h-[110px]"
-              : "max-h-[852px]" // ⭐️ 수정: max-h-[852px]만 남겨 유동적 높이 유지 (overflow-y-auto 제거)
+              : "max-h-[852px]"
             : "h-[255px]"
         }`}
       >

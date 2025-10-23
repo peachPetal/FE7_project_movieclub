@@ -114,7 +114,6 @@ const UserActions = ({
       onClick={onToggleMessage}
       aria-expanded={isMessageOpen}
       aria-label="쪽지 보기"
-      title="쪽지 보기"
       className="flex h-10 w-10 items-center justify-center rounded-full hover:opacity-90 active:scale-95 cursor-pointer"
     >
       <img src={messageUserIcon} alt="" className="h-full w-full" />
