@@ -73,15 +73,15 @@ export function useFriends() {
     },
   });
 
-  const handleFriendshipChange = async (payload: any) => {
+  const handleFriendshipChange = async () => {
     if (!userId) return;
 
-    const friendId =
-      payload.eventType === "DELETE"
-        ? payload.old?.friend_id ?? payload.old?.user_id
-        : payload.new?.friend_id ?? payload.new?.user_id;
+    // const friendId =
+    //   payload.eventType === "DELETE"
+    //     ? payload.old?.friend_id ?? payload.old?.user_id
+    //     : payload.new?.friend_id ?? payload.new?.user_id;
 
-    if (!friendId) return;
+    // if (!friendId) return;
 
     queryClient.invalidateQueries({ queryKey });
   };
@@ -90,9 +90,9 @@ export function useFriends() {
 useEffect(() => {
   if (!userId) return;
 
-  const channel = supabase.channel("friendship-changes");
+  const friendshipChannel = supabase.channel("friendship-changes");
 
-  channel.on(
+  friendshipChannel.on(
     "postgres_changes",
     {
       event: "*",
@@ -103,7 +103,7 @@ useEffect(() => {
     handleFriendshipChange
   );
 
-  channel.on(
+  friendshipChannel.on(
     "postgres_changes",
     {
       event: "*",
@@ -114,10 +114,57 @@ useEffect(() => {
     handleFriendshipChange
   );
 
-  channel.subscribe();
+  friendshipChannel.subscribe();
+
+// --- 2. 친구 온라인 상태 변경 (is_online) 채널 추가 (새로 추가) ---
+  const onlineStatusChannel = supabase.channel("users-online-status");
+
+  onlineStatusChannel
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE", // UPDATE 이벤트만 감지
+        schema: "public",
+        table: "users", // users 테이블 감지
+      },
+      (payload) => {
+        const updatedUser = payload.new as any;
+        const updatedUserId = updatedUser.id;
+        
+        // 내 자신의 업데이트는 무시하고, is_online 필드가 변경된 경우에만 처리
+        if (updatedUserId === userId || updatedUser.is_online === undefined) return; 
+
+        const newStatus: FriendStatus = updatedUser.is_online ? "online" : "offline";
+
+        // friends 쿼리 캐시를 직접 업데이트하여 실시간 반영
+        queryClient.setQueryData(
+          queryKey,
+          (oldFriends: Friend[] | undefined) => {
+            if (!oldFriends) return [];
+
+            // 업데이트된 유저가 현재 친구 목록에 포함되어 있는지 확인
+            const isFriendUpdate = oldFriends.some(f => f.id === updatedUserId);
+            if (!isFriendUpdate) return oldFriends;
+
+            // 해당 친구의 상태를 업데이트하고, 상태가 변경된 경우에만 새로운 배열 반환
+            return oldFriends.map((friend) => {
+              if (friend.id === updatedUserId && friend.status !== newStatus) {
+                return {
+                  ...friend,
+                  status: newStatus,
+                };
+              }
+              return friend;
+            });
+          }
+        );
+      }
+    )
+    .subscribe();
 
   return () => {
-    supabase.removeChannel(channel);
+    supabase.removeChannel(friendshipChannel);
+    supabase.removeChannel(onlineStatusChannel);
   };
 }, [userId, queryClient]);
 
