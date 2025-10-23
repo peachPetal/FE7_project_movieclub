@@ -16,6 +16,7 @@ import profileIconWhite from "../../assets/person-circle-white.svg";
 import addFriendIcon from "../../assets/add-friend.svg";
 import deleteFriendIcon from "../../assets/delete-friend-mouse-on.svg";
 import messageUserIcon from "../../assets/message-user.svg";
+import useLoginRequiredAlert from "../alert/useLoginRequiredAlert";
 
 // ----------------------------------------------------------------
 // --- 3. 서브 컴포넌트 정의 (UserProfileHeader - 변경 없음) ---
@@ -43,11 +44,13 @@ const UserProfileHeader = ({
         <p className="mt-1 flex items-center gap-1.5 text-sm text-[var(--color-text-sub)]">
           {user.is_online ? (
             <>
-              <span className="h-2 w-2 rounded-full bg-[var(--color-alert-online)]" /> Online
+              <span className="h-2 w-2 rounded-full bg-[var(--color-alert-online)]" />{" "}
+              Online
             </>
           ) : (
             <>
-              <span className="h-2 w-2 rounded-full bg-[var(--color-text-light)]" /> Offline
+              <span className="h-2 w-2 rounded-full bg-[var(--color-text-light)]" />{" "}
+              Offline
             </>
           )}
         </p>
@@ -89,7 +92,7 @@ const UserActions = ({
       <>
         {isFriend ? (
           <button
-            onClick={onDeleteFriend} 
+            onClick={onDeleteFriend}
             disabled={isDeletingFriend}
             className="relative h-10 w-10 hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -128,8 +131,8 @@ type Props = {
   onPickMessage?: (msg: MessageDetailData | null) => void;
   onAddFriend: () => void;
   isAddingFriend: boolean;
-  onDeleteFriend: () => void; 
-  isDeletingFriend: boolean; 
+  onDeleteFriend: () => void;
+  isDeletingFriend: boolean;
   refreshKey?: number;
   onMessageSent?: () => void;
   isMessageOpen: boolean;
@@ -145,8 +148,8 @@ export default function UserDetailPanel({
   onPickMessage,
   onAddFriend,
   isAddingFriend,
-  onDeleteFriend, 
-  isDeletingFriend, 
+  onDeleteFriend,
+  isDeletingFriend,
   refreshKey,
   onMessageSent,
   isMessageOpen,
@@ -159,13 +162,13 @@ export default function UserDetailPanel({
   const { friends } = useFriends();
   const isFriend = friends.some((f) => f.id === user.id);
   const isOwnProfile = user.id === currentUserId;
-
+  const loginAlert = useLoginRequiredAlert();
 
   // --- 핸들러 (부모가 정의한 로직을 호출) ---
   const handleToggleMessage = useCallback(() => {
     if (loading) return;
     if (!session) {
-      navigate("/login");
+      loginAlert();
       return;
     }
     onToggleMessage();
@@ -174,7 +177,7 @@ export default function UserDetailPanel({
   const handleAddFriend = useCallback(() => {
     if (loading) return;
     if (!session) {
-      navigate("/login");
+      loginAlert();
       return;
     }
     onAddFriend();
@@ -183,7 +186,7 @@ export default function UserDetailPanel({
   const handleDeleteFriend = useCallback(() => {
     if (loading) return;
     if (!session) {
-      navigate("/login");
+      loginAlert();
       return;
     }
     onDeleteFriend();
@@ -198,7 +201,6 @@ export default function UserDetailPanel({
       >
         <UserProfileHeader user={user} isDark={isDark} />
 
-        {/* ✅ [수정] props로 받은 상태와 핸들러 전달 */}
         <UserActions
           isOwnProfile={isOwnProfile}
           isFriend={isFriend}
@@ -211,7 +213,6 @@ export default function UserDetailPanel({
         />
       </aside>
 
-      {/* 메시지 리스트 (isMessageOpen 상태에 따라 렌더링) */}
       {isMessageOpen && (
         <div className="mt-4">
           <UserMessageList
