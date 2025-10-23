@@ -4,6 +4,8 @@ FE7 2차 2팀 프로젝트 "Movie Club"
 
 영화 정보 조회와 리뷰 공유, 댓글·좋아요·메시지 등 소셜 기능을 갖춘 영화 커뮤니티 플랫폼
 
+### [Vercel Link](https://project-movieclub.vercel.app/)
+
 ## 🚀 기술 스택
 
 - React, React Router
