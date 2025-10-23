@@ -66,20 +66,6 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
         top: position.top,
         left: position.left + 15,
       }}
-      //     className="
-      //   absolute
-      //   w-[290px]
-      //   min-h-[82px]      /* 최소 높이 */
-      //   max-h-[500px]     /* 최대 높이 */
-      //   bg-[var(--color-background-sub)]
-      //   rounded-lg
-      //   shadow-md
-      //   z-60
-      //   px-4
-      //   py-3
-      //   overflow-y-auto
-      // "
-      //   >
       className="
     fixed
     w-[330px]
@@ -123,7 +109,6 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
             "
             title={msg.title}
           >
-            {/* {msg.title} */}
             <div className="flex flex-col">
               <div className="font-medium text-[var(--color-text-main)] truncate">
                 {msg.title}
