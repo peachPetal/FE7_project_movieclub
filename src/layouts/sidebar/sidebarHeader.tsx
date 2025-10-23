@@ -47,7 +47,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
       {!loading && isLoggedIn && (
         <button
           onClick={onToggleCollapse}
-          className="absolute top-4 right-4 p-1 text-white rounded-full hover:bg-white/20 transition-colors"
+          className="absolute top-4 right-4 p-1 text-white rounded-full hover:bg-white/20 transition-colors cursor-pointer"
           aria-label={isCollapsed ? "펼치기" : "접기"}
         >
           <svg
