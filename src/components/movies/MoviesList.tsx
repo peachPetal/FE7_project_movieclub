@@ -207,7 +207,9 @@ export default function MoviesList({
           <div ref={sentinelRef} className="h-6 w-6" aria-hidden />
           {isFetchingMore && (
             <div className="mt-4 flex justify-center">
-              <ClipLoader color="var(--color-main)" size={30} />
+              <div className="-ml-[135px]">
+                <ClipLoader color="var(--color-main)" size={30} />
+              </div>
             </div>
           )}
           {!isInitialLoading && !isFetchingMore && !hasMore && (

@@ -1,5 +1,5 @@
 // src/pages/UsersPage.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUsersPageLogic } from "../hooks/useUsersPageLogic";
 import UserList from "../components/users/UserList";
 import UserDetailPanel from "../components/users/UserDetailPanel";
@@ -8,7 +8,6 @@ import UserMessageDetail, {
 } from "../components/users/UserMessageDetail";
 import type { AppUser } from "../types/appUser";
 
-// --- 서브 컴포넌트 타입 정의 ---
 type UserDetailsProps = {
   selectedUser: AppUser | null;
   pickedMessage: MessageDetailData | null;
@@ -43,14 +42,6 @@ const UserDetails = ({
   isMessageOpen,
   onToggleMessage,
 }: UserDetailsProps) => {
-  // if (!selectedUser) {
-  //   return (
-  //     <div className="flex h-full w-full items-center justify-end text-[var(--color-text-sub)]">
-  //       {" "}
-  //       사용자를 선택하여 대화를 시작하세요.{" "}
-  //     </div>
-  //   );
-  // }
   if (!selectedUser) {
     return null;
   }
@@ -85,7 +76,6 @@ const UserDetails = ({
   );
 };
 
-// --- 메인 페이지 컴포넌트 ---
 export default function UsersPage() {
   const {
     users,
@@ -112,11 +102,17 @@ export default function UsersPage() {
     setMessagesRefreshKey((k) => k + 1);
   };
 
-// ✅ 4. 삭제 완료 핸들러 정의
   const handleMessageDeleted = () => {
-    setPickedMessage(null); // 👈 디테일 뷰 닫기
-    handleRefreshMessages(); // 👈 리스트 새로고침
+    setPickedMessage(null);
+    handleRefreshMessages();
   };
+
+    // 화면 최상단으로 자동 이동
+    useEffect(() => {
+      if (selectedUser) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }, [selectedUser]);
 
   return (
     <div className="ml-[50px] flex h-full w-full gap-6">
