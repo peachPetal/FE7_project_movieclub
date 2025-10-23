@@ -88,6 +88,7 @@ export default function MovieItem({ movie, isLoading }: MovieItemProps) {
                     viewBox="0 0 22 21"
                     fill="currentColor"
                     xmlns="http://www.w3.org/2000/svg"
+                    className="transform group-hover:scale-120 transition-transform"
                   >
                     <ellipse
                       cx="11.1357"
@@ -105,7 +106,7 @@ export default function MovieItem({ movie, isLoading }: MovieItemProps) {
                   </svg>
                 </button>
                 {showCopyPopup && (
-                  <div className="absolute z-10 -bottom-4.5 left-39.5">
+                  <div className="absolute z-10 -bottom-5 left-39">
                     <div
                       className="absolute -top-[7px] left-1/2 -translate-x-1/2 
               w-0 h-0 border-l-[7.5px] border-l-transparent 

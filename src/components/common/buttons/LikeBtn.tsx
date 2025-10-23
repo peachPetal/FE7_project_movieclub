@@ -7,15 +7,18 @@ interface LikeBtn {
 export default function LikeBtn({ like, isLiked, onClick }: LikeBtn) {
   return (
     <>
-      <div className="flex justify-center items-center font-bold text-[24px] duration-200 border bg-background-main text-main rounded-[20px] pt-3 pr-5 pb-3 pl-5">
-        <button className="cursor-pointer" onClick={onClick}>
+      <div
+        onClick={onClick}
+        className="flex justify-center items-center font-bold cursor-pointer hover:bg-main-10 text-[24px] duration-200 border border-main bg-background-main text-main rounded-[20px] pt-3 pr-5 pb-3 pl-5"
+      >
+        <button className="cursor-pointer">
           {isLiked ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
               height="20"
               fill="currentColor"
-              className="bi bi-heart-fill mr-5"
+              className="bi bi-heart-fill mr-5 "
               viewBox="0 0 16 16"
             >
               <path
