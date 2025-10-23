@@ -175,7 +175,7 @@ const SearchResultPage = () => {
         {isUserSearch ? (
           <>
             <h2 className="text-2xl font-semibold text-[var(--color-text-secondary)] my-6">
-              사용자
+              사용자{" "}
               <span className="text-[var(--color-main)]">
                 {!isLoading ? processedUsers.length : "..."}
               </span>
