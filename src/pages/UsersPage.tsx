@@ -108,11 +108,11 @@ export default function UsersPage() {
   };
 
     // 화면 최상단으로 자동 이동
-    useEffect(() => {
-      if (selectedUser) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    }, [selectedUser]);
+    // useEffect(() => {
+    //   if (selectedUser) {
+    //     window.scrollTo({ top: 0, behavior: "smooth" });
+    //   }
+    // }, [selectedUser]);
 
   return (
     <div className="ml-[50px] flex h-full w-full gap-6">
@@ -123,7 +123,11 @@ export default function UsersPage() {
         isLoading={isLoading}
         error={error}
       />
-      <div ref={userDetailsRef} className="flex h-[284px] w-[500px] gap-6">
+      <div 
+      ref={userDetailsRef} 
+      // className="flex h-[284px] w-[500px] gap-6"
+      className="flex w-[500px] gap-6 sticky top-6 self-start"
+      >
         <UserDetails
           selectedUser={selectedUser}
           pickedMessage={pickedMessage}

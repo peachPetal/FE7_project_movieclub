@@ -31,7 +31,7 @@ const UserList = ({
   }, [isLoading]);
 
   const list: (AppUser | undefined)[] = showLoading
-    ? Array.from({ length: 9 }).map(() => undefined)
+    ? Array.from({ length: 10 }).map(() => undefined)
     : users;
 
   return (

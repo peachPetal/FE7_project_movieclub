@@ -18,17 +18,15 @@ export default function Sidebar() {
 
   const { user, loading } = useAuthSession();
   const { profile } = useUserProfile();
-  
+
   const { friends, deleteFriend, isDeletingFriend } = useFriends();
 
   const isLoggedIn = !!user;
   const userId = user?.id;
 
   // 알림 개수 (기존과 동일)
-  const { 
-    messages: notifications, 
-  } = useUserMessages({ 
-    filter: 'unread' 
+  const { messages: notifications } = useUserMessages({
+    filter: "unread",
   });
   const notificationCount = notifications.length;
 
@@ -47,7 +45,7 @@ export default function Sidebar() {
 
   const handleToggleCollapse = useCallback(
     () => setIsCollapsed((prev) => !prev),
-    [],
+    []
   );
 
   const handleFriendClick = useCallback(
@@ -60,7 +58,7 @@ export default function Sidebar() {
       });
       setModalFriend(friend);
     },
-    [modalNotificationOpen],
+    [modalNotificationOpen]
   );
 
   const handleDeleteFriend = useCallback(() => {
@@ -77,15 +75,12 @@ export default function Sidebar() {
 
   const handleProfileClick = useCallback(
     () => navigate("/profile"),
-    [navigate],
+    [navigate]
   );
-  
-  const handleChangeThemeClick = useCallback(
-    () => {
-      toggleTheme();
-    },
-    [], 
-  );
+
+  const handleChangeThemeClick = useCallback(() => {
+    toggleTheme();
+  }, []);
 
   const handleNotificationClick = useCallback(() => {
     setModalFriend(null);
@@ -122,11 +117,20 @@ export default function Sidebar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeModals]);
 
-
   return (
     <>
-      <aside
+      {/* <aside
         className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ml-[50px] ${
+          !loading && isLoggedIn
+            ? isCollapsed
+              ? "h-[110px]"
+              : "h-[852px]"
+            : "h-[255px]"
+        }`}
+      > */}
+      <aside
+        className={`w-[290px] bg-[var(--color-background-sub)] shadow-lg rounded-[10px] font-pretendard flex flex-col transition-all duration-300 ease-in-out ${
+          // <- 여기서 ml-[50px]를 제거
           !loading && isLoggedIn
             ? isCollapsed
               ? "h-[110px]"
