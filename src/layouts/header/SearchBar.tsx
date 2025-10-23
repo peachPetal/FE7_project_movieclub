@@ -9,8 +9,8 @@ export default function SearchBar() {
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && query.trim() !== "") {
-      navigate(`/search/${query}`); // /search/검색어 경로로 이동
-      setQuery(""); // 검색 후 입력창 비우기 (선택사항)
+      navigate(`/search/${query}`);
+      setQuery("");
     }
   };
 
@@ -24,9 +24,9 @@ export default function SearchBar() {
       <input
         type="text"
         placeholder="Search"
-        value={query} // value 속성 연결
-        onChange={(e) => setQuery(e.target.value)} // onChange 핸들러 추가
-        onKeyDown={handleSearch} // onKeyDown 핸들러 추가
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyUp={handleSearch}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         className="w-full h-full bg-[var(--color-background-main)] border border-[var(--color-text-placeholder)] rounded-full
@@ -34,26 +34,27 @@ export default function SearchBar() {
           focus:outline-none focus:ring-2 focus:ring-[var(--color-main-20)]"
       />
 
-      {isFocused && query.trim() === "" && ( // 검색어가 없을 때만 툴팁 표시
-        <div className="absolute top-[50px] left-1/2 -translate-x-1/2 z-10">
-          {/* Tooltip Arrow */}
-          <div
-            className="absolute -top-[7px] left-1/2 -translate-x-1/2 
+      {isFocused &&
+        query.trim() === "" && (
+          <div className="absolute top-[50px] left-1/2 -translate-x-1/2 z-10">
+            {/* Tooltip Arrow */}
+            <div
+              className="absolute -top-[7px] left-1/2 -translate-x-1/2 
               w-0 h-0 border-l-[7.5px] border-l-transparent 
               border-r-[7.5px] border-r-transparent 
               border-b-[7.5px] border-b-[var(--color-main)]"
-          />
-          {/* Tooltip Body */}
-          <div
-            className="w-[268px] h-[40px] bg-[var(--color-main)] rounded-[30px] 
+            />
+            {/* Tooltip Body */}
+            <div
+              className="w-[268px] h-[40px] bg-[var(--color-main)] rounded-[30px] 
               flex items-center justify-center shadow-lg"
-          >
-            <p className="text-white text-[10px] font-normal font-pretendard">
-              사용자를 찾으려면 @아이디를 입력해 보세요
-            </p>
+            >
+              <p className="text-white text-[10px] font-normal font-pretendard">
+                사용자를 찾으려면 @아이디를 입력해 보세요
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }
@@ -85,14 +86,14 @@ export default function SearchBar() {
 //         <div className="absolute top-[50px] left-1/2 -translate-x-1/2 z-10">
 //           {/* Tooltip Arrow */}
 //           <div
-//             className="absolute -top-[7px] left-1/2 -translate-x-1/2 
-//               w-0 h-0 border-l-[7.5px] border-l-transparent 
-//               border-r-[7.5px] border-r-transparent 
+//             className="absolute -top-[7px] left-1/2 -translate-x-1/2
+//               w-0 h-0 border-l-[7.5px] border-l-transparent
+//               border-r-[7.5px] border-r-transparent
 //               border-b-[7.5px] border-b-[var(--color-main)]"
 //           />
 //           {/* Tooltip Body */}
 //           <div
-//             className="w-[268px] h-[40px] bg-[var(--color-main)] rounded-[30px] 
+//             className="w-[268px] h-[40px] bg-[var(--color-main)] rounded-[30px]
 //               flex items-center justify-center shadow-lg"
 //           >
 //             <p className="text-white text-[10px] font-normal font-pretendard">
