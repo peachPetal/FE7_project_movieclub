@@ -268,6 +268,7 @@ export default function ReviewItem({
                       viewBox="0 0 18 17"
                       fill="currentColor"
                       xmlns="http://www.w3.org/2000/svg"
+                      className="transform group-hover:scale-120 transition-transform"
                     >
                       <path
                         d="M8.89816 1.53033C13.7875 -3.1765 26.0119 5.05993 8.89816 15.6508C-8.21557 5.06096 4.00884 -3.1765 8.89816 1.53033Z"
@@ -284,7 +285,7 @@ export default function ReviewItem({
                   </span>
                 </div>
                 <div className="comment flex items-center group">
-                  <button className="comment-btn cursor-pointer">
+                  <button className="comment-btn">
                     <svg
                       width="19"
                       height="19"
@@ -320,6 +321,7 @@ export default function ReviewItem({
                       viewBox="0 0 22 21"
                       fill="currentColor"
                       xmlns="http://www.w3.org/2000/svg"
+                      className="transform group-hover:scale-120 transition-transform"
                     >
                       <ellipse
                         cx="11.1357"
