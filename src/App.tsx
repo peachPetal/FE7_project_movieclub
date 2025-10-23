@@ -22,9 +22,12 @@ import ProtectedRoute from "./components/routes/ProtectedRoute";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { AppErrorBoundary } from './components/error/ErrorBoundary';
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <AppErrorBoundary>
       <Routes>
         {/* Layout 적용 영역 */}
         <Route element={<DefaultLayout />}>
@@ -60,7 +63,9 @@ export default function App() {
         <Route path="/error" element={<Error />} />
         <Route path="*" element={<Navigate to="/error" replace />} />
       </Routes>
+      </AppErrorBoundary>
 
+      {/* ToastContainer 컴포넌트 추가 */}
       <ToastContainer
         position="bottom-right"
         autoClose={1000}
