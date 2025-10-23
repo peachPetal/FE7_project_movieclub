@@ -48,8 +48,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full h-full flex ml-[340px] mt-[50px]">
-      <div className="login-container w-[470px] h-[500px]">
+    <div className="w-full h-full flex justify-center items-center">
+      <div className="login-container w-2/5 h-2/3">
         {/* 페이지 타이틀 */}
         <h1 className="text-4xl font-bold mb-11 text-center text-[var(--color-text-main)]">
           로그인
